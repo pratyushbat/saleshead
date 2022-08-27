@@ -1,0 +1,65 @@
+<div class="create-email" #scrollIdTarget [@filterAnimation]="showAnimation">
+  <fieldset>
+    <legend>Recent Documents</legend>
+    <div class="email-module">
+        <div class="lead-wraper-section">
+          <div class="wraper-main-section">
+            <div class="global-card-section">
+              <div class="create-link-group">
+                <div class="global-header-section">
+                  <div class="svg-icon-panel">Upload Documents</div>
+                  <div class="header-button-panel">
+                    <div class="button-wrapper">
+                      <button type="button" (click)="onCloseUpload();" class="icon-btn">
+                        <i class="fas fa-times"></i>
+                        <span class="btn-text">Close</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="align-top-style">
+                <div class="global-body-section">
+                  <div class="margin-all-area">
+                    <div class="mt-1">
+                      <angular-file-uploader [config]="recentDocConfig" (ApiResponse)="changeFileApiResponse($event)" #imageUpload></angular-file-uploader>
+                      <div class="search-query-error acc-info-srch-error">
+                        {{errorMsg}}
+                      </div>
+                    </div>
+                    <span class="text-success text-center d-block">max file size: 3 MB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="grid-wrapper">
+      <kendo-grid #grid id="gridId"
+                  [kendoGridBinding]="documentList"
+                  (edit)="viewHandler($event)"
+                   (remove)="removeHandler($event)"
+                  [pageSize]="10" [pageable]="{buttonCount:10, pageSizes:[10,50,100,200]}">
+        <div class="grid-scroll-bar">
+          <kendo-grid-column *ngFor="let column of columns"
+                             [field]="column.field"
+                             [title]="column.title | titlecase"
+                             [width]="column.width">
+            <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+              <div class="customer-name" *ngIf="column.field == '$'">{{ rowIndex+1 }}</div>
+              <div class="customer-name" *ngIf="column.field == 'documentName'">   {{ dataItem[column.field] }}</div>
+              <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ dataItem[column.field] |  date: 'MM/dd/yyyy' }}</div>
+            </ng-template>
+          </kendo-grid-column>
+          <kendo-grid-command-column title="Action" width="40" min="40" [style]="{'text-align': 'center'}">
+            <ng-template kendoGridCellTemplate>
+              <button kendoGridEditCommand [primary]="true" icon="download" title="View"></button>
+              <!--<button kendoGridRemoveCommand [primary]="true" icon="delete" title="Remove"></button>-->
+            </ng-template>
+          </kendo-grid-command-column>
+        </div>
+      </kendo-grid>
+    </div>
+  </fieldset>
+</div>

@@ -1,0 +1,93 @@
+<header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+      <div class="login-logo">
+          <a href="{{globalService.mySoHome}}"><img  class="admin-user-logo" src="../assets/so_logo.png"></a>
+      </div>
+    <div class="collapse-panel navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+      </ul>
+      <ul class="nav pull-right user-panel">
+          <li class="dropdown">
+              <i class="fa fa-user-circle-o"></i> Welcome<span *ngIf="user">,&nbsp;{{user.firstName}}&nbsp;{{user.lastName}}</span>
+          </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<div class="container">
+  <div class="admin-user-acct">
+    <div class="header-table-section">
+      <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-12">
+          <div class="header-table-panel">
+            <h2>Security Administration</h2>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-12">
+          <mat-form-field>
+            <mat-label class="admin-user-srch" >Search...</mat-label>
+            <input matInput (keyup)="applyFilterTemplateConfiguration($event.target.value)" type="search">
+            <mat-icon matSuffix class="admin-user-srch1" >search</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+      <div class="admin-account-table-grid">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="table-grid-panel">
+              <div class="mat-container mat-elevation-z2">
+              <table mat-table [dataSource]="dataSource" matSort>
+                <ng-container matColumnDef="clpcompanyId" class="admin-user-tab" >
+                    <mat-header-cell mat-header-cell *matHeaderCellDef class="admin-user-tab"> CompanyId </mat-header-cell>
+                    <mat-cell mat-cell *matCellDef="let element" class="admin-user-tab"> {{element.clpCompanyId}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="clpUserId" class="admin-user-tab">
+                    <mat-header-cell mat-header-cell *matHeaderCellDef class="admin-user-tab"> UserId </mat-header-cell>
+                    <mat-cell mat-cell *matCellDef="let element" class="admin-user-tab"> {{element.clpUserId}} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="companyName" [style.display]="user.cLPCompanyID != 0 ? 'none' : ''">
+                    <mat-header-cell mat-header-cell *matHeaderCellDef class="table-th-header text-left" [style.display]="user.cLPCompanyID != 0 ? 'none' : ''" mat-sort-header> Company </mat-header-cell>
+                    <mat-cell mat-cell *matCellDef="let element" class="table-th-header" [style.display]="user.cLPCompanyID != 0 ? 'none' : ''">
+                        <span class="mobile-label">Company</span>
+                        {{element.companyName}}
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="userName">
+                    <mat-header-cell mat-header-cell *matHeaderCellDef class="table-th-header text-left" mat-sort-header> Username </mat-header-cell>
+                    <mat-cell mat-cell *matCellDef="let element" class="table-th-header">
+                        <span class="mobile-label">Username</span>
+                        <span *ngIf="element.firstName">{{element.firstName}}&nbsp;</span>
+                        <span *ngIf="element.lastName">{{element.lastName}}&nbsp;</span>
+                        <span *ngIf="element.userName">({{element.userName}})</span>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="isLocked">
+                    <mat-header-cell mat-header-cell *matHeaderCellDef mat-sort-header>Locked/Reset</mat-header-cell>
+                    <mat-cell mat-cell *matCellDef="let element" class="text-center">
+                        <span class="mobile-label">Locked/Reset</span>
+                        <button class="btn btn-sm" type="button" [ngClass]="element.isLocked == 1 || element.isLocked == 2 ? 'btn-danger' : 'btn-success'" (click)="updateClpUser(element.clpUserId)" [disabled]="btnLock == true || element.isLocked == 3">
+                            <i class="fa lock-font" [ngClass]="element.isLocked == 1 || element.isLocked == 2 ? 'fa-unlock' : 'fa-lock'"></i> <span>{{ element.isLocked == 1 || element.isLocked == 2 ? 'Unlock' : 'Lock' }}</span>
+                        </button>
+                        <button class="btn btn-sm btn-ac-pass" type="button" [ngClass]="element.isLocked == 3 ? ' btn-warning' : 'btn-primary'" (click)="updateClpUserPassword(element.clpUserId)" [disabled]="btnPasswordUpdate == true || element.isLocked == 2 || element.isLocked == 1">
+                            <i class="fa lock-font" [ngClass]="element.isLocked == 3 ? 'fa-undo' : 'fa-refresh'"></i> <span>{{ element.isLocked == 3 ? 'Undo Reset' : 'Reset Password' }}</span>
+                        </button>
+                    </mat-cell>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" [style.background]="row.isLocked == 1 || row.isLocked == 2 ? 'rgb(255, 179, 179)' : ''"></tr>
+              </table>
+                <mat-paginator [pageSizeOptions]="[10, 20, 50]" [pageSize]="pageSize" (page)="pageEvent = handlePage($event)" showFirstLastButtons></mat-paginator>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,148 @@
+<div class="margin-all-area">
+  <div class="wraper-body-panel">
+    <div class="wraper-body-left">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="inner-header-bg">
+            <div class="inner-cards-panel">
+              <span>Date Filter</span>
+              <span></span>
+              <span>User Filter</span>
+              <span>Invoice Status</span>
+              <span>Lead Status</span>
+              <span>Refresh</span>
+            </div>
+          </div>
+          <div class="">
+            <form [formGroup]="invoiceForm" (ngSubmit)="getInvoiceList()">
+              <div class="inner-cards-grid">
+                <div class="">
+                  <span class="mr-2 font-weight-bold">Start</span>
+                  <kendo-datepicker formControlName="startDate"></kendo-datepicker>
+                </div>
+                <div class="">
+                  <span class="mr-2 font-weight-bold">End</span>
+                  <kendo-datepicker formControlName="endDate"></kendo-datepicker>
+                </div>
+                <div class="">
+                  <select class="form-control" formControlName="ddUser">
+                    <option *ngFor="let item of userList" [value]="item?.value">{{item?.display}}</option>
+                  </select>
+                </div>
+                <div class="">
+                  <select class="form-control" formControlName="invoiceStatus">
+                    <option value="0">-Any-</option>
+                    <option value="1">Pending</option>
+                    <option value="2">Paid</option>
+                    <option value="3">Void</option>
+                  </select>
+                </div>
+                <div class="">
+                  <select class="form-control" formControlName="leadStatus">
+                    <option value="0">-Any-</option>
+                    <option value="10535">Phase 1</option>
+                    <option value="10536">Phase 2</option>
+                    <option value="10537">Phase 3</option>
+                    <option value="10538">Phase 4</option>
+                    <option value="9332">Win</option>
+                    <option value="9333">Lost</option>
+                    <option value="9334">Abandoned</option>
+                  </select>
+                </div>
+                <div class="">
+                  <button type="submit" class="grid-common-btn"><i class="fa fa-refresh"></i></button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wraper-body-right"></div>
+  </div>
+</div>
+
+<div class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/invoicestitle.svg" class="mr-1" />Invoice Results</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting();">Reset Grid Setting</button>
+          </div>
+        </div>
+      </div>
+      <div class="alert-panel">Total invoices found: {{invoiceLeadResponce?.leadInvoiceList?.length}}. Total amount: ${{total}}</div>
+
+      <div class="global-body-section">
+        <kendo-grid #grid id="gridId" class="invoice-result-grid"
+          [kendoGridBinding]="invoiceLeadResponce?.leadInvoiceList"
+          [sortable]="{mode: 'multiple'}"
+          [scrollable]="'scrollable'"
+          [sort]="_gridCnfgService.sort"
+          [columnMenu]="{ filter: true }"
+          [resizable]="true"
+          [pageSize]="_gridCnfgService.pageSize"
+          [reorderable]="true"
+          [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+          (columnReorder)="_gridCnfgService.columnsOrderChanged('invoice_report_grid', $event)"
+          (sortChange)="_gridCnfgService.sortChange('invoice_report_grid', $event)"
+          (pageChange)="_gridCnfgService.pageChange('invoice_report_grid', $event)"
+          (columnResize)="_gridCnfgService.columnResize(12,'invoice_report_grid', $event)"
+          (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'invoice_report_grid',grid)">
+          <ng-template kendoGridToolbarTemplate>
+            <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+              <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+              <span>Download Excel</span>
+            </button>
+            <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+              <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+              <span>Download PDF</span>
+            </button>
+          </ng-template>
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+              [field]="column.field"
+              [title]="column.title | titlecase"
+              [width]="column.width"
+              [filterable]="true"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+              [includeInChooser]="column.field=='$' ? false : true"
+              [editable]="column.field == '$'?false: true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                <div class="customer-name" *ngIf="column.field == 'LeadDesc'">  <a class="contact-cursor-pointer" (click)="viewHandler(dataItem);"> {{ dataItem[column.field] ? dataItem[column.field] : '--' }}</a></div>
+                <div class="customer-name" *ngIf="column.field == 'FullName'">{{ dataItem[column.field] ? dataItem[column.field] : '--' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'InvoiceNumber'">{{ dataItem[column.field] ? dataItem[column.field] : '--' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'dtInvoiceShow'">{{ dataItem[column.field] ? dataItem[column.field] : '--' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'InvoiceShortDesc'">{{dataItem[column.field]}}</div>
+                <div class="customer-name" *ngIf="column.field == 'Amount'">{{dataItem[column.field] ? '$'+dataItem[column.field] : '$0'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'MailMergeTemplateShow'">{{dataItem[column.field]}}</div>
+                <div class="customer-name" *ngIf="column.field == 'UserName'">{{dataItem[column.field]}}</div>
+                <div class="customer-name" *ngIf="column.field == 'StatusDisplay'">{{dataItem[column.field] != 0 ? dataItem[column.field] : 'Not Set'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'dtModifiedDisplay'">{{dataItem[column.field] | date:'MM/dd/yyyy'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'dtCreatedDisplay'">{{dataItem[column.field] | date:'MM/dd/yyyy'}}</div>
+              </ng-template>
+
+            </kendo-grid-column>
+            <kendo-excelexport #excelexport [data]="invoiceLeadResponce?.leadInvoiceList" fileName='InvoiceReport'>
+              <kendo-excelexport-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+            </kendo-excelexport>
+            <kendo-grid-pdf fileName="InvoiceReport.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+              <kendo-grid-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+              </kendo-grid-column>
+            </kendo-grid-pdf>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

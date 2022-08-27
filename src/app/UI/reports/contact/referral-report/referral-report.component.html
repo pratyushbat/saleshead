@@ -1,0 +1,154 @@
+<div class="margin-all-area">
+  <div class="wraper-body-panel">
+    <div class="wraper-body-left">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="inner-header-bg">
+            <div class="inner-cards-panel">
+              <span>Date Created Filter</span>
+              <span></span>
+              <span *ngIf="responseDD?.isTeamDd || responseDD?.isOfficeDd || responseDD?.isUserDd">User Filter</span>
+              <span>Refresh</span>
+            </div>
+          </div>
+          <div class="">
+            <form [formGroup]="referralForm" (ngSubmit)="getReferrerList()">
+              <div class="inner-cards-grid">
+                <div class="">
+                  <span class="mr-2 font-weight-bold">Start</span>
+                  <kendo-datepicker formControlName="startDate" placeholder=""></kendo-datepicker>
+                </div>
+                <div class="">
+                  <span class="mr-2 font-weight-bold">End</span>
+                  <kendo-datepicker formControlName="endDate" placeholder=""></kendo-datepicker>
+                </div>
+                <div class="flex-width3" *ngIf="responseDD?.isTeamDd || responseDD?.isOfficeDd || responseDD?.isUserDd">
+                  <div class="inner-cards-grid">
+                    <div class="" *ngIf="responseDD?.isTeamDd">
+                      <span class="font-weight-bold">Team</span>
+                      <select class="form-control" formControlName="teamCode" (change)="getUserList()">
+                        <option value="0">-All-</option>
+                        <option *ngFor="let item of responseDD?.teamDd; let i= index;" [value]="item?.teamCode">{{item?.display}}</option>
+                      </select>
+                    </div>
+                    <div class="txt-right" *ngIf="responseDD?.isOfficeDd">
+                      <span class="font-weight-bold">Office</span>
+                      <select class="form-control" formControlName="officeCode" (change)="getUserList()">
+                        <option value="0">-All-</option>
+                        <option *ngFor="let item of responseDD?.officeDd; let i= index;" [value]="item?.officeCode">{{item?.display}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="flex-row-inner">
+                    <div *ngIf="responseDD?.isUserDd">
+                      <span class="font-weight-bold">User</span>
+                      <select class="form-control" formControlName="ddUser">
+                        <option value="0">-All-</option>
+                        <option *ngFor="let item of responseDD?.userDD; let i= index;" [value]="item?.key">{{item?.value}}</option>
+                      </select>
+                    </div>
+                    <div class="click-txt-left">
+                      <button type="submit" class="grid-common-btn">
+                        <i class="fa fa-refresh" title="Refresh"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="" *ngIf="!responseDD?.isTeamDd && !responseDD?.isOfficeDd && !responseDD?.isUserDd">
+                  <button type="submit" class="grid-common-btn">
+                    <i class="fa fa-refresh" title="Refresh"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wraper-body-right"></div>
+  </div>
+</div>
+
+
+
+<div class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/txtmsgibtitle.svg" class="mr-1" /> Contact Referral Report</div>
+        <div class="header-button-panel white-font" *ngIf="startDate || endDate">
+          <span>Referral Contact Create Date: <span *ngIf="startDate">From {{startDate}} -</span><span *ngIf="endDate">To {{endDate}}</span></span>
+        </div>
+      </div>
+      <div class="alert-panel d-flex">
+        <span>Total Records Found:{{referrerList?.length}}</span>
+        <select class="form-control" (change)="onChangeReferral($event.target.value)" [(ngModel)]="selectedType">
+          <option value="both">Both</option>
+          <option value="referrers">Referrers Only</option>
+          <option value="referrals">Referrals Only</option>
+        </select>
+      </div>
+      <div class="global-body-section" *ngIf="!isShowContactList">
+        <kendo-grid #griddupl id="griddupl"
+                    [kendoGridBinding]="referrerList"
+                    [sortable]="{mode: 'multiple'}"
+                    [sort]="_gridCnfgService.sort"
+                    [pageSize]="_gridCnfgService.pageSize"
+                    [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                    [scrollable]="'false'"
+                    [reorderable]="true"
+                    [resizable]="true"
+                    [navigable]="true"
+                    [columnMenu]="{ filter: true }"
+                    [ngStyle]="gridHeight"
+                    (columnReorder)="_gridCnfgService.columnsOrderChanged('referrer_report_grid', $event)"
+                    (sortChange)="_gridCnfgService.sortChange('referrer_report_grid', $event)"
+                    (pageChange)="_gridCnfgService.pageChange('referrer_report_grid', $event)"
+                    (columnResize)="_gridCnfgService.columnResize(4,'referrer_report_grid', $event)"
+                    (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'referrer_report_grid',grid)">
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                               [field]="column.field"
+                               [title]="column.title | titlecase"
+                               [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                               [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                               [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                               [width]="column.width"
+                               [filterable]="true"
+                               [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                               [includeInChooser]="column.field=='$' ? false : true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.field == '$' && column.title == ''">{{ rowIndex+1 }}</div>
+                <div class="customer-name" *ngIf="column.field == '$' && column.title == ' '">
+                  <a class="contact-cursor-pointer" (click)="gotoLink('address-card', dataItem);" title="View Contact"><i class="icon_contact"><img src="../../../assets/icon_contact.svg" /></i></a>
+                </div>
+                <div class="customer-name" *ngIf="column.field == 'firstName'">
+                  <a (click)="gotoLink('userName', dataItem);" class="text-primary">{{ dataItem.lastName }},{{ dataItem.firstName }}</a>
+                </div>
+                <div class="customer-name" *ngIf="column.field == 'count'">{{ dataItem[column.field] }} </div>
+                <div class="customer-name" *ngIf="column.field == 'email'"><a class="contact-cursor-pointer" (click)="gotoLink('email', dataItem);" title="send email to {{dataItem.email}}" *ngIf="dataItem.email"><i class="email_new"><img src="../../../assets/email_new.svg" /></i></a></div>
+                <div class="customer-name" *ngIf="column.field == 'amazon'"><a href="https://www.amazon.com/gp/product/B004LLIKVU/ref=as_li_tf_tl?ie=UTF8&tag=sales041-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=B004LLIKVU" target="_blank">Send Gift Card</a></div>
+                <div class="customer-name" *ngIf="column.field == 'companyName'">{{ dataItem[column.field] }} </div>
+                <div class="customer-name user-name-colunm" *ngIf="column.field == 'userName'">{{ dataItem[column.field]}}</div>
+                <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ dataItem[column.field] | date: 'MM/dd/yy'}}</div>
+              </ng-template>
+            </kendo-grid-column>
+            <div *kendoGridDetailTemplate="let dataItem">
+              <app-referral-report-common [contactID]="dataItem.contactID" [user]="user" [selectedUserId]="selectedUserId" [startDate]="" [endDate]=""></app-referral-report-common>
+            </div>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isShowContactList" class="margin-all-area">
+  <app-search-result-common [user]="user" [selectedUserId]="selectedUserId" [startDate]="startDate" [endDate]="endDate" [searchBy]="searchBy" [eType]="2"></app-search-result-common>
+</div>
+
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+

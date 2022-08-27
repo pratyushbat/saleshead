@@ -1,0 +1,169 @@
+<div class="container-fluid common-alignment mt-3">
+  <div class="wraper-main-section mb-3">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel">Link Information</div>
+        <div class="header-button-panel" *ngIf="showViewMode == true">
+          <div class="button-wrapper">
+            <button type="button" matTooltip="Edit" class="icon-btn" (click)="editLink();">
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+              <span class="btn-text">Edit</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="global-body-section">
+        <div class="wraper-body-panel">
+          <div class="wraper-body-left">
+            <form [formGroup]="linkGroupForm" (ngSubmit)="linkGroupFormSubmit()">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Link Name</span>
+                </div>
+                <div class="cards-colunm-right" *ngIf="showViewMode == false">
+                  <div [ngClass]="{'has-error': linkGroupFrm.linkName.errors && (linkGroupFrm.linkName.touched ||  linkGroupFrm.linkName.dirty)}">
+                    <input type="text" class="form-control" id="linkName" formControlName="linkName" />
+                  </div>
+                  <div class="search-query-error" *ngIf="linkGroupFrm.linkName.errors && ( linkGroupFrm.linkName.touched ||  linkGroupFrm.linkName.dirty)">
+                    <div *ngIf="linkGroupFrm.linkName.errors.required">Please enter Link Name.</div>
+                  </div>
+                </div>
+                <div class="cards-colunm-right" *ngIf="showViewMode == true">
+                  <span>{{linkData?.linkName}}</span>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Shareable</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <span *ngIf="showViewMode == true">{{linkData?.isShareable == true ? 'Link is shared' : 'Link is not shared'}}</span>
+                  <input *ngIf="showViewMode == false" type="checkbox" class="checkbox ml-2" id="isShareable" formControlName="isShareable" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Created By</span>
+                </div>
+                <div class="cards-colunm-right">
+                  {{user?.firstName}}&nbsp;{{user?.lastName}}
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Date Created</span>
+                </div>
+                <div class="cards-colunm-right">
+                  {{linkId > 0 ? (linkData?.dtCreated |  date: 'MM/dd/yyyy') : (dtCreated |  date: 'MM/dd/yyyy')}}
+                </div>
+              </div>
+              <div class="cards-body-section" *ngIf="linkId > 0 && showViewMode == true">
+            <div class="cards-colunm-left">
+              <span class="control-label spantext">Quick Add</span>
+            </div>
+            <div class="cards-colunm-right">
+              <kendo-autocomplete style="width:20%!important" [data]="contactSearchList" valueField="searchText" (valueChange)="getContactId($event)" placeholder="Search" (keyup)="getSearchData($event.target.value)"></kendo-autocomplete>
+
+            </div>
+          </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"></div>
+                <div class="cards-colunm-right">
+                  <div class="" *ngIf="showViewMode == false">
+                    <button class="btn btn-primary" [disabled]="isLinkGroupSubmit" type="submit">{{linkData?.linkID > 0 ? 'Update' : 'Save' }}</button>
+                    <button type="button" (click)="onCancel()" class="btn btn-cancel"><i class="fa fa-times mr-2"></i>Cancel</button>
+                    <!--<button *ngIf="linkId > 0" type="button" class="btn btn-danger"><i class="fa fa-trash mr-2"></i>Delete</button>-->
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid common-alignment mt-3" *ngIf="showExports || linkContactList?.length > 0">
+  <div class="wraper-main-section mb-3">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel">Linked Contacts</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <!--<button type="button" matTooltip="Delete selected linked contacts" class="icon-btn" *ngIf="mySelection?.length > 0">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+              <span class="btn-text">Delete selected linked contacts</span>
+            </button>-->
+          </div>
+        </div>
+      </div>
+
+      <div class="global-body-section">
+        <contact-exports *ngIf="showExports" [user]="user"></contact-exports>
+        <div *ngIf="linkContactList?.length > 0">
+          <kendo-grid class="link-group-grid" #grid id="gridId"
+            [kendoGridBinding]="linkContactList"
+            kendoGridSelectBy="contactID"
+            [selectable]="{enabled: true, checkboxOnly: true }"
+            [(selectedKeys)]="mySelection"
+            (edit)="editHandler($event)"
+            (cancel)="cancelHandler($event)"
+            (save)="saveHandler($event)"
+            [pageSize]="10"
+            [pageable]="{buttonCount:10, pageSizes:[10,50,100,200]}">
+          <div class="grid-scroll-bar">
+              <kendo-grid-checkbox-column [width]="45"
+                  [headerClass]="{ 'text-center': true }"
+                  [class]="{ 'text-center': true }"
+                  showSelectAll="true">
+              </kendo-grid-checkbox-column>
+              <kendo-grid-column *ngFor="let column of columns"
+                  [field]="column.field"
+                  [title]="column.title | titlecase"
+                  [width]="column.width"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [editable]="column.field == '$'
+                || column.field == 'lastFirst'
+                || column.field == 'email'
+                || column.field == 'title'
+                || column.field == 'companyName'
+                || column.field == 'phone'
+                || column.field == 'ufirstName'
+                || column.field == 'dtModified'
+                || column.field == 'dtCreated'?false: true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="column.field == '$'">{{ rowIndex+1 }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'lastFirst'">   {{ dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'relationship'">   {{ dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'email'">   {{ dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'title'">   {{ dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'companyName'">   {{ dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'phone'">   {{ dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'ufirstName'">   {{ dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'dtModified'"> {{dataItem[column.field] |  date: 'MM/dd/yyyy'}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'dtCreated'"> {{dataItem[column.field] |  date: 'MM/dd/yyyy'}}</div>
+                </ng-template>
+                <ng-template kendoGridEditTemplate let-dataItem="dataItem" let-formGroup="formGroup" let-column="column">
+                  <div class="customer-name" *ngIf="column.field=='relationship'">
+                    <input placeholder="Relationship" [(ngModel)]="dataItem[column.field]" name="column.title" />
+                  </div>
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-grid-command-column title="Action" width="60" min="60" [style]="{'text-align': 'center'}">
+                <ng-template kendoGridCellTemplate>
+                  <button kendoGridEditCommand [primary]="true" icon="edit" title="Edit"></button>
+                  <button kendoGridSaveCommand [primary]="true" icon="check" title="Update"></button>
+                  <button kendoGridCancelCommand icon="times" [primary]="true" title="Cancel"></button>
+                </ng-template>
+              </kendo-grid-command-column>
+            </div>
+          </kendo-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

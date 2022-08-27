@@ -1,0 +1,338 @@
+<div class="container-fluid common-alignment mt-3">
+  <div class="custom-security-link">
+    <a [routerLink]="['/email-template']">Email Templates</a>
+    <a [routerLink]="['/mail-merge-template']">Mail Merge Templates</a>
+  </div>
+  <div class="row">
+    <div class="col-lg-3 col-sm-12 col-md-12">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel"><img src="../../../../assets/tagtitle.svg" class="mr-1" />Folders</div>
+            <div class="header-button-panel">
+              <div class="button-wrapper">
+                <button type="button" [hidden]="roleFeaturePermissions?.create == false" matTooltip="New" class="icon-btn">
+                  <span class="btn-text">Add</span>
+                  <i class="fa fa-plus" aria-hidden="true" (click)="addFolder();"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="global-body-section" *ngIf="!isEnableEdit">
+            <div class="common-grid-section" *ngFor="let item of folderList; let idx=index;">
+              <div class="common-grid-row">
+                <div class="common-grid-colunm" *ngIf="user">
+                  {{item.folderName}}<br />
+                  <span *ngIf="item?.cLPUserID != user?.cLPUserID" class="text-success">({{item.userName}})</span>
+                </div> 
+                <div class="common-grid-colunm">
+                  <span class="text-success" *ngIf="item.isShared == true">Shared</span>
+                  <span class="text-danger font-weight-bold" *ngIf="item.isShared == false">Private</span>
+                </div>
+                <div class="common-grid-colunm">
+                  <button type="button" class="grid-common-btn" (click)="getDocumentList(item.folderID); selectedFolder = item;"> <i class="fa fa-search" aria-hidden="true" title="Open"></i></button>
+                  <button type="button" [hidden]="roleFeaturePermissions?.edit == false" class="grid-common-btn" (click)="folderEdit(item,idx);" *ngIf="item.cLPUserID == user.cLPUserID"> <i class="fa fa-pencil" aria-hidden="true" title="Edit"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="isEnableEdit">
+            <div class="global-body-section" *ngFor="let item of folderList; let idx=index;">
+              <div class="common-grid-section" *ngIf="editFolderId != idx">
+                <div class="common-grid-row">
+                  <div class="common-grid-colunm">
+                    {{item.folderName}}
+                    <span *ngIf="item?.cLPUserID != user?.cLPUserID" class="text-success"></span>
+                  </div>
+                  <div class="common-grid-colunm">
+                    <span class="text-success" *ngIf="item.isShared == true">Shared</span>
+                    <span class="text-danger font-weight-bold" *ngIf="item.isShared == false">Private</span>
+                  </div>
+                  <div class="common-grid-colunm">
+                    <button type="button" class="grid-common-btn" (click)="getDocumentList(item.folderID); selectedFolder = item;"> <i class="fa fa-search" aria-hidden="true" title="Open"></i></button>
+                    <button type="button" [hidden]="roleFeaturePermissions?.create == false" class="grid-common-btn" (click)="folderEdit(item,idx);" *ngIf="item.cLPUserID == user.cLPUserID"> <i class="fa fa-pencil" aria-hidden="true" title="Edit"></i></button>
+                  </div>
+                </div>
+              </div>
+              
+              <form [formGroup]="imageBankForm" class="common-grid-section" *ngIf="isEnableEdit && editFolderId == idx">
+                <div class="common-grid-row">
+                  <div class="common-grid-colunm">
+                    <input type="text" class="form-control" formControlName="folderName" [ngClass]="{'has-error': imageBankForm.controls.folderName.errors && (imageBankForm.controls.folderName.touched || imageBankForm.controls.folderName.dirty)}" />
+                    <div *ngIf="imageBankForm.controls.folderName.errors && (imageBankForm.controls.folderName.touched || imageBankForm.controls.folderName.dirty)">
+                      <div class="login-error" *ngIf="imageBankForm.controls.folderName.errors.required"> Required </div>
+                    </div>
+                  </div>
+                  <div class="common-grid-colunm">
+                    <div class="for-share">
+                      <input type="checkbox" class="checkbox" formControlName="isShared" />
+                      <span> Share</span>
+                    </div>
+                  </div>
+                  <div class="common-grid-colunm">
+                    <button type="button" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" matTooltip="Save" class="grid-common-btn" (click)="submitImageBankFolder(item);"><i class="fa fa-save" aria-hidden="true"></i></button>
+                    <button type="button" class="grid-common-btn" (click)="isEnableEdit = false"> <i class="fa fa-arrow-left" aria-hidden="true" title="Cancel"></i></button>
+                    <button type="button" class="grid-delete-btn" [hidden]="roleFeaturePermissions?.delete == false" data-toggle="modal" data-target="#deleteFolder"> <i class="fa fa-trash-alt" aria-hidden="true" title="Delete"></i></button>
+                  </div>
+                </div>
+              </form>
+
+              <div class="modal fade" id="deleteFolder" tabindex="-1" role="dialog" aria-labelledby="deleteFolder" aria-hidden="true">
+                <div class="modal-dialog  modal-common-dialog" role="document">
+                  <div class="modal-content modal-common-content">
+                    <div class="modal-header modal-common-background">
+                      <h4 class="modal-title modal-common-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body modal-common-body">
+                      <h2>Caution: This folder and images inside it will be permanently deleted.</h2>
+                      <h2>  Are you sure you want to Delete this folder? </h2>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" (click)="imageBankFolderDelete(folderList[editFolderId]);" data-dismiss="modal" class="btn btn-primary">Ok</button>
+                      <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-9 col-md-12 col-sm-12" *ngIf="isShowDocument">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel"><img src="../../../../assets/tagtitle.svg" class="mr-1" />Images in: {{selectedFolder.folderName}}</div>
+            <div class="header-button-panel">
+              <div class="button-wrapper">
+                <button type="button" [hidden]="roleFeaturePermissions?.create == false" matTooltip="New" class="icon-btn" (click)="setDocument(); isShowDocList = true;" *ngIf="selectedFolder.cLPUserID == user.cLPUserID" >
+                  <span class="btn-text">Add</span>
+                  <i class="fa fa-plus"></i>
+                </button>
+                <button type="button" [hidden]="roleFeaturePermissions?.edit == false" matTooltip="Edit Order" class="icon-btn" (click)="setOrder();" *ngIf="!isEditOrder">
+                  <span class="btn-text">A-Z</span>
+                  <i class="fa-solid fa-arrow-down-a-z" aria-hidden="true"></i>
+                </button>
+                <button type="button" matTooltip="Save" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" class="icon-btn" (click)="documentOrderUpdate(documentList);" *ngIf="isEditOrder">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                  <span class="btn-text">Save</span>
+                </button>
+                <button type="button" matTooltip="Cancel" class="icon-btn" (click)="isEditOrder = false" *ngIf="isEditOrder">
+                  <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                  <span class="btn-text">Cancel</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="wraper-body-panel" *ngIf="isShowUpdate">
+            <div class="wraper-body-left">
+              <div class="alert-panel" *ngIf="isShowUpdate && !isShowDocList">There are no images in this folder.</div>
+              <div class="alert-panel" *ngIf="isShowUpdate && isShowDocList">Browse to select the images you would like to upload.</div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Upload Images</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="order-row-inner">
+                    <angular-file-uploader bankUpload [config]="contactDocConfig" (ApiResponse)="apiResponse($event)" #imageUpload></angular-file-uploader>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left ">
+                  <span>Re-size Image Width</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="flex-row-inner ">
+                    <form [formGroup]="documentForm" class="d-flex">
+                      <div class="">
+                        <input type="text" class="form-control" formControlName="imageWidth" />
+                      </div>
+                      <div class="">
+                        &nbsp;<input type="checkbox" class="checkbox" formControlName="isForceResize" />
+                        <span>&nbsp;Force Re-size</span>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Image Size Limit</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div>
+                    <span>
+                      There is a size limit of .5 MB for each image uploaded into the image bank. If a file is larger than .5 MB,
+                      the image will be re-sized to a width of the pixels specified above during the upload process (the height would then be re-sized proportionally).
+                      If the file is less than .5 MB, the image will be uploaded without any re-sizing.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="isShowDocList && documentList?.length != 0" class="p-3">
+            <div class="wraper-main-section">
+              <div class="global-card-section">
+                <div class="inner-header-bg">
+                  <div class="inner-cards-panel">
+                    <span>Image</span>
+                    <span>Detail</span>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="" *ngFor="let item of documentList; let idx=index;">
+                  <div class="inner-cards-grid">
+                    <div>
+                      <span *ngIf="!isEditOrder" class="pr-3">{{item.sOrder}}</span>
+                      <div *ngIf="isEditOrder" class="pr-2">
+                        <input type="number" class="form-control" [ngModel]="item.sOrder" (ngModelChange)="item.sOrder = $event" />
+                      </div>
+                      <div class="image-preview" [innerHTML]="item.imagePreview"></div>
+                    </div>
+                    <div>
+                      <h4>Title</h4>
+                      <div class="mb-4">
+                        <h6 *ngIf="!isdocTitleEdit || editDocumentId != idx" class="text-dark">{{item.documentTitle}}</h6>
+                        <div *ngIf="isdocTitleEdit && editDocumentId == idx">
+                          <input type="text" class="form-control" [ngModel]="item.documentTitle" (ngModelChange)="item.documentTitle = $event" />
+                        </div>
+                      </div>
+                      <h6 *ngIf="isdocTitleEdit && editDocumentId == idx" class="text-dark">Copy/Paste URL</h6>
+                      <span>{{item.imageURL}}</span>
+                      <a class="btn btn-info copy-btn form-group-btn ml-2" (click)="copyInputMessage(item.imageURL);  Copied.hidden=false;" *ngIf="isdocTitleEdit && editDocumentId != idx && Copied.hidden==true" #Copy>
+                        <img src="../../../assets/copy-file-icon.svg" />
+                      </a>
+                      <a class="btn copy-btn grid-common-btn" (click)="copyInputMessage(item.imageURL);  Copied.hidden=false;" *ngIf="!isdocTitleEdit && Copied.hidden==true" #Copy>
+                        <img src="../../../assets/copy-file-icon.svg" />
+                      </a>
+                      <a class="copiedText ml-2" (click)="copyInputMessage(item.imageURL);" #Copied hidden><img src="../../../assets/copy-file-icon.svg" class="mr-2" />Copied</a>
+                    </div>
+                    <div *ngIf="!isdocTitleEdit || editDocumentId != idx">
+                      <button type="button" [hidden]="roleFeaturePermissions?.edit == false" class="grid-common-btn" (click)="docTitleEdit(idx);"> <i class="fa fa-pencil" aria-hidden="true" title="Edit"></i></button>
+                      <button type="button" [hidden]="roleFeaturePermissions?.edit == false" class="grid-common-btn" (click)="documentReplace(item);"> <i class="fa fa-upload" aria-hidden="true" title="Replace"></i></button>
+                      <button type="button" [hidden]="roleFeaturePermissions?.delete == false" class="grid-delete-btn" data-toggle="modal" data-target="#deleteImage" (click)="selectedDocument = item;"> <i class="fa fa-trash-alt" aria-hidden="true" title="Delete"></i></button>
+                    </div>
+                    <div *ngIf="isdocTitleEdit && editDocumentId == idx">
+                      <button type="button" matTooltip="Save" class="grid-common-btn" (click)="documentUpdate(item);"><i class="fa fa-save" aria-hidden="true"></i></button>
+                      <button type="button" class="grid-common-btn" (click)="isdocTitleEdit = false;"> <i class="fa fa-arrow-left" aria-hidden="true" title="Cancel"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-9 col-md-12 col-sm-12" *ngIf="isReplaceDocument">
+      <div class="wraper-main-section">
+        <div class="global-card-section">         
+          <div class="global-header-section">
+            <div class="svg-icon-panel"><img src="../../../../assets/tagtitle.svg" class="mr-1" />Replace Image</div>
+            <div class="header-button-panel">
+              <div class="button-wrapper">
+                <button type="button" class="icon-btn" (click)="isReplaceDocument = false;">
+                  <i class="fa fa-close" aria-hidden="true"></i>
+                 <span class="btn-text">Cancel</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="wraper-body-panel">
+            <div class="wraper-body-left">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Upload Images</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="order-row-inner">
+                    <angular-file-uploader [config]="contactDocConfig" (ApiResponse)="apiResponse($event)" #imageUpload></angular-file-uploader>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Re-size Image Width</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="flex-row-inner">
+                    <form [formGroup]="documentForm" class="d-flex">
+                      <div class="">
+                        <input type="text" class="form-control" formControlName="imageWidth" />
+                      </div>
+                      <div class="">
+                        &nbsp;<input type="checkbox" class="checkbox" formControlName="isForceResize" />
+                        <span>&nbsp;Force Re-size</span>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Image Size Limit</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div>
+                    <span>
+                      There is a size limit of .5 MB for each image uploaded into the image bank. If a file is larger than .5 MB,
+                      the image will be re-sized to a width of the pixels specified above during the upload process (the height would then be re-sized proportionally).
+                      If the file is less than .5 MB, the image will be uploaded without any re-sizing.
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="p-2">
+                    <button class="btn btn-primary" type="button" (click)="isReplaceDocument = false;">Close Window</button>
+                  </div>
+                </div>
+              </div>             
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="image-note">
+        <span>Note: These images have been optimized and disseminated throughout the known universe for ultra-fast access, so once you replace them, give us about 5 minutes to update them.</span>
+      </div>
+      <div class="teamoffice-bottom">
+        <button class="btn btn-primary" type="button" (click)="isReplaceDocument = false;">Close Window</button>
+      </div>
+      <div class="text-center image-replace">
+        <div [innerHTML]="selectedImagePreview"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="deleteImage" tabindex="-1" role="dialog" aria-labelledby="deleteImage" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h4 class="modal-title modal-common-title">Confirmation</h4>
+      </div>
+      <div class="modal-body modal-common-body">
+        <h2>Caution: This image will be permanently deleted.</h2>
+        <h2> Are you sure you want to Delete this image? </h2>
+      </div>
+      <div class="modal-footer">
+        <button type="button" (click)="documentDelete(selectedDocument);" data-dismiss="modal" class="btn btn-primary">Ok</button>
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+

@@ -1,0 +1,233 @@
+<div class="create-email" #scrollIdTarget [@filterAnimation]="showAnimation">
+  <fieldset>
+    <div class="outbound-module">
+      <form class="form-horizontal required-section" [formGroup]="emailForm">
+        <div class="outbound-top-panel">
+          <div>
+            <span class="outbound-top-font"><i class="fas fa-envelope-open-text email-color-font"></i> Outbound Email</span>
+          </div>
+          <div>
+            <button type="button" class="btn btn-primary" (click)="showAttachedDiv = !showAttachedDiv"><i class="fas fa-paperclip"></i> Attach File</button>
+            <button type="button" class="btn btn-cancel" (click)="hideSendMail();"> Close</button>
+          </div>
+        </div>
+        <hr />
+        <!-------------------------->
+        <div class="row">
+          <div class="col-md-12">
+            <table cellspacing=0 class="email-table">
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    To
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <div class="generic-width-per" *ngIf="linkName == undefined">
+                      <div>
+                        <select class="form-control" (change)="getLinkId($event.target.value)">
+                          <option value=null>-None Selected-</option>
+                          <option *ngFor="let item of filterLinks" [value]="item.value">{{ item.text }}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="generic-width-per" *ngIf="linkName != undefined">
+                      {{linkName}}
+                    </div>
+                  </div>
+
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    From
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <div class="generic-width-per">
+                      {{loggedUser?.email}}
+                    </div>
+                  </div>
+
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    CC
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group" [ngClass]="{'has-error': sendEmailFrm.cc.errors}">
+                    <input type="text" class="form-control" formControlName="cc" />
+                  </div>
+                  <div class="search-query-error" *ngIf="sendEmailFrm.cc.errors">
+                    <div *ngIf="sendEmailFrm.cc.errors">Invalid Email Syntax.</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Bcc
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group" [ngClass]="{'has-error': sendEmailFrm.bcc.errors}">
+                    <input type="text" class="form-control" formControlName="bcc" />
+                  </div>
+                  <div class="search-query-error" *ngIf="sendEmailFrm.bcc.errors">
+                    <div *ngIf="sendEmailFrm.bcc.errors">Invalid Email Syntax.</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Subject
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group" [ngClass]="{'has-error': sendEmailFrm.subject.errors && (sendEmailFrm.subject.touched ||  sendEmailFrm.subject.dirty)}">
+                    <input type="text" class="form-control" formControlName="subject" />
+                  </div>
+                  <div class="search-query-error generic-text-align" *ngIf="sendEmailFrm.subject.errors && ( sendEmailFrm.subject.touched ||  sendEmailFrm.subject.dirty)">
+                    <div *ngIf="sendEmailFrm.subject.errors.required">Subject is Required</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div *ngIf="showAttachedDiv" class="sendemail-div">
+                    Attached Files
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div *ngIf="showAttachedDiv">
+                    <div class="flex-panel">
+                      <div class="email-form-group">
+                        <span>Attached Files</span>
+                        <div *ngIf="attachedFiles" class="messageInfo">{{ attachedFiles.length > 0 ? attachedFiles.length + ' file(s) attached' : 'No files attached.' }}</div>
+                      </div>
+                      <!--File uploader-->
+                      <div class="file-attach-uploader">
+                        <div class="attach-alignment">
+                          <div class="email-form-group">
+                            <span></span>
+                            <div class="file-uploader" *ngIf="showFileUploader">
+                              <div class="border">
+                                <angular-file-uploader [config]="afuConfig" (ApiResponse)="fileUpload($event)"></angular-file-uploader>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!--File Uploader-->
+                      <div class="attach-alignment">
+                        <div class="email-form-group">
+                          <span></span>
+                          <div class="flex-left">
+                            <input type="text" placeholder="file1,file2" id="idSearchAttached" class="form-control" [(ngModel)]="searchValue" [ngModelOptions]="{standalone: true}" />
+                          </div>
+                          <div class="flex-right">
+                            <button type="button" class="btn btn-primary btn-sm" (click)="searchDocumentsList();"><i class="fas fa-search"></i>&nbsp;Search</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="getLeadDocumentsListByOwner();"><i class="fas fa-search"></i>&nbsp;View Lead Files</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="showFileUploader = !showFileUploader"><i class="fas fa-sync"></i>&nbsp;Upload New</button>
+                          </div>
+                        </div>
+                      </div>
+                      <!--Attached file grid-->
+                      <div class="email-form-group" *ngIf="documents && documents.length <= 0">
+                        <span></span>
+                        <div class="messageInfo">No file(s) found.</div>
+                      </div>
+                      <div class="attach-alignment" *ngIf="documents && documents.length > 0">
+                        <span></span>
+                        <div class="attachFile-grid">
+                          <kendo-grid #gridAttach id="attachGridId" [kendoGridBinding]="documents" [sort]="attachFileSort" [skip]="skip" [pageSize]="pageSize" [pageable]="{ buttonCount: 0, info: true }">
+
+                            <kendo-grid-column [width]="2">
+                              <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                                <img class="img-slidecast" src="{{ soUrl + dataItem.documentTypeIcon}}" />
+                              </ng-template>
+                            </kendo-grid-column>
+                            <kendo-grid-column title="{{ documentGridTitle }}" [width]="20" [class.selected-row]="isSelected">
+                              <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                                {{dataItem.documentName}}
+                                &nbsp;<i class="fa fa-check" *ngIf="dataItem.isSelected"></i>
+                              </ng-template>
+                            </kendo-grid-column>
+                            <kendo-grid-column title="" [width]="4">
+                              <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                                <button type="button" class="btn btn-sm btn-success" *ngIf="!dataItem.isSelected" (click)="attachDetachFile('add', dataItem, rowIndex)"><i class="fas fa-paperclip"></i> Attach</button>
+                                <button type="button" class="btn btn-sm btn-danger" *ngIf="dataItem.isSelected" (click)="attachDetachFile('remove', dataItem, rowIndex)"><i class="fas fa-minus-circle"></i> Detach</button>
+                              </ng-template>
+                            </kendo-grid-column>
+
+                          </kendo-grid>
+                        </div>
+                      </div>
+                      <!--Attached file grid-->
+                    </div>
+                  </div>
+
+
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Email Template
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <select class="form-control" formControlName="emailTemplateID">
+                      <option value=null> -Use plain text- </option>
+                      <option *ngFor="let eTemplate of linkEmailFilterResponse?.filterEmailTemplates" [value]="eTemplate.value">{{eTemplate.text}}</option>
+                    </select>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Important Note
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <span class="imp-sub-notes">No HTML tags permitted | <a href="https://www.salesoptima.com/support/email-placeholder-list" target="_blank" (click)="goToLink('mailPlaceholderList')">Email Merge Placeholder list</a></span>
+                  </div>
+                </td>
+              </tr>
+
+            </table>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+
+            <div class="email-form-group" [ngClass]="{'has-error': sendEmailFrm.body.errors && (sendEmailFrm.body.touched ||  sendEmailFrm.body.dirty)}">
+              <textarea class="form-control" row="7" formControlName="body"></textarea>
+            </div>
+            <div class="search-query-error generic-text-align" *ngIf="sendEmailFrm.body.errors && ( sendEmailFrm.body.touched ||  sendEmailFrm.body.dirty)">
+              <div *ngIf="sendEmailFrm.body.errors.required">Message is Required</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <small class="text-success"><b>Note:</b> The email will be saved in this lead's history.</small>
+        </div>
+        <div class="bottom-panel email-bottom-justify">
+          <button type="button"  (click)="emailFormSubmit();" class="btn btn-primary">Send Email</button>
+        </div>
+      </form>
+    </div>
+  </fieldset>
+</div>

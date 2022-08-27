@@ -1,0 +1,203 @@
+<div class="role-setup-section">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="">
+        <div class="global-header-section">
+          <div class="svg-icon-panel">
+            <span><i class="fas fa-users"></i> Roles</span>
+          </div>
+          <div class="header-button-panel">
+            <div class="button-wrapper">
+              <button class="icon-btn" [disabled]="showSpinner" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" (click)="saveRoleSettings()">
+                <i class="fa fa-save" aria-hidden="true"></i>
+                <span class="btn-text">Save</span>
+              </button>
+              <button class="icon-btn" (click)="onreset()" type="button">
+                <i class="fa fa-refresh" aria-hidden="true"></i>
+                <span class="btn-text">Reset</span>
+              </button>
+              <button class="icon-btn" [routerLink]="['/contacts']">
+                <span class="btn-text">Cancel</span>
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <div class="roles-body-section">
+          <div class="role-listing-panel" *ngIf="_roleList && _roleList.length>0">
+            <h3><a href="javascript:void();">Role</a></h3>
+            <ul>
+              <mat-selection-list #selectedRole [multiple]="false">
+                <mat-list-option [ngStyle]="{'background-color':this.selectedRoleId === i+1? '#EBF7FB' : 'white'}" *ngFor="let r of _roleList, let i = index" [value]="r.role.roleId" (click)="roleSelectionChange()" [selected]="r && i == 0">
+                  {{r.role.roleName}}
+                </mat-list-option>
+              </mat-selection-list>
+            </ul>
+          </div>
+          <div class="role-description-panel">
+            <form [formGroup]="roleFormGroup">
+              <div class="display-row">
+                <div class="full-width-container">
+                  <label>Role </label>
+                  <input type="text" formControlName="roleName" readonly />
+                </div>
+                <div class="full-width-container">
+                  <label>Description </label>
+                  <input type="text" formControlName="roleDescription" readonly />
+                </div>
+              </div>
+              <div class="role-tabs-section">
+                <div class="role-tabs-panel">
+                  <kendo-tabstrip (tabSelect)="onTabSelect($event)">
+                    <kendo-tabstrip-tab [title]="'Feature'" [selected]="true">
+                      <ng-template kendoTabContent>
+                        <div class="feature-table" formArrayName="featuresArray">
+                          <fieldset>
+                            <legend>Features</legend>
+                            <table class="table">
+                              <thead>
+                                <tr>
+                                  <th>Feature</th>
+                                  <th>View</th>
+                                  <th>Create</th>
+                                  <th>Edit</th>
+                                  <th>Delete</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+
+                                <tr class="roles-setup-checkbox" *ngFor="let fctls of featuresArrayCtls.controls; let i = index" [formGroupName]="i">
+                                  <ng-container *ngIf="!fctls.controls.isAdmin.value">
+                                    <td>{{featuresArrayCtls.controls[i].controls.featureName.value}}</td>
+                                    <td><div class="custom-toggle"><label class="switch"><input type="checkbox" (change)="onchange($event,i)" formControlName="view"><span class="slider round"></span></label></div></td>
+                                    <td><div class="custom-toggle"><label class="switch"><input type="checkbox" (change)="onchangeToggle($event,i)" formControlName="create"><span class="slider round"></span></label></div></td>
+                                    <td><div class="custom-toggle"><label class="switch"><input type="checkbox" (change)="onchangeToggle($event,i)" formControlName="edit"><span class="slider round"></span></label></div></td>
+                                    <td><div class="custom-toggle"><label class="switch"><input type="checkbox" (change)="onchangeToggle($event,i)" formControlName="delete"><span class="slider round"></span></label></div></td>
+                                  </ng-container>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </fieldset>
+                          <fieldset>
+                            <legend>Configuration</legend>
+                            <table class="table">
+                              <thead>
+                                <tr>
+                                  <th>Feature</th>
+                                  <th>View</th>
+                                  <th>Create</th>
+                                  <th>Edit</th>
+                                  <th>Delete</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr class="roles-setup-checkbox" *ngFor="let fctls of featuresArrayCtls.controls; let i = index" [formGroupName]="i">
+                                  <ng-container *ngIf="fctls.controls.isAdmin.value">
+                                    <td>{{featuresArrayCtls.controls[i].controls.featureName.value}}</td>
+                                    <td><div class="custom-toggle"><label class="switch"><input type="checkbox" (change)="onchange($event,i)" formControlName="view"><span class="slider round"></span></label></div></td>
+                                    <td><div class="custom-toggle"><label class="switch"><input type="checkbox" (change)="onchangeToggle($event,i)" formControlName="create"><span class="slider round"></span></label></div></td>
+                                    <td><div class="custom-toggle"><label class="switch"><input type="checkbox" (change)="onchangeToggle($event,i)" formControlName="edit"><span class="slider round"></span></label></div></td>
+                                    <td><div class="custom-toggle"><label class="switch"><input type="checkbox" (change)="onchangeToggle($event,i)" formControlName="delete"><span class="slider round"></span></label></div></td>
+                                  </ng-container>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </fieldset>
+
+                        </div>
+                      </ng-template>
+                    </kendo-tabstrip-tab>
+                    <kendo-tabstrip-tab [title]="'Users in Roles'">
+                      <ng-template kendoTabContent>
+                        <div class="user-tabs-panel">
+                          <div class="display-row">
+                            <div class="user-form">
+                              <label>Offices</label>
+                              <select class="form-control" (change)="filterOffice_onchange($event.key)">
+                                <option [value]=0>--Select--</option>
+                                <option *ngFor="let filterOffice_item of filterOffice; let i = index" [value]='filterOffice_item.key'>
+                                  {{filterOffice_item.value}}
+                                </option>
+                              </select>
+                            </div>
+                            <div class="user-form">
+                              <label>Teams</label>
+                              <select class="form-control" (change)="filterTeam_onchange($event.key)">
+                                <option [value]=0>--Select--</option>
+                                <option *ngFor="let filterTeam_item of filterTeam; let i = index" [value]='filterTeam_item.key'>
+                                  {{filterTeam_item.value}}
+                                </option>
+                              </select>
+                            </div>
+                            <div class="user-form">
+                              <label>Search</label>
+                              <input class="role-serach" type="text" [(ngModel)]="searchText" (keyup)="keyPress($event)" placeholder="Search" [ngModelOptions]="{standalone: true}" />
+                            </div>
+                            <div class="header-button-side">
+                              <button class="btn btn-cancel" (click)="clearDataSearch()"><i class="fas fa-times"></i> Clear</button>
+                            </div>
+                          </div>
+                          <div class="switch-section">
+                            <div class="switch-left">
+                              <div class="example-container">
+                                <div cdkDropList
+                                      #frmList="cdkDropList"
+                                      [cdkDropListData]="fromUserlist"
+                                      [cdkDropListConnectedTo]="[tolist]"
+                                      class="example-list"
+                                      (cdkDropListDropped)="drop($event)"
+                                      (click)="fromList_Onclick()">
+                                  <div class="example-box" *ngFor="let i of  fromUserlist" cdkDrag (click)="fromList_Onclick($event)">
+                                    {{i.value}}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="switch-middle-btn">
+                              <button class="btn btn-primary" (click)="selectAll()"><i class="fas fa-angle-double-right"></i></button>
+                              <button class="btn btn-primary" (click)="unSelectAll()"><i class="fas fa-angle-double-left"></i></button>
+                            </div>
+                            <div class="switch-right">
+                              <div class="example-container">
+                                <div cdkDropList
+                                      #tolist="cdkDropList"
+                                      [cdkDropListData]="toUserlist"
+                                      [cdkDropListConnectedTo]="[frmList]"
+                                      class="example-list"
+                                      (cdkDropListDropped)="drop($event)">
+                                  <div class="example-box" *ngFor="let i of toUserlist" cdkDrag>{{i.value}}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </kendo-tabstrip-tab>
+                  </kendo-tabstrip>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModal" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-role-content">
+      <div class="modal-body modal-common-body">
+        <h2>Admin Role can not be removed . Please add current logged in user in List!!!</h2>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

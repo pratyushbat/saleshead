@@ -1,0 +1,296 @@
+<div class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="">
+        <div *ngIf="settingEdit==1">
+          <!--Edit-->
+          <div class="">
+            <div class="inner-header-bg">
+              <div class="inner-detail-bg">
+                <span>Details</span>
+              </div>
+              <div class="inner-cards-panel header-inner-hidden">
+                <span>Order</span>
+                <span [ngClass]="showColorClm() ? '' : ''">Display</span>
+                <span>Code</span>
+                <span *ngIf="showColorClm()">Color</span>
+              </div>
+            </div>
+            <div class="global-body-section">
+              <div class="wraper-body-panel" [formGroup]="settingForm">
+                <div class="wraper-body-left">
+                  <div cdkDropList
+                       #frmList="cdkDropList"
+                       [cdkDropListData]="settingFormCtls.controls"
+                       (cdkDropListDropped)="dropSetting($event)">
+                    <div formArrayName="settingConfigs" class="inner-cards-grid-height">
+                      <div *ngFor="let name of settingFormCtls.controls;trackBy:identifySetting; let i = index">
+                        <div *ngIf="i>=skipSize && i<skipSize+pageSize" [formGroupName]="i" cdkDrag>
+                          <div class="inner-cards-grid">
+                            <div class="inner-card-mobile">
+                              <label>Rows</label>
+                              <div class="mobile-view-design">
+                                <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  {{i+1}}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="inner-card-mobile">
+                              <label>Display</label>
+                              <div class="mobile-view-design">
+                                <div class="" *ngIf="!isSorted" [ngClass]="showColorClm() ? '' : ''" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  <input type="text" name="display" formControlName="display" [disabled]="isSorted" placeholder="Enter display" class="form-control" *ngIf="editRowIndex == -1">
+                                  <input type="text" name="display" formControlName="display" [disabled]="isSorted" placeholder="Enter display" class="form-control" *ngIf="editRowIndex > -1 && editRowIndex == i">
+                                  <span *ngIf="editRowIndex > -1 && editRowIndex != i">{{name.value.display}}</span>
+                                </div>                                
+                              </div>
+                            </div>
+                            <div class="inner-card-mobile">
+                              <label>Display</label>
+                              <div class="mobile-view-design">                                
+                                <div class="" *ngIf="isSorted" [ngClass]="showColorClm() ? '' : ''" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  {{name.value.display}}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="inner-card-mobile">
+                              <label>Code</label>
+                              <div class="mobile-view-design">
+                                <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  {{name.value.code}}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="inner-card-mobile">
+                              <label>Action</label>
+                              <div class="mobile-view-design">
+                                <div class="text-right" *ngIf="showColorClm()" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  <input type="color" formControlName="colorCode" placeholder="Enter Color Code" title="{{name.value.colorCode}}" class="form-control" *ngIf="editRowIndex == -1 && !isSorted">
+                                  <input type="color" formControlName="colorCode" placeholder="Enter Color Code" title="{{name.value.colorCode}}" class="form-control" *ngIf="editRowIndex > -1 && editRowIndex == i && !isSorted">
+                                  <input type="color" formControlName="colorCode" title="{{name.value.colorCode}}" class="form-control" *ngIf="editRowIndex > -1 && editRowIndex != i && name.value.colorCode != ''" disabled>
+                                  <span *ngIf="editRowIndex > -1 && editRowIndex != i && name.value.colorCode == ''">-None-</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="team-example-box" *ngIf="settingFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <app-pagination *ngIf="dataSource" (newData)="emitPagination($event)" [total]="dataSource.length" [data]="dataSource" [originalData]="originalSettingFormcontrols"></app-pagination>
+            <div class="bottom-button-bar">
+              <div class="margin-all-area">
+                <button class="btn btn-primary" [disabled]="showSpinner || settingFormCtls.length<=0" (click)="saveSettingItems()" type="submit">
+                  {{ settingEdit==1 ? ' Update' : settingEdit==2 ?  'Save' : 'Save' }}
+                </button>
+                <button class="btn btn-cancel" (click)="cancelSettingCode()"> Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="settingEdit==0">
+          <div class="">
+            <div class="inner-header-bg">
+              <div class="inner-cards-panel header-inner-hidden">
+                <span>Order</span>
+                <span [ngClass]="showColorClm() ? '' : ''">Display</span>
+                <span>Code</span>
+                <span *ngIf="showColorClm()">Color</span>
+                <span class="text-right">Action</span>
+              </div>
+              <div class="inner-detail-bg">
+                <span>Details</span>
+              </div>
+            </div>
+
+            <div class="global-body-section">
+              <div class="wraper-body-panel" [formGroup]="settingForm">
+                <div class="wraper-body-left">
+                  <div cdkDropList
+                       #frmList="cdkDropList"
+                       [cdkDropListData]="settingFormCtls.controls"
+                       (cdkDropListDropped)="dropSetting($event)">
+                    <div formArrayName="settingConfigs" class="inner-cards-grid-height">
+                      <div *ngFor="let i of  settingFormCtls.controls;trackBy:identifySetting;let idx=index;">
+                        <div *ngIf="idx>=skipSize && idx<skipSize+pageSize" [formGroupName]="idx" cdkDrag>
+                          <div class="inner-cards-grid">
+                            <div class="inner-card-mobile">
+                              <label>Order</label>
+                              <div class="mobile-view-design">
+                                <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  {{idx+1}}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="inner-card-mobile">
+                              <label>Display</label>
+                              <div class="mobile-view-design">
+                                <div class="" [ngClass]="showColorClm() ? '' : ''" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  {{i.value.display}}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="inner-card-mobile">
+                              <label>Code</label>
+                              <div class="mobile-view-design">
+                                <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  {{i.value.code}}
+                                </div>                                
+                              </div>
+                            </div>
+                            <div class="inner-card-mobile">
+                              <label>Code</label>
+                              <div class="mobile-view-design">                                
+                                <div class="" *ngIf="showColorClm()" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  <input type="color" formControlName="colorCode" title="{{i?.value?.colorCode}}" class="form-control" *ngIf="i?.value?.colorCode != ''" disabled>
+                                  <span *ngIf="i?.value?.colorCode == ''">-None-</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="inner-card-mobile">
+                              <label>Action</label>
+                              <div class="mobile-view-design">
+                                <div class="text-right">
+                                  <button type="button" [hidden]="roleFeaturePermissions?.edit == false" class="grid-common-btn" [disabled]="sortSettingMode || showSpinner" (click)="settingItemtoEdit(idx)">
+                                    <i class="fa fa-pencil" aria-hidden="true" title="Edit"></i>
+                                    <span class="grid-common-text">Edit</span>
+                                  </button>
+                                  <button type="button" [hidden]="roleFeaturePermissions?.delete == false" class="grid-delete-btn" [disabled]="sortSettingMode || showSpinner" (click)="settingItemtoDelete(idx)" data-toggle="modal" data-target="#teamDeleteModal">
+                                    <i class="fa fa-trash-alt" aria-hidden="true" title="Delete"></i>
+                                    <span class="grid-common-text">Delete</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="team-example-box" *ngIf="settingFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <app-pagination *ngIf="dataSource" (newData)="emitPagination($event)" [total]="dataSource.length" [data]="dataSource" [originalData]="originalSettingFormcontrols"></app-pagination>
+
+            <div class="bottom-button-bar" *ngIf="!sortSettingMode">
+              <div class="margin-all-area">
+                <button class="btn btn-primary" (click)="editClassCodes()" *ngIf="settingFormCtls.controls?.length>0">
+                  <i class="fa-star" [hidden]="roleFeaturePermissions?.edit == false" [ngClass]="{ 'fas ': settingEdit, far: !settingEdit }"></i> Edit All Items
+                </button>
+                <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false" (click)="addClassItems(); scrollToNew()"> Add Items</button>
+                <button class="btn btn-primary" (click)="sortAlphaSettingCode()"> Sort Alphabetically</button>
+              </div>
+            </div>
+            <div class="bottom-button-bar" *ngIf="sortSettingMode">
+              <div class="margin-all-area">
+                <button class="btn btn-primary" [disabled]="showSpinner" (click)="saveSettingItems()" type="submit"><i class="fas fa-save"></i> {{ settingEdit==1 ? ' Update' : settingEdit==2 ?  'Save' : 'Save' }}</button>
+                <button class="btn btn-cancel" (click)="cancelSettingCode()"> Cancel</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="teamDeleteModal" tabindex="-1" role="dialog" aria-labelledby="teamDeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog  modal-common-dialog" role="document">
+              <div class="modal-content modal-common-content">
+                <div class="modal-header modal-common-background">
+                  <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+                </div>
+                <div class="modal-body modal-common-body">
+                  <h5>Are you sure to delete {{tableName}} - <b>{{settingCodeDisplay}} ?</b></h5>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" (click)="deleteSettingItems()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                  <button type="button" class="btn btn-cancel" data-dismiss="modal"> Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="settingEdit==2">
+          <div class="">
+            <div class="inner-header-bg">
+              <div class="inner-detail-bg">
+                <span>Details</span>
+              </div>
+              <div class="inner-cards-panel header-inner-hidden">
+                <span>Order</span>
+                <span [ngClass]="showColorClm() ? '' : ''">Display {{settingEdit}}</span>
+                <span>Code</span>
+                <span *ngIf="showColorClm()">Color</span>
+                <span class="text-right">Action</span>
+              </div>
+            </div>
+            <div class="global-body-section">
+              <div class="wraper-body-panel" [formGroup]="settingForm">
+                <div class="wraper-body-left">
+                  <div formArrayName="settingConfigs" class="inner-cards-grid-height">
+                    <div *ngFor="let i of  settingFormCtls.controls;trackBy:identifySetting; let idx=index;">
+                      <div *ngIf="idx>=skipSize && idx<skipSize+pageSize">
+                        <div class="inner-cards-grid">
+                          <div class="inner-card-mobile">
+                            <label>Order</label>
+                            <div class="mobile-view-design">
+                              <div class="">{{idx+1}}</div>
+                            </div>
+                          </div>
+                          <div class="inner-card-mobile" [ngClass]="showColorClm() ? '' : ''">
+                            <label>Display</label>
+                            <div class="mobile-view-design">
+                              <div>{{i.value.display}}</div>
+                            </div>
+                          </div>
+                          <div class="inner-card-mobile">
+                            <label>Code</label>
+                            <div class="mobile-view-design">
+                              <div class="">{{i.value.code}}</div>
+                            </div>
+                          </div>
+                          <div class="inner-card-mobile">
+                            <label>Color</label>
+                            <div class="mobile-view-design">
+                              <div class="" *ngIf="showColorClm()">{{i.value.colorCode ? i.value.colorCode : '-None-' }}</div>
+                            </div>
+                          </div>
+                          <div class="inner-card-mobile">
+                            <label>Action</label>
+                            <div class="mobile-view-design">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="team-example-box" *ngIf="settingFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="wraper-body-left" id="scrollId">
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span class="control-label" for="teamSName">New Item List </span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <textarea [(ngModel)]="settingAddData" type="text" class="form-control" id="teamSName"></textarea>
+                    <label><span class="text-danger">Note: Do not exceed 25 lines.</span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <app-pagination *ngIf="dataSource" (newData)="emitPagination($event)" [total]="dataSource.length" [data]="dataSource" [originalData]="originalSettingFormcontrols"></app-pagination>
+            <div class="bottom-button-bar">
+              <div class="margin-all-area">
+                <button class="btn btn-primary" [disabled]="showSpinner" (click)="saveBulkSetting()" type="submit"> {{ settingEdit==1 ? ' Update' : settingEdit==2 ?  'Save' : 'Save' }}</button>
+                <button class="btn btn-cancel" (click)="cancelSettingCode()"> Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

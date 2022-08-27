@@ -1,0 +1,524 @@
+<div class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div [hidden]="!showTaskDayDetails">
+        <div class="global-header-section">
+          <div *ngIf="!showView">
+            <div class="svg-icon-panel">
+              <img src="../../../../../assets/appttitle.svg" class="mr-1" />
+              <span *ngIf="isFirstCalender">
+                <img src="../../../../../assets/arrow_left.svg">
+                <span>{{selectedDate | date}}</span>
+                <img src="../../../../../assets/arrow_right.svg">
+              </span>
+              <span *ngIf="!isFirstCalender">
+                <img src="../../../../../assets/arrow_left.svg">
+                <span *ngIf="changeFromCopyCal">{{selectedDate2 | date}}</span>
+                <span *ngIf="!changeFromCopyCal">{{selectedDate | date}}</span>
+                <img src="../../../../../assets/arrow_right.svg">
+              </span>
+            </div>
+          </div>
+          <div *ngIf="showView===1">
+            <div class="svg-icon-panel">
+              <img src="../../../../../assets/appttitle.svg" class="mr-1" />
+              <span>
+                <img src="../../../../../assets/arrow_left.svg"> Week of {{dtWeekStart | date}} to {{dtWeekEnd | date}}
+                <img src="../../../../../assets/arrow_right.svg">
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="global-body-section">
+          <div class="excel-toolbar margin-none">
+            <div class="text-right">
+              <button kendoButton (click)="showView = 0;showFilter=false;">Day</button>
+              <button kendoButton (click)="showView = 1;showFilter=false;">Week</button>
+              <button kendoButton (click)=" showTaskDayDetails = false;callIndex('month');">Month</button>
+            </div>            
+          </div>
+          <div class="margin-all-area">
+            <div class="align-top-style">
+              <div class="inner-container">
+                <div>
+                  <kendo-calendar [(value)]=" changeFromCopyCal?selectedDate2:selectedDate" [focusedDate]="focusedDate"></kendo-calendar>
+                </div>
+                <div class="inner-container-right">
+                  <app-contact-task [loggedUser]="user" [contactId]="0" [taskCalender]="selectedTask" [isCalenderTask]="true" [taskIDCalender]="true" (updatedTask)="updateFromTask($event)"></app-contact-task>
+                  <ng-container [ngSwitch]="showView">
+                    <ng-container *ngSwitchCase="0">
+                      <div *ngIf="phoneDayCall" class="global-body-section">
+                        <div class="wraper-body-panel">
+                          <div class="wraper-body-left">
+                            <div class="p-2">
+                              <div>
+                                <p><a class="btn btn-primary" href="javascript:void(0)">There is {{phoneDayCall?.count}}  pending call scheduled for this day.</a></p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="global-body-section">
+                        <div class="wraper-body-panel">
+                          <div class="wraper-body-left">
+                            <div class="global-card-section">
+                              <div *ngIf="taskDataByTeamOffice?.length >= 1">
+                                <div *ngFor="let task of taskDataByTeamOffice">
+                                  <div class="global-header-section">
+                                    <div class="inner-container" (click)="enableEditTask(task)">
+                                      <span><img src="../../../../../assets/appttableft.png"></span>
+                                      <span><img class="grid-common-btn" src="../../../../../assets/icon_user.svg"></span>
+                                      <span><a class="text-primary"><b>Task:  {{task.reminderTime |date}}</b></a></span>
+                                      <span><img class="grid-common-btn" src="../../../../../assets/statuspending.svg"></span>
+                                      <span><img src="../../../../../assets/appttabright.png"></span>
+                                    </div>
+                                  </div>
+                                  <div class="global-padding10">
+                                    <div class="admin-row-flex">
+                                      <div>
+                                        <span>Priority: <b>{{task.priority===1?'Low':task.priority===2?'Medium':task.priority===3?'High':'Low'}}</b></span>
+                                        <span>Task: <b>{{task.taskDesc}}</b></span>
+                                      </div>
+                                      <div>
+                                        <span>{{task.firstName}} {{task.lastName}}</span>
+                                        <span>email validation</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="global-card-section mt-3 mb-3" *ngFor="let appt of initNotesVar ">
+                        <div class="global-header-section">
+                          <div class="wraper-body-left">
+                            <div class="svg-icon-panel">
+                              Appointment {{appt?.apptStartTime | date:'shortTime'}} - {{appt?.apptEndTime | date:'shortTime'}}
+                            </div>
+                          </div>
+                          <div class="wraper-body-right">
+                            <div class="svg-icon-panel">
+                              Status: <b>{{appt.status===0 ? 'Pending' : appt.priority===1 ? 'Cancelled' : appt.priority===2 ? 'Completed' :appt.status===3 ? 'None' : appt.priority===4 ? 'Bumped' : appt.priority===5 ? 'CompleteAndCampaignStop' :appt.priority===9 ? 'ToBeDeleted' :'Low'}}</b>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="global-body-section">
+                          <div class="wraper-body-panel">
+                            <div class="wraper-body-left">
+                              <div class="global-padding10">
+                                <div class="admin-row-flex">
+                                  <div>
+                                    <span>Subject: <b>{{appt?.subject}}</b></span>
+                                    <span>Type: <b>{{appt?.contactName}}</b></span>
+                                    <span>Notes: <b>{{appt?.notes}}</b></span>
+                                  </div>
+                                  <div>
+                                    <span>{{appt?.userLastFirst}} </span>
+                                    <span>{{appt?.ownerName}}</span>
+                                    <span *ngIf="appt?.contactObj?.companyName"> {{appt.contactObj.companyName}}</span>
+                                    <span *ngIf="appt?.contactObj?.add1"> {{appt.contactObj.add1}}</span>
+                                    <span *ngIf="appt.contactObj?.add2"> {{appt.contactObj.add2}}</span>
+                                    <span *ngIf="appt?.contactObj?.add3"> {{appt.contactObj.add3}}</span>
+                                    <span *ngIf="appt?.contactObj?.city"> {{appt.contactObj.city}}</span>
+                                    <span *ngIf="appt?.contactObj?.state"> {{appt.contactObj.state}}</span>
+                                    <span *ngIf="appt?.contactObj?.zip"> {{appt.contactObj.zip}}</span>
+                                    <span *ngIf="appt?.contactObj?.country"> {{appt.contactObj.country}}</span>
+                                    <span *ngIf="appt?.contactObj?.mobile">B: {{appt.contactObj.mobile}}</span>
+                                    <span *ngIf="appt?.contactObj?.homePhone">H: {{appt.contactObj.homePhone}}</span>
+                                    <span *ngIf="appt?.contactObj?.altPhone">O: {{appt.contactObj.altPhone}}</span>
+                                    <span *ngIf="appt?.contactObj?.fax">F:  {{appt.contactObj.fax}}</span>
+                                    <span *ngIf="appt?.contactObj?.email">E:  {{appt.contactObj.email}}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div *ngIf="initNotesVar?.length == 0">No appointment Scheduled</div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="1">
+                      <div class="global-body-section">
+                        <div class="wraper-body-panel">
+                          <div class="wraper-body-left">
+                            <div class="wraper-main-section" *ngIf="weekTaskDataDisplay?.length >= 1">
+                              <div class="global-card-section mt-3 mb-3" *ngFor="let weekTaskData of weekTaskDataDisplay | slice:0:4">
+                                <div class="global-header-section">
+                                  <div class="svg-icon-panel">{{weekTaskData.dispDate | date:'fullDate'}}</div>
+                                </div>
+                                <div class="global-body-section">
+                                  <div class="wraper-body-panel">
+                                    <div class="wraper-body-left">
+                                      <div class="p-2">
+                                        <div *ngIf="weekTaskData?.taskData?.length >= 1">
+                                          <div *ngFor="let task of weekTaskData.taskData">
+                                            <div class="global-card-section">
+                                              <div class="global-header-section">
+                                                <div class="inner-container" (click)="enableEditTask(task)">
+                                                  <span><img src="../../../../../assets/appttableft.png"></span>
+                                                  <span><img class="grid-common-btn" src="../../../../../assets/icon_user.svg"></span>
+                                                  <span><a class="text-primary"><b>Task:  {{task.reminderTime |date}}</b></a></span>
+                                                  <span><img class="grid-common-btn" src="../../../../../assets/statuspending.svg"></span>
+                                                  <span><img src="../../../../../assets/appttabright.png"></span>
+                                                </div>
+                                              </div>
+                                              <div class="global-body-section">
+                                                <div class="wraper-body-panel">
+                                                  <div class="wraper-body-left">
+                                                    <div class="global-padding10">
+                                                      <div class="admin-row-flex">
+                                                        <div>
+                                                          <span>Priority: <b>{{task.priority===1 ? 'Low' : task.priority===2 ? 'Medium' : task.priority===3 ? 'High' :'Low'}}</b></span>
+                                                          <span>Task: <b>{{task.taskDesc}}</b></span>
+                                                        </div>
+                                                        <div>
+                                                          <span>{{task.firstName}} {{task.lastName}}</span>
+                                                          <span>email validation</span>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div *ngIf="weekTaskData?.phoneData?.length >= 1">
+                                          <div *ngFor="let phoneData of weekTaskData.phoneData">
+                                            <div class="mt-3">
+                                              <a class="btn btn-primary" href="javascript:void(0)">{{phoneData.count}} pending calls</a>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div *ngIf="weekTaskData?.apptData?.length >= 1">
+                                          <div class="global-card-section mb-3" *ngFor="let appt of weekTaskData?.apptData ">
+                                            <div class="global-header-section">
+                                              <div class="wraper-body-left">
+                                                <div class="svg-icon-panel">
+                                                  Appointment {{appt?.apptStartTime | date:'shortTime'}} - {{appt?.apptEndTime | date:'shortTime'}}
+                                                </div>
+                                              </div>
+                                              <div class="wraper-body-right">
+                                                <div class="svg-icon-panel">
+                                                  Status: <b>{{appt.status===0 ? 'Pending' : appt.priority===1 ? 'Cancelled' : appt.priority===2 ? 'Completed' :appt.status===3 ? 'None' : appt.priority===4 ? 'Bumped' : appt.priority===5 ? 'CompleteAndCampaignStop' :appt.priority===9 ? 'ToBeDeleted' :'Low'}}</b>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div class="global-body-section">
+                                              <div class="wraper-body-panel">
+                                                <div class="wraper-body-left">
+                                                  <div class="global-padding10">
+                                                    <div class="admin-row-flex">
+                                                      <div>
+                                                        <span>Subject: <b>{{appt?.subject}}</b></span>
+                                                        <span>Type: <b>{{appt?.contactName}}</b></span>
+                                                        <span>Notes: <b>{{appt?.notes}}</b></span>
+                                                      </div>
+                                                      <div>
+                                                        <span>{{appt?.userLastFirst}} </span>
+                                                        <span>{{appt?.ownerName}}</span>
+                                                        <span *ngIf="appt?.contactObj?.companyName"> {{appt?.contactObj?.companyName}}</span>
+                                                        <span *ngIf="appt?.contactObj?.add1"> {{appt?.contactObj?.add1}}</span>
+                                                        <span *ngIf="appt.contactObj?.add2"> {{appt?.contactObj?.add2}}</span>
+                                                        <span *ngIf="appt?.contactObj?.add3"> {{appt?.contactObj?.add3}}</span>
+                                                        <span *ngIf="appt?.contactObj?.city"> {{appt?.contactObj?.city}}</span>
+                                                        <span *ngIf="appt?.contactObj?.state"> {{appt?.contactObj?.state}}</span>
+                                                        <span *ngIf="appt?.contactObj?.zip"> {{appt?.contactObj?.zip}}</span>
+                                                        <span *ngIf="appt?.contactObj?.country"> {{appt?.contactObj?.country}}</span>
+                                                        <span *ngIf="appt?.contactObj?.mobile">B: {{appt?.contactObj?.mobile}}</span>
+                                                        <span *ngIf="appt?.contactObj?.homePhone">H: {{appt?.contactObj?.homePhone}}</span>
+                                                        <span *ngIf="appt?.contactObj?.altPhone">O: {{appt?.contactObj?.altPhone}}</span>
+                                                        <span *ngIf="appt?.contactObj?.fax">F:  {{appt?.contactObj?.fax}}</span>
+                                                        <span *ngIf="appt?.contactObj?.email">E:  {{appt?.contactObj?.email}}</span>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div *ngIf="weekTaskData?.apptData?.length == 0">No appointment Scheduled</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="wraper-body-right ml-2">
+                            <div class="wraper-main-section" *ngIf="weekTaskDataDisplay?.length >= 1">
+                              <div class="global-card-section mt-3 mb-3" *ngFor="let weekTaskData of weekTaskDataDisplay | slice:4:8">
+                                <div class="global-header-section">
+                                  <div class="svg-icon-panel">
+                                    {{weekTaskData?.dispDate | date:'fullDate'}}
+                                  </div>
+                                </div>
+                                <div class="global-body-section">
+                                  <div class="wraper-body-panel">
+                                    <div class="wraper-body-left">
+                                      <div class="p-2">
+                                        <div *ngIf="weekTaskData?.taskData?.length >= 1">
+                                          <div *ngFor="let task of weekTaskData.taskData">
+                                            <div class="global-card-section">
+                                              <div class="global-header-section">
+                                                <div class="inner-container" (click)="enableEditTask(task)">
+                                                  <span><img src="../../../../../assets/appttableft.png"></span>
+                                                  <span><img class="grid-common-btn" src="../../../../../assets/icon_user.svg"></span>
+                                                  <span><a class="text-primary"><b>Task:  {{task.reminderTime |date}}</b></a></span>
+                                                  <span><img class="grid-common-btn" src="../../../../../assets/statuspending.svg"></span>
+                                                  <span><img src="../../../../../assets/appttabright.png"></span>
+                                                </div>
+                                              </div>
+                                              <div class="global-body-section">
+                                                <div class="wraper-body-panel">
+                                                  <div class="wraper-body-left">
+                                                    <div class="global-padding10">
+                                                      <div class="admin-row-flex">
+                                                        <div>
+                                                          <span>Priority: <b>{{task?.priority===1?'Low':task.priority===2?'Medium':task.priority===3?'High':'Low'}}</b></span>
+                                                          <span>Task: <b>{{task.taskDesc}}</b></span>
+                                                        </div>
+                                                        <div>
+                                                          <span>{{task?.firstName}} {{task?.lastName}}</span>
+                                                          <span>email validation</span>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div *ngIf="weekTaskData?.apptData?.length >= 1">
+                                          <div class="global-card-section mt-3 mb-3" *ngFor="let appt of weekTaskData?.apptData ">
+                                            <div class="global-header-section">
+                                              <div class="svg-icon-panel">
+                                                Appointment  {{appt?.apptStartTime | date:'shortTime'}} - {{appt?.apptEndTime | date:'shortTime'}}
+                                              </div>
+                                            </div>
+                                            <div class="global-body-section">
+                                              <div class="wraper-body-panel">
+                                                <div class="wraper-body-left">
+                                                  <div class="global-padding10">
+                                                    <div class="admin-row-flex">
+                                                      <div>
+                                                        <span>Subject: <b>{{appt.subject}}</b></span>
+                                                        <span>Type: <b>{{appt.contactName}}</b></span>
+                                                        <span>Notes: <b>{{appt.notes}}</b></span>
+                                                      </div>
+                                                      <div>
+                                                        <span>{{appt.userLastFirst}} </span>
+                                                        <span>{{appt.ownerName}}</span>
+                                                        <span *ngIf="appt?.contactObj?.companyName"> {{appt?.contactObj?.companyName}}</span>
+                                                        <span *ngIf="appt?.contactObj?.add1"> {{appt?.contactObj?.add1}}</span>
+                                                        <span *ngIf="appt.contactObj?.add2"> {{appt?.contactObj?.add2}}</span>
+                                                        <span *ngIf="appt?.contactObj?.add3"> {{appt?.contactObj?.add3}}</span>
+                                                        <span *ngIf="appt?.contactObj?.city"> {{appt?.contactObj?.city}}</span>
+                                                        <span *ngIf="appt?.contactObj?.state"> {{appt?.contactObj?.state}}</span>
+                                                        <span *ngIf="appt?.contactObj?.zip"> {{appt?.contactObj?.zip}}</span>
+                                                        <span *ngIf="appt?.contactObj?.country"> {{appt?.contactObj?.country}}</span>
+                                                        <span *ngIf="appt?.contactObj?.mobile">B: {{appt?.contactObj?.mobile}}</span>
+                                                        <span *ngIf="appt?.contactObj?.homePhone">H: {{appt?.contactObj?.homePhone}}</span>
+                                                        <span *ngIf="appt?.contactObj?.altPhone">O: {{appt?.contactObj?.altPhone}}</span>
+                                                        <span *ngIf="appt?.contactObj?.fax">F:  {{appt?.contactObj?.fax}}</span>
+                                                        <span *ngIf="appt?.contactObj?.email">E:  {{appt?.contactObj?.email}}</span>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div *ngIf="weekTaskData?.apptData?.length == 0">No appointment Scheduled</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+                    <ng-container *ngSwitchDefault>
+                      <h1></h1>
+                    </ng-container>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="global-body-section mb-3" *ngIf="showFilter">
+    <div class="wraper-body-panel">
+      <div class="wraper-body-left">
+        <div class="wraper-main-section" [class.fade-out]="showSpinner">
+          <div class="global-card-section">
+            <div class="inner-header-bg">
+              <div class="inner-cards-panel">
+                <span>User Filter</span>
+                <span>Status Filter</span>
+                <span>Refresh</span>
+              </div>
+            </div>
+            <div>
+              <form [formGroup]="filterForm" (ngSubmit)="filterFormSubmit()" [class.fade-out]="showSpinner">
+                <div class="inner-cards-grid">
+                  <div>
+                    <label class="calender-label">Team</label>
+                    <select class="form-control" formControlName="team">
+                      <option disabled value="0">-All-</option>
+                      <option *ngFor="let c of teamCodeList" [ngValue]="c.key"> {{c?.value}} </option>
+                    </select>
+                  </div>
+                  <div></div>
+                  <div></div>
+                </div>
+                <div class="inner-cards-grid">
+                  <div>
+                    <label class="calender-label">Office</label>
+                    <select class="form-control" formControlName="office">
+                      <option disabled value="0">-All-</option>
+                      <option *ngFor="let c of officeCodeList" [ngValue]="c.key"> {{c?.value}} </option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="calender-label">Status</label>
+                    <select class="form-control" formControlName="status">
+                      <option disabled value="-1">-All-</option>
+                      <option *ngFor="let c of taskStatusList" [ngValue]="c.key"> {{c?.value}} </option>
+                    </select>
+                  </div>
+                  <div>
+                    <div class="buttonsbar" typeof="submit">
+                      <button onclick="document.getElementById('hiddenSaveButtonForMicrosoftWithLove').click()" title="Reload Call List" class="grid-common-btn">
+                        <i class="fa fa-refresh"></i>
+                      </button>
+                      <button id="hiddenSaveButtonForMicrosoftWithLove" type="submit" style="display: none;">hiddenSaveButtonForMicrosoftWithLove</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="inner-cards-grid">
+                  <div>
+                    <label class="calender-label">User</label>
+                    <select class="form-control generic-width" formControlName="user">
+                      <option disabled value="0">-All-</option>
+                      <option *ngFor="let c of userList" [ngValue]="c.key"> {{c?.value}} </option>
+                    </select>
+                  </div>
+                  <div></div>
+                  <div></div>
+                </div>
+              </form>
+              <div class="example-container">
+                <div class="calender-list">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wraper-body-right"></div>
+    </div>
+  </div>
+
+  <div class="mb-3" >
+    <kendo-scheduler [hidden]="showTaskDayDetails" 
+      [selectedDate]="selectedDate"
+      [kendoSchedulerBinding]="events"
+      [currentTimeMarker]="{ enabled: true,localTimezone: true,updateInterval: 10000 }"
+      (dateChange)="onDateChange($event)"
+      (slotClick)="onClick($event)"
+      [selectedViewIndex]="selectedView"
+      [eventStyles]="getEventStyles"
+      [slotClass]="getSlotClass"
+      (remove)="onRemove($event)"
+      (eventClick)="eventClick($event)"
+      (cancel)="cancelHandler($event)"
+      (save)="saveHandler($event)"
+      #scheduler>
+      <ng-template kendoSchedulerToolbarTemplate let-selectedDate="selectedDate">
+        <span *ngIf="!isShowTwoMonthBtn">{{selectedDate | date:"MMMM yyyy"}}</span>
+        <div kendoSchedulerToolbarNavigation *ngIf="isShowTwoMonthBtn"></div>
+        <div kendoSchedulerToolbarViewSelector *ngIf="isShowTwoMonthBtn"></div>
+        <select class="form-control generic-width" [(ngModel)]="selectedDay" (ngModelChange)="onOptionsSelectedDD($event)" *ngIf="isShowTwoMonthBtn">
+          <option disabled value="null">-Select Date-</option>
+          <option *ngFor="let c of dateDropDown" [ngValue]="c"> {{c.text}} </option>
+        </select>
+        <button kendoButton *ngIf="isShowTwoMonthBtn" (click)=" twoMonthView() ">Two Months</button>
+        <button kendoButton *ngIf="isShowTwoMonthBtn" (click)="showFilter=!showFilter">Filter</button>
+      </ng-template>
+
+      <kendo-scheduler-day-view [eventHeight]="0"></kendo-scheduler-day-view>
+      <kendo-scheduler-week-view [eventHeight]="0"> </kendo-scheduler-week-view>
+      <kendo-scheduler-month-view  [eventHeight]="40"></kendo-scheduler-month-view>
+      <ng-template kendoSchedulerEventTemplate let-event >
+        <div class="event-layout" >
+          <p *ngIf="event.description=='task'">{{ event.title }}</p>
+          <p *ngIf="event.description=='call'" class="text-primary">{{ event.title }}</p>
+          <div *ngIf="event.description=='appt'" class="calendar-module-section">
+            <div class="calendar-module-panel" [innerHTML]="prepareAppoinmentMonthData(event.dataItem.dataItem)"></div>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template kendoSchedulerEditDialogTemplate
+        autoFocusedElement=".title-input"
+        [kendoSchedulerReactiveEditing]="createFormGroup"
+        let-editMode="editMode">
+        <div class="k-form-inline">
+          <div class="k-form-field">
+            <span>Title</span>
+            <input kendoTextBox id="title-input" class="k-rounded-md" placeholder="Title" />
+          </div>
+          <div class="k-form-field k-datetime-picker-wrapper">
+            <span>Start</span>
+          </div>
+        </div>
+      </ng-template>
+    </kendo-scheduler>
+  </div>
+</div>
+<div class="modal fade" id="underConstruction" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body modal-common-body">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <p class="under-construction under-construction-common">
+          <img src="../../../assets/under-construction.gif" />
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="scheduleModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to save changes to this document before closing?</p>
+        <p class="text-secondary"><small>If you don't save, your changes will be lost.</small></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

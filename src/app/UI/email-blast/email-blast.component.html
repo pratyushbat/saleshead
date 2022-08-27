@@ -1,0 +1,354 @@
+<div class="container-fluid">
+  <contact-common-search></contact-common-search>
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../assets/emailtitle.svg" class="mr-1" />Create New Email Marketing Mailing</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper" *ngIf="step ">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting();"><i class="fas fa-refresh mr-1"></i>Reset Grid Setting</button>
+          </div>
+        </div>
+      </div>
+      <div class="">
+        <div class="step">
+          <div *ngIf="step == 1">
+            <div class="active vertical-center">
+              <img src="../../../../assets/trans1x1.gif" class="steps1_3" border="0">
+              <div class="">
+                <h4 class="font-weight-bold">Select Contacts </h4>
+                <h6 class="font-weight-bold">Use Quick Search to select the contacts for whom you'd like to email. Then click the Go To Next Step button on the right.</h6>
+              </div>
+              <div class="top-common-btn_txtmsg">
+                <button class="btn btn-primary" type="button" (click)="goToNext(1);" *ngIf="movedEmailMailingData.length > 0">Go To Next Step</button>
+              </div>
+            </div>
+            <div *ngIf="emailMailingData?.length >0" class="email-total-records">
+              <span>Total Records found: {{emailMailingData?.length}}</span>
+              <div class="top-common-btn_txtmsg">
+                <button class="btn btn-primary" type="button">Select All</button>
+                <button class="btn btn-primary" type="button" (click)="onSelectAllChange('checked')">Check All</button>
+                <button class="btn btn-primary" type="button" (click)="moveRight();">Move Right</button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="step == 2">
+            <div class="vertical-center" [ngClass]="{'active': step >= 2}">
+              <img src="../../../../assets/trans1x1.gif" class="steps2_3" border="0">
+              <div class="">
+                <h4 class="font-weight-bold">Configure Email</h4>
+                <h6 class="font-weight-bold">Configure the email settings.</h6>
+              </div>
+              <div class="top-common-btn_txtmsg">
+                <button class="btn btn-primary" type="button" (click)="goToNext(2);">Go To Next Step</button>
+              </div>
+            </div>
+            <span class="email-total-records">Total Records found: {{movedEmailMailingData?.length}}</span>
+          </div>
+          <div *ngIf="step >= 3">
+            <div class="vertical-center" [ngClass]="{'active': step >= 3}">
+              <img src="../../../../assets/trans1x1.gif" class="steps3_3" border="0" *ngIf="step == 3">
+              <img src="../../../../assets/trans1x1.gif" class="stepsdone_3" border="0" *ngIf="step == 4">
+              <div class="">
+                <h4 class="font-weight-bold"> Confirm Email Mailing</h4>
+                <h6 class="font-weight-bold">Confirm the email emailing and click the Confirm and Finish button.</h6>
+                <h6 class="text-danger font-weight-bold">Note: In order to comply with industry wide spam guidelines, every email will contain an unsubscribe image link on the bottom of the message.</h6>
+              </div>
+              <div class="top-common-btn_txtmsg" *ngIf="step == 3">
+                <button class="btn btn-primary" type="button" (click)="goToNext(3);">Confirm and Finish</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="margin-inner-grid">
+        <div class="inner-container" *ngIf="step == 1">
+          <div class="inner-container-right">
+            <div class="global-body-section">
+              <kendo-grid #grid id="gridId"
+                [kendoGridBinding]="emailMailingData"
+                kendoGridSelectBy="contactID"
+                [selectable]="{enabled: true, checkboxOnly: true }"
+                [(selectedKeys)]="mySelection"
+                [pageSize]="_gridCnfgService.pageSize"
+                [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                [sortable]="{mode: 'multiple'}"
+                [scrollable]="'scrollable'"
+                [sort]="_gridCnfgService.sort"
+                [columnMenu]="{ filter: true }"
+                [resizable]="true"
+                [reorderable]="true"
+                [ngStyle]="gridHeight"
+                (columnReorder)="_gridCnfgService.columnsOrderChanged('email_mailing_grid', $event)"
+                (sortChange)="_gridCnfgService.sortChange('email_mailing_grid', $event)"
+                (pageChange)="_gridCnfgService.pageChange('email_mailing_grid', $event)"
+                (columnResize)="_gridCnfgService.columnResize(5,'email_mailing_grid', $event)"
+                (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'email_mailing_grid',grid)">
+                <div class="grid-scroll-bar">
+                  <kendo-grid-checkbox-column [width]="40">
+                    <ng-template kendoGridHeaderTemplate>
+                      <input type="checkbox"
+                             kendoCheckBox
+                             id="selectAllCheckboxId"
+                             kendoGridSelectAllCheckbox
+                             [state]="selectAllState"
+                             (selectAllChange)="onSelectAllChange($event)" />
+                      <label class="k-checkbox-label" for="selectAllCheckboxId"></label>
+                    </ng-template>
+                  </kendo-grid-checkbox-column>
+                  <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                                     [field]="column.field"
+                                     [title]="column.title | titlecase"
+                                     [width]="column.field == '$' ? '40' : column.width"
+                                     [filterable]="true"
+                                     [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                     [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                     [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                     [includeInChooser]="column.field=='$' ? false : true">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                      <div class="customer-name" *ngIf="column.title == '  '"><a class="contact-cursor-pointer" (click)="gotoLink('address-card', dataItem);" title="View Contact"><i class="icon_contact"><img src="../../../assets/icon_contact.svg" /></i></a></div>
+                      <div class="customer-name" *ngIf="column.field == 'email'"><a class="contact-cursor-pointer" (click)="gotoLink('email', dataItem);" title="send email to {{dataItem.email}}" *ngIf="dataItem.email"><i class="email_new"><img src="../../../assets/email_new.svg" /></i></a></div>
+                      <div class="customer-name" *ngIf="column.field == 'phone'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--'"></span></div>
+                      <div class="customer-name" [ngClass]="[column.field=='name' ? 'text-left' : '',  column.field=='companyName' ? 'text-left' : '']">
+                        <a class="webkit-any-link" (click)="gotoLink(column.field, dataItem);" [style.color]="column.field == 'userName'? '#1c0dbf':''" *ngIf="column.field == 'name' || column.field == 'userName'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</a>
+                        <span *ngIf="column.field=='companyName'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</span>
+                        <span *ngIf="column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy' }}</span>
+                      </div>
+
+                    </ng-template>
+                  </kendo-grid-column>
+                </div>
+              </kendo-grid>
+            </div>
+          </div>
+          <div class="inner-container-left">
+            <div class="wraper-main-section mr-2">
+              <div class="global-card-section">
+                <div class="global-header-section">
+                  <div class="svg-icon-panel"><span class="text-white">Selected: {{movedEmailMailingData.length}}</span></div>
+                  <div class="header-button-panel">
+                    <div class="button-wrapper" *ngIf="movedEmailMailingData.length > 0">
+                      <button type="button" class="icon-btn" (click)="clearMovedList();">
+                        <i class="fa fa-arrow-left" aria-hidden="true" title="Clear List"></i>
+                        <span class="btn-text">Back</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section">
+                  <div *ngIf="movedEmailMailingData.length > 0">
+                    <div class="common-grid-section " *ngFor="let item of movedEmailMailingData; let idx=index;">
+                      <div class="common-grid-row">
+                        <div class="common-grid-colunm">
+                          <div class="">{{movedEmailMailingData[idx].name}}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        <!--Steep 2 -->
+      <div class="global-body-section" *ngIf="step == 2">
+        <div class="custom-action-title"></div>
+        <div class="wraper-body-panel">
+          <div class="wraper-body-left">
+            <form [formGroup]="emailBlastForm">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Schedule</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="order-row-inner">
+                    <div class="flex-width-panel mr-2">
+                      <kendo-datetimepicker formControlName="mailingStartTime"></kendo-datetimepicker>
+                    </div>
+                    <div class="flex-width-panel">
+                      <input type="text" class="form-control px-4" formControlName="subject" [ngClass]="{'has-error': emailBlastForm.controls.subject.errors && (emailBlastForm.controls.subject.touched || emailBlastForm.controls.subject.dirty)}" />
+                      <div *ngIf="emailBlastForm.controls.subject.errors && (emailBlastForm.controls.subject.touched || emailBlastForm.controls.subject.dirty)">
+                        <div class="login-error" *ngIf="emailBlastForm.controls.subject.errors.required">Enter Subject Line for this mailing. </div>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="text-success font-weight-bold">* Note: This is the window of time the email blast will be added to the queue to be processed. Actual delivery time will vary depending on traffic.</span>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Mailing Type</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="mailingTypeCode">
+                    <option value="0">-None Selected-</option>
+                    <option [value]="item?.sOrder" *ngFor="let item of emailTypeList?.mailType; let i = index">{{item?.display}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>From Address</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="fromType">
+                    <option value="1">Mailing Owner</option>
+                    <option value="2">Contact Owner</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>To Address</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="toType">
+                    <option value="1">Contact Primary Email</option>
+                    <option value="2">All Contact Emails</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Salutation</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="salutation">
+                    <option value="0">-None Selected-</option>
+                    <!--<option value="1">Dear <First Name>, </First></option>
+                    <option value="2">Dear <First Name> <Last Name>,</option>-->
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Mail Merge Template <p class="text-success">Attached Document</p></span>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="mailMergeTemplateID">
+                    <option value="0">-Selecte One-</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>HTML Template</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="emailTemplateID">
+                    <option value="0">-None Selected-</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Add to Buzz Index</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="number" class="form-control-sm" formControlName="score" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left bg-warning text-white">
+                  <span class="">Important Note</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <span >No HTML tags permitted |<a class="webkit-any-link"> Email Merge Placeholder list</a></span>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Body</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <textarea formControlName="body"></textarea>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Attached Files</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="order-row-inner">
+                    <angular-file-uploader [config]="contactDocConfig" (ApiResponse)="apiResponse($event)" #imageUpload></angular-file-uploader>
+                  </div>
+                </div>
+              </div>
+            </form>
+           </div>
+          <div class="wraper-body-right"></div>
+        </div>
+      </div>
+      <!--Steep 3 -->
+      <div class="global-body-section" *ngIf="step >= 3">
+        <div class="custom-action-title"></div>
+        <div class="wraper-body-panel">
+          <div class="wraper-body-left">
+            <form>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Schedule</span>
+                </div>
+                <div class="cards-colunm-right"></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Mailing Type</span>
+                </div>
+                <div class="cards-colunm-right"></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>From Address</span>
+                </div>
+                <div class="cards-colunm-right"></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>To Address</span>
+                </div>
+                <div class="cards-colunm-right"></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Salutation</span>
+                </div>
+                <div class="cards-colunm-right"></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Mail Merge Template</span>
+                </div>
+                <div class="cards-colunm-right"></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>HTML Template</span>
+                </div>
+                <div class="cards-colunm-right"></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Add to Buzz Index</span>
+                </div>
+                <div class="cards-colunm-right"></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Body</span>
+                </div>
+                <div class="cards-colunm-right"></div>
+              </div>
+            </form>
+          </div>
+          <div class="wraper-body-right"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>
+</div>

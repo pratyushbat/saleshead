@@ -1,0 +1,346 @@
+<div class="create-email" #scrollIdTarget [@filterAnimation]="showAnimation">
+
+  <fieldset>
+    <!--<legend>Create Email</legend> _localService.hideCommonComponentEmit('email'); _localService.showCommonComp = ''"-->
+
+    <div class="outbound-module">
+      <form class="form-horizontal required-section" [formGroup]="emailForm" (ngSubmit)="emailFormSubmit()">
+        <div class="outbound-top-panel">
+          <div>
+            <span class="outbound-top-font"><i  class="fas fa-envelope-open-text email-color-font"></i> Outbound Email</span>
+          </div>
+          <div>
+            <button type="button" class="btn btn-primary" (click)="goToLink('help', '69')">Help</button>
+            <button type="button" class="btn btn-primary" (click)="showAttachedDiv = !showAttachedDiv"><i class="fas fa-paperclip"></i> Attach File</button>
+            <button type="button" class="btn btn-cancel" (click)="hideSendMail();" > Close</button>
+          </div>
+        </div>
+        <hr />
+
+        <!--Mail merge error here-->
+        <div class="imp-sub-notes" *ngIf="isMailMergeError && noteResult && noteResult.messageBool">
+          <span [innerHTML]="noteResult.messageString"></span>
+        </div>
+        <!-------------------------->
+        <div class="row">
+          <div class="col-md-12">
+            <table cellspacing=0 class="email-table">
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    To
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group align-div">
+                    <label class="k-label ml-0" [for]="contact" >Contact</label>
+                    <input #contact type="radio" value="contact" name="type" formControlName="type" (change)="changeToType($event)" kendoRadioButton />
+                    <label class="k-label" [for]="user">&nbsp;User</label>
+                    <input #user type="radio" value="user" name="type" formControlName="type" (change)="changeToType($event)" kendoRadioButton />
+                    <label class="k-label" [for]="other">&nbsp;Other</label>
+                    <input #other type="radio" value="other" name="type" formControlName="type" (change)="changeToType($event)" kendoRadioButton />
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    To
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <div class="to-title" *ngIf="selectedType == 'contact'">
+                      <span *ngIf="contactFields">{{emailBind}} ({{contactFields.firstName.fieldValue}} {{contactFields.lastName.fieldValue}})</span>
+                    </div>
+                    <div class="generic-width-per"  *ngIf="selectedType == 'user'" >
+                      <select class="form-control" formControlName="to">
+                        <option value="-1" [selected]="toUsersArr?.length <= 0">-Select-</option>
+                        <option *ngFor="let user of toUsersArr" [value]="user.key">{{user.value}}</option>
+                      </select>
+                    </div>
+                    <div *ngIf="selectedType == 'other'" class="generic-width-per">
+                      <div class="" [ngClass]="{'has-error': sendEmailFrm.to.errors && (sendEmailFrm.to.touched ||  sendEmailFrm.to.dirty)}">
+                        <input type="text" class="form-control" formControlName="to" />
+                      </div>
+                      <div class="search-query-error generic-text-align" *ngIf="sendEmailFrm.to.errors && ( sendEmailFrm.to.touched ||  sendEmailFrm.to.dirty)">
+                        <div *ngIf="sendEmailFrm.to.errors.required">Please enter comma delimited list of email addresses to send this email to.</div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    From
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <div *ngIf="loggedUser.userRole>2">
+                      <div class="generic-width-per" *ngIf="emailDropDownsResponse && !emailDropDownsResponse.isMultipleFromAddress">
+                        <input type="text" class="form-control" formControlName="from" readonly />
+                      </div>
+                      <div class="generic-width-per" *ngIf="emailDropDownsResponse && emailDropDownsResponse.isMultipleFromAddress">
+                        <select class="form-control" formControlName="from">
+                          <option disabled value="-1" [selected]="users?.length <= 0">-Select-</option>
+                          <option *ngFor="let user of users" [value]="user.key">{{user.value}}</option>
+                        </select>
+                      </div>
+                    </div>
+                 
+                    <div class="to-title" *ngIf="loggedUser.userRole<=2">
+                      <span>{{getUserEmail(emailForm.controls.from.value)}}</span>
+                    </div>
+                  </div>
+                
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    CC
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group" [ngClass]="{'has-error': sendEmailFrm.cc.errors}">
+                    <input type="text" class="form-control" formControlName="cc" />
+                  </div>
+                  <div class="search-query-error" *ngIf="sendEmailFrm.cc.errors">
+                    <div *ngIf="sendEmailFrm.cc.errors">Invalid Email Syntax.</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Bcc
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group" [ngClass]="{'has-error': sendEmailFrm.bcc.errors}">
+                    <input type="text" class="form-control" formControlName="bcc" />
+                  </div>
+                  <div class="search-query-error" *ngIf="sendEmailFrm.bcc.errors">
+                    <div *ngIf="sendEmailFrm.bcc.errors">Invalid Email Syntax.</div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Subject
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <input type="text" class="form-control" formControlName="subject" />
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Attach Mail Merge Document
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <select class="form-control" formControlName="mailMergeTemplateID" (change)="changeMailMerge($event);">
+                      <option value="0">- Select one -</option>
+                      <option *ngFor="let mmTemplate of mailMergeTemplates" [value]="mmTemplate.mailMergeTemplateID">{{mmTemplate.templateName}}</option>
+                    </select>
+                  </div>
+                  <div *ngIf="showAttachedDiv">
+                    <div class="flex-panel">
+                      <div class="email-form-group">
+                        <span>Attached Files</span>
+                        <div *ngIf="attachedFiles" class="messageInfo">{{ attachedFiles.length > 0 ? attachedFiles.length + ' file(s) attached' : 'No files attached.' }}</div>
+                      </div>
+                      <!--File uploader-->
+                      <div class="file-attach-uploader">
+                        <div class="attach-alignment">
+                          <div class="email-form-group">
+                            <span></span>
+                            <div class="file-uploader" *ngIf="showFileUploader">
+                              <div class="border">
+                                <angular-file-uploader [config]="afuConfig" [resetUpload]=resetUpload (ApiResponse)="fileUpload($event)"></angular-file-uploader>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!--File Uploader-->
+                      <div class="attach-alignment">
+                        <div class="email-form-group">
+                          <span></span>
+                          <div class="flex-left">
+                            <input type="text" placeholder="file1,file2" id="idSearchAttached" class="form-control" [(ngModel)]="searchValue" [ngModelOptions]="{standalone: true}" />
+                          </div>
+                          <div class="flex-right">
+                            <button type="button" class="btn btn-primary btn-sm" (click)="searchDocumentsList();"><i class="fas fa-search"></i>&nbsp;Search</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="getContactDocumentsListByOwner();"><i class="fas fa-search"></i>&nbsp;View Contact Files</button>
+                            <button type="button" class="btn btn-primary btn-sm" (click)="showFileUploader = !showFileUploader"><i class="fas fa-sync"></i>&nbsp;Upload New</button>
+                          </div>
+                        </div>
+                      </div>
+                      <!--Attached file grid-->
+                      <div class="email-form-group" *ngIf="documents && documents.length <= 0">
+                        <span></span>
+                        <div class="messageInfo">No file(s) found.</div>
+                      </div>
+                      <div class="attach-alignment" *ngIf="documents && documents.length > 0">
+                        <span></span>
+                        <div class="attachFile-grid">
+                          <kendo-grid #gridAttach id="attachGridId" [kendoGridBinding]="documents" [sort]="attachFileSort" [skip]="skip" [pageSize]="pageSize" [pageable]="{ buttonCount: 0, info: true }">
+
+                            <kendo-grid-column [width]="2">
+                              <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                                <img class="img-slidecast" src="{{ soUrl + dataItem.documentTypeIcon}}" />
+                              </ng-template>
+                            </kendo-grid-column>
+                            <kendo-grid-column title="{{ documentGridTitle }}" [width]="20" [class.selected-row]="isSelected">
+                              <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                                {{dataItem.documentName}}
+                                &nbsp;<i class="fa fa-check" *ngIf="dataItem.isSelected"></i>
+                              </ng-template>
+                            </kendo-grid-column>
+                            <kendo-grid-column title="" [width]="4">
+                              <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                                <button type="button" class="btn btn-sm btn-success" *ngIf="!dataItem.isSelected" (click)="attachDetachFile('add', dataItem, rowIndex)"><i class="fas fa-paperclip"></i> Attach</button>
+                                <button type="button" class="btn btn-sm btn-danger" *ngIf="dataItem.isSelected" (click)="attachDetachFile('remove', dataItem, rowIndex)"><i class="fas fa-minus-circle"></i> Detach</button>
+                              </ng-template>
+                            </kendo-grid-column>
+
+                          </kendo-grid>
+                        </div>
+                      </div>
+                      <!--Attached file grid-->
+                    </div>
+                  </div>
+
+
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Email Template
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <select class="form-control" formControlName="emailTemplateID">
+                      <option value="0"> -Use plain text- </option>
+                      <option *ngFor="let eTemplate of emailTemplates" [value]="eTemplate.emailTemplateID">{{eTemplate.templateName}}</option>
+                    </select>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="emailSnippets && emailSnippets.length > 0">
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Email Snippet
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <select class="form-control" formControlName="emailSnippetID" (change)="changeEmailSnippet($event);">
+                      <option value="0">- Select one -</option>
+                      <option *ngFor="let eSnippet of emailSnippets" [value]="eSnippet.emailSnippetID">{{eSnippet.snippetTitle}}</option>
+                    </select>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Important Note
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <span class="imp-sub-notes">No HTML tags permitted | <a href="https://www.salesoptima.com/support/email-placeholder-list" target="_blank" (click)="goToLink('mailPlaceholderList')">Email Merge Placeholder list</a></span>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="selectedType == 'user' || selectedType == 'other'">
+                <th class="sendemail-th">
+                  <div class="sendemail-div">
+                    Regarding Link
+                  </div>
+                </th>
+                <td class="sendemail-td">
+                  <div class="email-form-group">
+                    <input #regardingLink type="checkbox" name="regardingLink" formControlName="regardingLink" kendoCheckBox />
+                  </div>
+                </td>
+              </tr>
+
+            </table>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="email-form-group" [hidden]="sendEmailFrm.emailSnippetID.value && sendEmailFrm.emailSnippetID.value != ''">
+              <textarea class="form-control" row="7" formControlName="body"></textarea>
+            </div>
+          </div>
+        </div>
+        <!----------------------------->
+
+        <div class="email-snippet-editor" *ngIf="sendEmailFrm.emailSnippetID.value && sendEmailFrm.emailSnippetID.value != ''">
+          <kendo-editor [value]="selectedEmailSnippet" (valueChange)="changeValueKendoEditor($event)" class="email-editor-height">
+            <kendo-toolbar>
+              <kendo-toolbar-buttongroup>
+                <kendo-toolbar-button kendoEditorBoldButton></kendo-toolbar-button>
+                <kendo-toolbar-button kendoEditorItalicButton></kendo-toolbar-button>
+                <kendo-toolbar-button kendoEditorUnderlineButton></kendo-toolbar-button>
+              </kendo-toolbar-buttongroup>
+              <kendo-toolbar-buttongroup>
+                <kendo-toolbar-button kendoEditorAlignLeftButton></kendo-toolbar-button>
+                <kendo-toolbar-button kendoEditorAlignCenterButton></kendo-toolbar-button>
+                <kendo-toolbar-button kendoEditorAlignRightButton></kendo-toolbar-button>
+                <kendo-toolbar-button kendoEditorAlignJustifyButton></kendo-toolbar-button>
+              </kendo-toolbar-buttongroup>
+              <kendo-toolbar-dropdownlist kendoEditorFormat></kendo-toolbar-dropdownlist>
+              <kendo-toolbar-dropdownlist kendoEditorFontSize></kendo-toolbar-dropdownlist>
+              <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+              <kendo-toolbar-colorpicker kendoEditorForeColor></kendo-toolbar-colorpicker>
+              <kendo-toolbar-colorpicker kendoEditorBackColor view="gradient"></kendo-toolbar-colorpicker>
+              <kendo-toolbar-buttongroup>
+                <kendo-toolbar-button kendoEditorInsertUnorderedListButton></kendo-toolbar-button>
+                <kendo-toolbar-button kendoEditorInsertOrderedListButton></kendo-toolbar-button>
+                <kendo-toolbar-button kendoEditorIndentButton></kendo-toolbar-button>
+                <kendo-toolbar-button kendoEditorOutdentButton></kendo-toolbar-button>
+              </kendo-toolbar-buttongroup>
+              <kendo-toolbar-button kendoEditorInsertImageButton></kendo-toolbar-button>
+              <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+            </kendo-toolbar>
+          </kendo-editor>
+        </div>
+
+        <div>
+          <small class="text-success"><b>Note:</b> The email will be saved in this contact's history.</small>
+        </div>
+        <div class="bottom-panel email-bottom-justify" >
+          <button type="submit" class="btn btn-primary">{{ submitBtnTxt }}</button>
+          <small class="text-right">
+            <span *ngIf="!showDatePicker">
+              <span class="text-success">{{ getCurrentDate | date:"MM/dd/yy h:mm a" }} </span>
+              <a class="btn btn-primary btn-schedule" href="javascript:void(0)" (click)="showDatePicker = !showDatePicker">schedule for later</a>
+            </span>
+
+            <span *ngIf="showDatePicker">
+              <kendo-datetimepicker [format]="datePickerformat" [(value)]="datePickerValue" class="select-option"></kendo-datetimepicker>
+              <a class="btn btn-cancel" href="javascript:void(0)" (click)="showDatePicker = !showDatePicker">Cancel</a>
+            </span>
+
+          </small>
+        </div>
+      </form>
+    </div>
+  </fieldset>
+</div>

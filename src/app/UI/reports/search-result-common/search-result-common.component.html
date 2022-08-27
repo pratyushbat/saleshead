@@ -1,0 +1,38 @@
+<div class="wraper-main-section" *ngIf="!isShowSearchGrid">
+  <div class="global-card-section">
+    <div class="global-header-section">
+      <div class="svg-icon-panel d-flex appt-2D-heading" *ngIf="!isScoreCardGrid"><img src="../../../../../assets/contactstitle.svg" class="mr-1" />Contacts Search Results </div>
+      <div class="svg-icon-panel d-flex appt-2D-heading" *ngIf="isScoreCardGrid"><img src="../../../../../assets/rptappttitle.svg" class="mr-1" />{{headerTitle}}</div>
+      <div class="header-button-panel">
+        <div class="button-wrapper">
+          <select class="form-control" *ngIf="!isScoreCardGrid">
+            <option hidden>Send Results To</option>
+            <option value="1">Direct Mail Campaign</option>
+            <option value="2">Email Marketing Campaign</option>
+            <option value="3">Bulk Appointments Wizard</option>
+            <option value="4">Bulk Actions Wizard</option>
+          </select>
+          <div *ngIf="isExportDownload">
+            <input type="checkbox" class="checkbox" [(ngModel)]="includeMetrics" />
+            <span>Include Metrics</span>
+          </div>
+          <button type="button" class="btn" (click)="downloadExport()" [hidden]="(!companyResponse?.secExcel && user?.userRole==1) || !user?.isAllowDownload">
+            <i class="fa fa-download"></i>
+          </button>
+          <button type="button" class="btn btn-primary" (click)="addNewContact()" *ngIf="!isScoreCardGrid">
+            <i class="fa fa-plus"></i> New Contact
+          </button>
+        </div>
+      </div>
+    </div>
+    <contact-exports *ngIf="user" [user]="user" [selectedUserId]="selectedUserId" [isContactReport]="true" [eStat]="eStat" [eType]="eType"></contact-exports>
+    <div class="dist-manager-margin">
+      <app-contact-map-common *ngIf="user && !isScoreCardGrid" [contactsMapData]="referrerContact" [user]="user" [isDownload]=true [isContactReport]=true></app-contact-map-common>
+      <app-score-card-common *ngIf="user && isScoreCardGrid" [data]="scoreCardData" [hiddenColumns]="hiddenColumns" [user]="user"></app-score-card-common>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

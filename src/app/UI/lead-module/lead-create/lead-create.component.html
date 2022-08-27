@@ -1,0 +1,161 @@
+<div class="create-email">
+  <div class="global-padding10">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="text-right" *ngIf="isShowClosed == true">
+          <button class="btn btn-cancel task-btn-margin" type="button" (click)="onCloseForm();"><i class="fas fa-times"></i> Close</button>
+        </div>        
+        <div class="global-header-section">
+          <div class="svg-icon-panel">
+            <img style="filter: brightness(1.5);" src="../../../../assets/leadstitle.svg" class="mr-1" /> <span class="contact-create-header">Lead Information</span>
+          </div>
+        </div>
+        <div class="global-body-section">
+          <form [formGroup]="leadForm" (ngSubmit)="leadFormSubmit()">
+            <div class="cards-height-section">
+              <div class="margin-all-area">
+                <div class="full-width-container">
+                  <div class="search-query-error acc-info-srch-error">* Required</div>
+                  <kendo-autocomplete [data]="contactSearchList" valueField="searchText" [value]="contactName" (valueChange)="getContactId($event)" placeholder="Search"
+                    (keyup)="getSearchData($event.target.value)" [ngClass]="{'has-error': (isContactMandatory == true)}"></kendo-autocomplete>
+                </div>
+              </div>
+              <div class="cards-height-panel">
+                <div id="list">
+                  <div class="multiple-cards-section">
+                    <div class="multiple-cards-panel" *ngFor="let section of arrSortedBySection; let is = index;" [hidden]="section.items.length == 0 || isShowFields(is)">
+                      <div class="wraper-main-section">
+                        <div class="global-card-section">
+                          <div class="global-header-section">
+                            <span>{{ section.sectionName }}</span>
+                          </div>
+                          <div class="global-body-section">
+                            <div class="margin-all-area">
+                              <div class="draggable" *ngFor="let item of section.items; let i = index">
+                                <div class="form-group" *ngIf="item.fieldType == 0 && item.fieldValue != 0" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle}}</label>
+                                  <input type="text" class="form-control" formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (leadForm.get(item.fieldName).errors && (leadForm.get(item.fieldName).touched || leadForm.get(item.fieldName).dirty))}" />
+                                </div>
+                                <div class="form-group" *ngIf="item.fieldType == 0 && item.fieldValue == 0" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle}}</label>
+                                  <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (leadForm.get(item.fieldName).errors && (leadForm.get(item.fieldName).touched || leadForm.get(item.fieldName).dirty))}" />
+                                </div>
+                                <div class="form-group" *ngIf="item.fieldType == 2" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle}}</label>
+                                  <select class="form-control" formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (leadForm.get(item.fieldName).errors && (leadForm.get(item.fieldName).touched || leadForm.get(item.fieldName).dirty))}">
+                                    <option value=0>-None Selected-</option>
+                                    <option *ngFor="let blastItem of item.items; let i = index" [value]='blastItem.value'>
+                                      {{blastItem.display}}
+                                    </option>
+                                  </select>
+                                </div>
+                                <div class="form-group" *ngIf="item.fieldType == 5" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle}}</label>
+                                  <kendo-datetimepicker placeholder="" formControlName="{{ item.fieldName }}" [format]="format" class="generic-width-per"></kendo-datetimepicker>
+                                </div>
+                                <div class="custom-toggle">
+                                  <div class="form-group" *ngIf="item.fieldType == 1" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                    <label>{{item.fieldTitle}}</label>
+                                    <label class="switch">
+                                      <input type="checkbox" [id]="item.fieldName" [name]="item.fieldName" formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (leadForm.get(item.fieldName).errors && (leadForm.get(item.fieldName).touched || leadForm.get(item.fieldName).dirty))}" />
+                                      <span class="slider round"></span>
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="multiple-cards-panel" *ngFor="let item of arrSortedBySection1[0]?.items; let is = index;" [hidden]="item.length == 0">
+                      <div class="wraper-main-section">
+                        <div class="global-card-section">
+                          <div class="global-header-section" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                            <span>{{item?.fieldTitle}}</span>
+                          </div>
+                          <div class="global-body-section">
+                            <div class="margin-all-area">
+                              <div class="draggable">
+                                <div class="form-group">
+                                  <textarea type="text" formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (leadForm.get(item.fieldName).errors && (leadForm.get(item.fieldName).touched || leadForm.get(item.fieldName).dirty))}"></textarea>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="multiple-cards-panel">
+                      <div class="wraper-main-section">
+                        <div class="global-card-section">
+                          <div class="global-header-section">
+                            <span>System</span>
+                          </div>
+                          <div class="global-body-section">
+                            <div class="margin-all-area">
+                              <div class="draggable">
+                                <div class="form-group">
+                                  <label>User</label>
+                                  <select class="form-control" formControlName="userid">
+                                    <option value=0>-None Selected-</option>
+                                    <option *ngFor="let item of userList; let i = index" [value]='item.key'>
+                                      {{item.value}}
+                                    </option>
+                                  </select>
+                                </div>
+                                <div class="form-group">
+                                  <label>Last Modified</label><br />
+                                  <label>{{leadForm?.controls.lastModified.value | date:'MM/dd/yyyy'}}</label>
+                                </div>
+                                <div class="form-group">
+                                  <label>Created</label><br />
+                                  <label>{{leadForm?.controls.createdDt.value | date:'MM/dd/yyyy'}}</label>
+                                </div>
+                                <div class="form-group" *ngIf="leadId>0">
+                                  <label>Unique Idenfier</label><br />
+                                  <label>{{leadForm?.controls.uniqueIdentifier.value}}</label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bottom-fix-footer">
+                <div class="top-common-btn">
+                  <button class="btn btn-primary" type="submit" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false"><i class="fa fa-save'"></i> Save</button>
+                  <button class="btn btn-cancel" type="button" (click)="onCloseForm();"><i class="fa fa-save'"></i> Cancel</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>       
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="leadConfirmModal" tabindex="-1" role="dialog" aria-labelledby="fbcConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h4 class="modal-title modal-common-title">Confirmation</h4>
+      </div>
+      <div class="modal-body modal-common-body">
+        <h2>{{confirmText}}</h2>
+      </div>
+      <div class="modal-footer">
+        <button type="button" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" data-dismiss="modal" class="btn-lg btn-danger" (click)="confirmOperation(true)">Save</button>
+        <button type="button" class="btn-lg btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

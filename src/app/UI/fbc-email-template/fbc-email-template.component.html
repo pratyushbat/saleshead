@@ -1,0 +1,232 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-4" *ngIf="showEditPanel == false">
+      <div class="email-pricing-body">
+        <div class="teamoffice-body-section">
+          <div class="team-example-list-heading">
+            <div class="team-example-box-heading">
+              <div class="col-6"><h6>Team</h6></div>
+              <div class="col-6"><h6> Location</h6></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <div class="row">
+                <div class="col-6" *ngIf="isShowTeamDd == true">
+                  <select class="form-control select-option ml-2" [(ngModel)]="teamId" (change)="getFbcEmailListByTeam($event.target.value)">
+                    <option [value]=0>-View Base Templates-</option>
+                    <option *ngFor="let teamList of teamCodeList; let i = index" [value]="teamList.teamCode">{{teamList.display }}</option>
+                  </select>
+                </div>
+                <div class="col-6" *ngIf="isShowTeamLabel == true">{{lblTeamText}}</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="row">
+                <div class="col-6" *ngIf="isShowTeamDd == false || isShowLocationByTeam == true">
+                  <select class="form-control select-option ml-2" [(ngModel)]="locationId" (change)="getFbcEmailListByLocation($event.target.value)">
+                    <option *ngFor="let locList of locationList; let i = index" [value]="locList.class5Code">{{locList.location }}</option>
+                  </select>
+                </div>
+                <div class="col-6" *ngIf="isShowTeamLabel == false && isShowLocationByTeam == false">{{lblLocationText}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt-3">
+  <div class="row">
+    <div class="col-12" *ngIf="showEditPanel == false">
+      <div class="emlcommon-body-area">
+        <div class="user-body-section">
+          <div class="top-txtmsg">
+            <div class="user-body-heading header">
+              <span class="mthheading"><img src="../../../../assets/tagtitle.svg" class="mr-1" />{{griTitle}}</span>
+              <div class="top-common-btn_txtmsg">
+                <button class="btn btn-primary" type="button" (click)="resetGridSetting()"> Reset Grid Setting</button>
+                <input class="ml-2" placeholder="Search in all columns..." kendoTextBox />
+                <select class="form-control select-option ml-2" *ngIf="isShowActiveDd == true" [(ngModel)]="activeDDValue">
+                  <option value=true> Active Only </option>
+                  <option value=false> Draft Only </option>
+                </select>
+              </div>
+            </div>
+            <div class="user-setup-section userpref-setup-section">
+              <kendo-grid #grid id="gridId"
+                  [kendoGridBinding]="fbcEmailTemplateList"
+                  [sortable]="{mode: 'multiple'}"
+                  [sort]="_gridCnfgService.sort"
+                  [pageSize]="_gridCnfgService.pageSize"
+                  [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                  [scrollable]="'false'"
+                  [reorderable]="true"
+                  [resizable]="true"
+                  [columnMenu]="{ filter: true }"
+                  [ngStyle]="gridHeight"
+                  (columnReorder)="_gridCnfgService.columnsOrderChanged('fbc_email_template_grid', $event)"
+                  (sortChange)="_gridCnfgService.sortChange('fbc_email_template_grid', $event)"
+                  (pageChange)="_gridCnfgService.pageChange('fbc_email_template_grid', $event)"
+                  (columnResize)="_gridCnfgService.columnResize(5,'fbc_email_template_grid', $event)"
+                  (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'fbc_email_template_grid',grid)">
+                <div class="grid-scroll-bar">
+                  <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                    [field]="column.field"
+                    [title]="column.title | titlecase"
+                    [width]="column.width"
+                    [filterable]="true"
+                    [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                    [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                    [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                    [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                    [includeInChooser]="column.field=='$' ? false : true"
+                    [editable]="column.field == '$' || column.field == 'contact'?false: true">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                      <div class="customer-name" *ngIf="column.field == 'templateName'">   {{ dataItem[column.field]}}</div>
+                      <div class="customer-name" *ngIf="column.field == 'previewTemplate'">  <button kendoButton (click)="setHtmlText(dataItem.fBCETID)" matTooltip="Preview" [iconClass]="'fa fa-eye'"></button></div>
+                      <div class="customer-name" *ngIf="column.field == 'status'"
+                           [ngStyle]="{'color': getStatus(dataItem) == 'Draft (Default in use)' ? 'orange' : getStatus(dataItem) == 'Customized version in use' ? 'green' : 'navy'}">{{getStatus(dataItem)}}</div>
+                    </ng-template>
+                  </kendo-grid-column>
+
+                  <kendo-grid-column title="Action" width="100" min="100" [style]="{'text-align': 'center'}" [includeInChooser]="false" [reorderable]="false" [columnMenu]="false">
+                    <ng-template kendoGridCellTemplate let-dataItem>
+                      <button kendoButton matTooltip="Reset" *ngIf="btnText != 'Customize'" (click)="onResetFbcTemplate(dataItem.emailTemplateID)" [iconClass]="'fa fa-refresh'"></button>
+                      <button kendoButton matTooltip="Overwrite All" *ngIf="btnText != 'Customize'" (click)="overwriteAll(dataItem.emailTemplateID)" [iconClass]="'fas fa-exchange-alt'"></button>
+                      <button kendoButton matTooltip="{{btnText}}" (click)="onConfigure(dataItem)" [iconClass]="'fa fa-pencil'"></button>
+                    </ng-template>
+                  </kendo-grid-column>
+                </div>
+              </kendo-grid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12" *ngIf="showEditPanel == true">
+      <div class="emlcommon-body-area">
+        <div class="user-body-section">
+          <div class="user-body-heading header">
+            <span class="mthheading"><img src="../../../../assets/tagtitle.svg" class="mr-1" />{{griTitleEdit}}</span>
+            <div class="top-common-btn_txtmsg">
+              <button type="button" matTooltip="Email Test" (click)="sendEmail()" class="btn grid-common-btn">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+                <span class="btn-text">E-mail</span>
+              </button>
+              <span>{{statusDisplay}}</span>
+              <button type="button" matTooltip="{{activeTooltip}}" (click)="makeActiveDeactive(activeTooltip)" class="grid-common-btn">
+                <i class="fa fa-plug" aria-hidden="true"></i>
+                <span class="btn-text">link</span>
+              </button>
+              <button type="button" matTooltip="Back To List" (click)="backToList()" class="btn grid-common-btn">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                <span class="btn-text">Back</span>
+              </button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <div class="user-setup-section userpref-setup-section">
+                <kendo-grid #grid id="gridId"
+                            [kendoGridBinding]="editLocationListFbc"
+                            [ngStyle]="gridHeight"
+                            (edit)="editHandler($event)"
+                            (cancel)="cancelHandler($event)"
+                            (save)="saveHandler($event)"
+                            (remove)="removeHandler($event)">
+                  <div class="grid-scroll-bar">
+                    <kendo-grid-column *ngFor="let column of columnsEditPanel"
+                                       [field]="column.field"
+                                       [title]="column.title | titlecase"
+                                       [width]="column.width"
+                                       [filterable]="true"
+                                       [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                       [hidden]="column.field == 'fBCETPHItemID' || column.field == 'fBCETID' || column.field == 'pHName' || column.field == 'locationPHValue' ? true : false"
+                                       [editable]="column.field == '$' || column.field == 'pHDisplay' || column.field == 'valueType' || column.field == 'locationFBCETPHItemID'?false: true">
+                      <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                        <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                        <div class="customer-name" *ngIf="column.field == 'pHDisplay'">   {{ dataItem[column.field]}}</div>
+                        <div class="customer-name" *ngIf="column.field == 'valueType'">{{ dataItem.valueType == 1 ? 'Block' : dataItem.valueType == 2 ? 'Image URL' : dataItem.valueType == 3 ? 'Hyperlink URL' : dataItem.valueType == 4 ? 'Top Header Block' : dataItem.valueType == 0 ? 'None' : '--'}}</div>
+                        <div class="customer-name" *ngIf="column.field == 'pHValue'">Length : {{ dataItem.locationFBCETPHItemID ?  dataItem.locationPHValue.length : dataItem.pHValue.length}}</div>
+
+                        <div class="customer-name" *ngIf="column.field == 'locationFBCETPHItemID'" [ngStyle]="{'color': dataItem.locationFBCETPHItemID ? 'green' : 'red'}">   {{ dataItem[column.field] ? 'Custom' : 'Default'}}</div>
+                      </ng-template>
+                      <ng-template kendoGridEditTemplate let-dataItem="dataItem" let-formGroup="formGroup" let-rowIndex="rowIndex"
+                                   let-column="column">
+
+                        <div class="customer-name" *ngIf="column.field == 'pHValue'">
+                          <select class="form-control" *ngIf="dataItem.valueType == 4" (change)="getCodeBlockData($event.target.value,dataItem,rowIndex)">
+                            <option value="0"> -Select- </option>
+                            <option *ngFor="let itm of codeBlockList; let i = index" [value]="itm.fbCodeBlockId">{{itm.blockTitle }}</option>
+                          </select>
+                          <kendo-editor [(ngModel)]="dataItem.locationFBCETPHItemID ? dataItem.locationPHValue : dataItem[column.field]" style="height: 200px;width:450px">
+                            <kendo-toolbar>
+                              <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                              <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                              <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                              <kendo-toolbar-button kendoEditorBoldButton></kendo-toolbar-button>
+                              <kendo-toolbar-button kendoEditorItalicButton></kendo-toolbar-button>
+                              <kendo-toolbar-button kendoEditorUnderlineButton></kendo-toolbar-button>
+                              <kendo-toolbar-button kendoEditorAlignLeftButton></kendo-toolbar-button>
+                              <kendo-toolbar-button kendoEditorAlignCenterButton></kendo-toolbar-button>
+                              <kendo-toolbar-button kendoEditorAlignRightButton></kendo-toolbar-button>
+                              <kendo-toolbar-button kendoEditorAlignJustifyButton></kendo-toolbar-button>
+                              <kendo-toolbar-colorpicker kendoEditorForeColor></kendo-toolbar-colorpicker>
+                              <kendo-toolbar-colorpicker kendoEditorBackColor view="gradient"></kendo-toolbar-colorpicker>
+                              <kendo-toolbar-button kendoEditorInsertFileButton></kendo-toolbar-button>
+                              <kendo-toolbar-button kendoEditorInsertImageButton></kendo-toolbar-button>
+                              <kendo-toolbar-button kendoEditorCreateLinkButton></kendo-toolbar-button>
+                            </kendo-toolbar>
+                          </kendo-editor>
+                        </div>
+
+                      </ng-template>
+                    </kendo-grid-column>
+
+                    <kendo-grid-column title="Action" width="100" min="100" [style]="{'text-align': 'center'}">
+                      <ng-template kendoGridCellTemplate let-dataItem>
+                        <button kendoGridRemoveCommand matTooltip="Delete" *ngIf="dataItem.locationFBCETPHItemID > 0" [iconClass]="'fa fa-trash'"></button>
+                        <button kendoGridCancelCommand matTooltip="Cancel" [iconClass]="'fas fa-times'"></button>
+                        <button kendoGridEditCommand matTooltip="Edit" [iconClass]="'fa fa-pencil'"></button>
+                        <button kendoGridSaveCommand matTooltip="Save" [iconClass]="'fa fa-save'"></button>
+                      </ng-template>
+                    </kendo-grid-column>
+                  </div>
+                </kendo-grid>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="user-setup-section userpref-setup-section">
+                <div [innerHTML]="htmlText | safeHtml"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="fbcConfirmModal" tabindex="-1" role="dialog" aria-labelledby="fbcConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h4 class="modal-title modal-common-title">Reset Confirmation</h4>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>{{confirmText}}</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" data-dismiss="modal" class="btn-lg btn-danger" (click)="confirmOperation()">Confirm</button>
+          <button type="button" class="btn-lg btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>
+</div>

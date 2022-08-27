@@ -1,0 +1,79 @@
+
+<div class="global-body-section mb-2  mt-2">
+  <div class="wraper-body-panel">
+    <div class="wraper-body-left">
+      <div class="margin-all-area" *ngFor="let goalGen of finalGoals;">
+        <div class="wraper-main-section">
+          <div class="global-card-section" >
+            <div class="inner-header-bg">
+              <div class="inner-detail-bg">
+                <span>Details</span>
+              </div>
+              <div class="inner-cards-panel header-inner-hidden">
+                <span>{{goalGen.sectionName}} </span>
+                <span> </span>
+                <span>Goal</span>
+                <span></span>
+                <span>Summary</span>
+              </div>
+            </div>
+            <div class="global-body-section">
+              <div class="wraper-body-panel">
+                <div class="wraper-body-left">
+                  <div class="inner-cards-grid-height">
+                    <div *ngFor="let goalRes of goalGen.goals; let i=index;">
+                      <div class="inner-cards-grid">
+                        <div class="inner-card-mobile">
+                          <label>Display</label>
+                          <div class="mobile-view-design">
+                            <div></div>
+                          </div>
+                        </div>
+                        <div class="inner-card-mobile">
+                          <label>Display</label>
+                          <div class="mobile-view-design">
+                            <div>{{goalRes.display}}</div>
+                          </div>
+                        </div>
+                        <div class="inner-card-mobile">
+                          <label>goal</label>
+                          <div class="mobile-view-design">
+                            <div *ngIf="!goalRes.active" class=""></div>
+                            <div *ngIf="goalRes.active" class="row">
+                            <input type="number" #model="ngModel"  (change)="setButtonDisable(model)" [(ngModel)]="goalRes.goal" required />
+                            <div *ngIf="model.invalid" style="color: red">Required</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="inner-card-mobile">
+                          <label>Activate</label>
+                          <div class="mobile-view-design">
+                            <div class="">
+                              <a class="table-row-action edit-action" (click)="activateRowGeneral(goalRes,goalGen.goals,i)">
+                                {{goalRes.active?'Deactivate':'Activate'}}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="inner-card-mobile">
+                          <label>goalType</label>
+                          <div class="mobile-view-design">
+                            <div *ngIf="!goalRes.active" class="">{{goalRes.showInSummary}}</div>
+                            <div *ngIf="goalRes.active" class=""><input type="checkbox"  class="checkbox mx-2" [(ngModel)]="goalRes.showInSummary" /></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="team-example-box" *ngIf="goalGen?.goals?.length === 0"><h6>No records found</h6></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

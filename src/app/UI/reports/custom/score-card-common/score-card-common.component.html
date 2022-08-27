@@ -1,0 +1,59 @@
+  <div class="global-body-section">
+    <kendo-grid #grid id="gridId"
+                [kendoGridBinding]="data"
+                [sortable]="{mode: 'multiple'}"
+                [sort]="_gridCnfgService.sort"
+                [pageSize]="_gridCnfgService.pageSize"
+                [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                [scrollable]="'false'"
+                [reorderable]="true"
+                [resizable]="true"
+                [columnMenu]="{ filter: true }"
+                [ngStyle]="gridHeight"
+                (columnReorder)="_gridCnfgService.columnsOrderChanged('score_card_code_grid', $event)"
+                (sortChange)="_gridCnfgService.sortChange('score_card_code_grid', $event)"
+                (pageChange)="_gridCnfgService.pageChange('score_card_code_grid', $event)"
+                (columnResize)="_gridCnfgService.columnResize(4,'score_card_code_grid', $event)"
+                (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'score_card_code_grid',grid)">
+      <ng-template kendoGridToolbarTemplate>
+        <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+          <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+          <span>Download Excel</span>
+        </button>
+        <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+          <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+          <span>Download PDF</span>
+        </button>
+      </ng-template>
+      <div class="grid-scroll-bar">
+        <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                           [field]="column.field"
+                           [title]="column.title"
+                           [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                           [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                           [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                           [width]="column.width"
+                           [filterable]="true"
+                           [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1">
+                           <!--[includeInChooser]="hiddenColumns.indexOf(column.field) > -1"-->
+          <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+            <div class="customer-name" >{{ dataItem[column.field]}}</div>
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-excelexport #excelexport [data]="data" fileName='Scorecard-Report'>
+          <kendo-excelexport-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+            <ng-template let-value="rowIndex">
+              <div class="customer-name" *ngIf="col.field != '$'" [innerHtml]="dataItem[col.field]"></div>
+            </ng-template>
+          </kendo-excelexport-column>
+        </kendo-excelexport>
+        <kendo-grid-pdf fileName="Scorecard-Report.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+          <kendo-grid-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+            <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+              <div class="customer-name" *ngIf="col.field != '$'" [innerHtml]="dataItem[col.field]"></div>
+            </ng-template>
+          </kendo-grid-column>
+        </kendo-grid-pdf>
+      </div>
+    </kendo-grid>
+  </div>

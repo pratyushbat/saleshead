@@ -1,0 +1,44 @@
+<div class="container-fluid">
+  <div class="role-tabs-panel mt-4">
+    <kendo-tabstrip  [keepTabContent]="true"  >
+
+      <kendo-tabstrip-tab [title]="'Web Form List'" [selected]="true">
+        <ng-template kendoTabContent>
+          <webform  *ngIf="user"  [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></webform>
+        </ng-template>
+      </kendo-tabstrip-tab>
+
+      <kendo-tabstrip-tab [title]="'Automation Processes'">
+        <ng-template kendoTabContent>
+          <div class="feature-table">
+            <p class="under-construction under-construction-common">
+              <img src="../../../assets/under-construction.gif" />
+            </p>
+          </div>
+        </ng-template>
+      </kendo-tabstrip-tab>
+
+      <kendo-tabstrip-tab [title]="'My Image Bank'">
+        <ng-template kendoTabContent>
+          <div class="feature-table">
+            <p class="under-construction under-construction-common">
+              <img src="../../../assets/under-construction.gif" />
+            </p>
+          </div>
+        </ng-template>
+      </kendo-tabstrip-tab>
+
+      <kendo-tabstrip-tab [title]="'My Round Robin List'">
+        <ng-template kendoTabContent>
+          <round-robin  *ngIf="user" [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></round-robin>
+        </ng-template>
+      </kendo-tabstrip-tab>
+
+
+
+    </kendo-tabstrip>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

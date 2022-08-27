@@ -1,0 +1,211 @@
+<div class="create-email">
+  <div class="global-padding10">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel">
+            <span class="contact-create-span">Company Information</span>
+            <span class="contact-create-span" *ngIf="companyForm?.get('companyName')?.value">&nbsp;-&nbsp;{{ companyForm.get('companyName').value  | titlecase}} </span>
+          </div>
+          <div class="header-button-panel">
+            <div class="button-wrapper">
+              <button [hidden]="roleFeaturePermissions?.create == false && user?.userRole <= 3" *ngIf="isEditMode && companyId>0" type="button" matTooltip="Edit" class="icon-btn" (click)="isEditMode=false;">
+                <i class="fa fa-pencil"></i>
+                <span class="btn-text">Edit</span>
+              </button>
+              <button *ngIf="isEditMode " type="button" matTooltip="Back To Company List" class="icon-btn" (click)="showCompanyList()">
+                <span class="btn-text">Back</span>
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+              </button>
+              <button *ngIf="!isEditMode " type="button" [hidden]="roleFeaturePermissions?.edit == false && user?.userRole <= 3" matTooltip="Save Company" class="icon-btn" (click)="saveCompanyById()">
+                <i class="fa fa-save" aria-hidden="true"></i>
+                <span class="btn-text">Save</span>
+              </button>
+              <button *ngIf="!isEditMode && currentUrl == 'company-create' " type="button" matTooltip="Cancel Company" class="icon-btn" (click)="companyId<=0?gotoCompany():cancelCompanyCreate()">
+                <span class="btn-text">Cancel</span>
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+              <button *ngIf="!isEditMode && companyId>0 " [hidden]="roleFeaturePermissions?.delete == false && user?.userRole <= 3" type="button" matTooltip="Delete Company" class="icon-btn" (click)="confirmCompanyDelete()" data-toggle="modal" data-target="#companyDeleteModal">
+                <span class="btn-text">Delete</span>
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>       
+        <div class="global-body-section">
+          <form [formGroup]="companyForm" (ngSubmit)="companyFormSubmit()" *ngIf="!showSpinner">
+            <div class="cards-height-section">
+              <div *ngIf="companyFields">
+                <div class="margin-all-area">
+                  <div class="form-group" [hidden]="companyFields.companyName?.isShow == 2" [ngClass]="{'has-asterisk': companyFields.companyName?.isShow == 1 && !isEditMode}">
+                    <label>{{companyFields.companyName.fieldTitle}}</label>
+                    <span *ngIf="isEditMode">:&nbsp;{{companyFields.companyName.fieldValue}}</span>
+                    <input type="text" tabindex="1" class="form-control" *ngIf="!isEditMode" formControlName="companyName" [ngClass]="{'has-error': (companyFrm?.companyName?.errors && (companyFrm?.companyName?.touched || companyFrm?.companyName?.dirty))}" required />
+                    <div *ngIf="companyFrm?.companyName?.errors &&(companyFrm?.companyName?.touched || companyFrm?.companyName?.dirty)">
+                      <div class="search-query-error acc-info-srch-error" *ngIf="companyFrm?.companyName?.errors?.required">
+                        Please enter Company Name
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-height-panel">
+                <div id="list">
+                  <div class="common-detail-section">
+                    <div class="multiple-cards-section">
+                      <div class="multiple-cards-panel" *ngFor="let section of arrSortedBySection; let is = index;" [hidden]="section.items.length == 0 || isShowFields(is)">
+                        <div class="wraper-main-section">
+                          <div class="global-card-section">
+                            <div class="global-header-section">
+                              <span>{{ section.sectionName }}</span>
+                            </div>
+                            <div class="global-body-section">
+                              <div class="margin-all-area">
+                                <div class="draggable" *ngFor="let item of section.items; let i = index">
+                                  <div class="form-group" *ngIf="item.fieldType == 0" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1 && !isEditMode}">
+                                    <label>{{item.fieldTitle}}</label>
+                                    <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                    <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" maxlength="14" *ngIf="!isEditMode && item.fieldTitle == 'Phone'" formControlName="{{ item.fieldName }}"
+                                            [placeholder]="placeHolder" [mask]="mobile_mask" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}" />
+                                    <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" maxlength="14" *ngIf="!isEditMode && item.fieldTitle == 'HomePhone'" formControlName="{{ item.fieldName }}"
+                                            [placeholder]="placeHolder" [mask]="mobile_mask" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}" />
+                                    <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" maxlength="14" *ngIf="!isEditMode && item.fieldTitle == 'AltPhone'" formControlName="{{ item.fieldName }}"
+                                            [placeholder]="placeHolder" [mask]="mobile_mask" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}" />
+
+                                    <input type="text" class="form-control" *ngIf="!isEditMode && item.fieldTitle == 'Zip'" placeholder="Zip" minlength="3" maxlength="9" (blur)="getCityState($event);" formControlName="{{ item.fieldName }}" (keypress)="_localService.onKeyDown($event)"
+                                            [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}" />
+
+                                    <input type="text" class="form-control" *ngIf="!isEditMode && item.fieldTitle != 'Email2' && item.fieldTitle != 'Email3' && item.fieldTitle != 'Phone' && item.fieldTitle != 'HomePhone' && item.fieldTitle != 'AltPhone' && item.fieldTitle != 'Zip' && item.fieldTitle != 'Fax' && item.fieldTitle != 'OtherFax'"
+                                            formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}" />
+
+                                    <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" *ngIf="!isEditMode && item.fieldTitle == 'Fax'" maxlength="11"
+                                            formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}" />
+
+                                    <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" *ngIf="!isEditMode && item.fieldTitle == 'OtherFax'" maxlength="11"
+                                            formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}" />
+                                  </div>
+                                  <div class="form-group" *ngIf="item.fieldType == 2 && item.fieldTitle != 'CompanyName'" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1 && !isEditMode}">
+                                    <label>{{item.fieldTitle}}</label>
+                                    <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                    <kendo-autocomplete *ngIf="!isEditMode" [data]="item.items" formControlName="{{ item.fieldName }}" [valueField]="'display'" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}">
+                                      <ng-template kendoAutoCompleteItemTemplate let-dataItem>{{dataItem.display}}</ng-template>
+                                    </kendo-autocomplete>
+                                  </div>
+                                  <div class="form-group" *ngIf="item.fieldType == 4 && item.fieldTitle == 'CompanyName'" [ngClass]="{'has-asterisk': item.isShow == 1 && !isEditMode}">
+                                    <label>{{item.fieldTitle}}</label>
+                                    <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                    <input type="text" class="form-control" formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}" />
+                                  </div>
+                                  <div class="form-group" *ngIf="item.fieldType == 5" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1 && !isEditMode}">
+                                    <label>{{item.fieldTitle}}</label>
+                                    <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                    <kendo-datetimepicker *ngIf="!isEditMode" formControlName="{{ item.fieldName }}" [format]="format" class="generic-width-per" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}"></kendo-datetimepicker>
+                                  </div>
+                                  <div class="custom-toggle">
+                                    <div class="form-group" *ngIf="item.fieldType == 1" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1 && !isEditMode}">
+                                      <label>{{item.fieldTitle}}</label>
+                                      <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                      <label class="switch">
+                                        <input type="checkbox" *ngIf="!isEditMode" [id]="item.fieldName" [name]="item.fieldName" formControlName="{{ item.fieldName }}" (change)="onCheckboxChange($event, item.fieldName)" [ngClass]="{'has-error': (companyForm.get(item.fieldName).errors && (companyForm.get(item.fieldName).touched || companyForm.get(item.fieldName).dirty))}" />
+                                        <span class="slider round"></span>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div class="form-group" *ngIf="item.fieldType == 3" [hidden]="item.isShow == 2 && item.fieldTitle != 'dtModified' && item.fieldTitle != 'dtCreated'" [ngClass]="{'has-asterisk': item.isShow == 1 && !isEditMode}">
+                                    <label>{{item.fieldTitle == 'dtModified' ? 'Last Modified' : item.fieldTitle == 'dtCreated' ? 'Created' : item.fieldTitle}}</label>
+                                    <span *ngIf="(item.fieldTitle == 'dtModified' || item.fieldTitle == 'dtCreated') && item.fieldValue != '0001-01-01T00:00:00'">&nbsp;{{item.fieldValue | date : 'MM/dd/yyyy'}}</span>
+                                    <span *ngIf="(item.fieldTitle == 'dtModified' || item.fieldTitle == 'dtCreated') && item.fieldValue == '0001-01-01T00:00:00'">&nbsp;</span>
+                                    <span *ngIf="item.fieldTitle != 'dtModified' && item.fieldTitle != 'dtCreated'">&nbsp;{{item.fieldValue}}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="multiple-cards-panel">
+                        <div class="wraper-main-section">
+                          <div class="global-card-section">
+                            <div class="global-header-section">
+                              <span>System</span>
+                            </div>
+                            <div class="global-body-section">
+                              <div class="margin-all-area">
+                                <div class="draggable">
+                                  <div *ngIf="companyFields">
+                                    <div class="form-group" [hidden]="companyFields.companyName?.isShow == 2">
+                                      <label>User</label>
+                                      <select class="form-control" formControlName="cLPUserID">
+                                        <option value=0 [selected]="companyUserList?.length <= 0">-Select-</option>
+                                        <option *ngFor="let companyUser of companyUserList" [ngValue]="companyUser.value">{{companyUser.display}}</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="multiple-cards-panel">
+                        <div class="wraper-main-section">
+                          <div class="global-card-section">
+                            <div class="global-header-section">
+                              <span>Comments</span>
+                            </div>
+                            <div class="global-body-section">
+                              <div class="margin-all-area">
+                                <div class="draggable">
+                                  <div *ngIf="companyFields">
+                                    <div class="form-group" [hidden]="companyFields.notes?.isShow == 2">
+                                      <label>{{companyFields.notes.fieldTitle}}</label>
+                                      <span *ngIf="isEditMode">:&nbsp;{{companyFields.notes.fieldValue}}</span>
+                                      <textarea type="text" tabindex="1" class="form-control" *ngIf="!isEditMode" formControlName="notes"></textarea>
+                                    </div>
+                                  </div>                                    
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bottom-fix-footer">
+                <div class="top-common-btn">
+                  <button *ngIf="!isEditMode" class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" [disabled]="showSpinner" id="primarySaveCompany" type="submit"><i class="fa "></i> Save</button>
+                  <button *ngIf="!isEditMode " type="button" class="btn btn-cancel" (click)="companyId<=0?gotoCompany():cancelCompanyCreate()"> Cancel</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="companyDeleteModal" tabindex="-1" role="dialog" aria-labelledby="companyDeleteModal" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h4 class="modal-title modal-common-title">Delete Confirmation</h4>
+      </div>
+      <div class="modal-body modal-common-body">
+        <h5>Are you sure to delete Company ?</h5>
+      </div>
+      <div class="modal-footer">
+        <button type="button" (click)="deleteCompany()" data-dismiss="modal" class="btn btn-primary">Ok</button>
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

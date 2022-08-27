@@ -1,0 +1,36 @@
+<div class="mb-2">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/companystitleheader.svg" /> Company Module Toggle</div>
+      </div>
+      <div class="margin-all-area">
+        <div>Current Status : <span class="text-danger">{{ companyModuleResponse?.messageString2 }}</span><span class="text-right float-right">{{ companyModuleResponse?.messageString }}</span></div>
+        <br />
+        <div>New Status : &nbsp;&nbsp;<button type="button" kendoButton [primary]="true" data-toggle="modal" data-target="#confirmModal" class="company-status">{{ companyModuleResponse?.messageString3 }}</button></div>
+      </div>      
+    </div>
+  </div>
+
+  <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModal" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h4 class="modal-title modal-common-title">Confirmation</h4>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>Are you sure do you want to <b>{{ companyModuleResponse?.messageString3 }}</b> ?</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" (click)="onConfirm()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

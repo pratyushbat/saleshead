@@ -1,0 +1,163 @@
+<div class="container-fluid">
+  <div class="card card-header-design">
+    <div class="card-header">
+      <h4>
+        Mailing Queue
+        <button type="button" [matTooltip]="isExpdMailsQueue ? 'Collapse' : 'Expand'" class="grid-common-btn ml-1" (click)="isExpdMailsQueue = !isExpdMailsQueue">
+          <i class="fa " [ngClass]="isExpdMailsQueue ? 'fa-compress' : 'fa-expand'"></i>
+        </button>
+        <button type="button" class="btn btn-primary ml-2" (click)="resetProcessor('email')">Reset Email Processor</button>
+      </h4>
+    </div>
+    <div class="card-body status-heading" *ngIf="isExpdMailsQueue">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel"></div>
+            <div class="header-button-panel">
+              <div class="button-wrapper">
+                <button class="btn btn-primary" type="button" (click)="resetGridSetting(); "><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+                <input class="webform-input-home" placeholder="Search in all columns..." kendoTextBox (input)="serviceStatusFilter($event.target.value)" #inputRobinSearch />
+              </div>
+            </div>
+          </div>
+          <div class="global-body-section">
+            <kendo-grid #grid id="gridId"
+              [kendoGridBinding]="mailingContactData"
+              [pageSize]="_gridCnfgService.pageSize"
+              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+              [sortable]="{mode: 'multiple'}"
+              [scrollable]="'scrollable'"
+              [sort]="_gridCnfgService.sort"
+              [columnMenu]="{ filter: true }"
+              [resizable]="true"
+              [reorderable]="true"
+              [ngStyle]="gridHeight"
+              (columnReorder)="_gridCnfgService.columnsOrderChanged('mailing_queue_grid', $event)"
+              (sortChange)="_gridCnfgService.sortChange('mailing_queue_grid', $event)"
+              (pageChange)="_gridCnfgService.pageChange('mailing_queue_grid', $event)"
+              (columnResize)="_gridCnfgService.columnResize(14,'mailing_queue_grid', $event)"
+              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'mailing_queue_grid',grid)">
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                  [field]="column.field"
+                  [title]="column.title | titlecase"
+                  [width]="column.width"
+                  [filterable]="true"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                  [includeInChooser]="column.field=='$' ? false : true">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.field == '$' && column.title == ''">{{ rowIndex+1 }}</div>
+                    <div *ngIf="column.field != '$' && column.title != ''">{{ dataItem[column.field] ? dataItem[column.field] : '--' }}</div>
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-messages [pagerItemsPerPage]="'Mails per page'" [pagerItems]="'Mails'"> </kendo-grid-messages>
+              </div>
+            </kendo-grid>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="row">
+    <!-- Processors -->
+    <div class="col-md-2">
+      <div class="card card-design">
+        <div class="card-header"><h4>Processors</h4></div>
+        <div class="card-body status-heading">
+          <h6> Email Active <span class="float-right">{{ processors?.emailActive }}</span> </h6>
+          <h6> Email Max <span class="float-right">{{ processors?.emailMax }}</span> </h6>
+          <h6> Text Active <span class="float-right">{{ processors?.textActive }}</span> </h6>
+          <h6> Text Max <span class="float-right">{{ processors?.textMax }}</span> </h6>
+          <h6> Text Campaign Active <span class="float-right">{{ processors?.textCampaignActive }}</span> </h6>
+          <h6> Text Campaign Max <span class="float-right">{{ processors?.textCampaignMax }}</span> </h6>
+          <h6> Voice Active <span class="float-right">{{ processors?.voiceActive }}</span> </h6>
+          <h6> Voice Max <span class="float-right">{{ processors?.voiceMax }}</span> </h6>
+        </div>
+      </div>
+    </div>
+    <!-- Text Messages -->
+    <div class="col-md-2">
+      <div class="card card-design">
+        <div class="card-header"><h4>Text Messages</h4></div>
+        <div class="card-body status-heading">
+          <h6> Manual In Queue <span class="float-right">{{ txtMsgs?.manualInQueue }}</span> </h6>
+          <h6> SFA In Queue <span class="float-right">{{ txtMsgs?.sFAInQueue }}</span> </h6>
+          <h6> Wizardry In Queue <span class="float-right">{{ txtMsgs?.wizardryInQueue ? txtMsgs?.wizardryInQueue : 0 }}</span> </h6>
+          <br />
+          <button class="btn btn-primary" type="button" (click)="resetProcessor('text')"> Reset Text Processor</button>
+        </div>
+      </div>
+    </div>
+    <!-- Voice Calls -->
+    <div class="col-md-2">
+      <div class="card card-design">
+        <div class="card-header"><h4>Voice Calls</h4></div>
+        <div class="card-body status-heading">
+          <h6> Being Handled <span class="float-right">{{ voiceCalls?.being }}</span> </h6>
+          <h6> Manual In Queue <span class="float-right">{{ voiceCalls?.manualInQueue }}</span> </h6>
+          <h6> SFA In Queue <span class="float-right">{{ voiceCalls?.sFAInQueue }}</span> </h6>
+          <h6> Reminders In Queue <span class="float-right">{{ voiceCalls?.remindersInQueue }}</span> </h6>
+          <button class="btn btn-primary" type="button" (click)="resetProcessor('voice')"> Reset Voice Processor</button>
+        </div>
+      </div>
+    </div>
+    <!-- Drops -->
+    <div class="col-md-2">
+      <div class="card card-design">
+        <div class="card-header"><h4>Drops</h4></div>
+        <div class="card-body status-heading">
+          <h6> Being Handled <span class="float-right">{{ drop?.being }}</span> </h6>
+          <h6> In Queue <span class="float-right">{{ drop?.inQueue }}</span> </h6>
+        </div>
+      </div>
+    </div>
+    <!-- Call Recordings -->
+    <div class="col-md-2">
+      <div class="card card-design">
+        <div class="card-header"><h4>Call Recordings</h4></div>
+        <div class="card-body status-heading">
+          <h6> Being Handled <span class="float-right">{{ voiceCallRec?.being }}</span> </h6>
+          <h6> In Queue <span class="float-right">{{ voiceCallRec?.inQueue }}</span> </h6>
+        </div>
+      </div>
+    </div>
+    <!--Recordings-->
+    <div class="col-md-2">
+      <div class="card card-design">
+        <div class="card-header"><h4>Recordings</h4></div>
+        <div class="card-body status-heading">
+          <h6> Being Handled <span class="float-right">{{ recording?.being }}</span> </h6>
+          <h6> In Queue <span class="float-right">{{ recording?.inQueue }}</span> </h6>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal fade" id="processorResetModal" tabindex="-1" role="dialog" aria-labelledby="processorResetModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h4 class="modal-title modal-common-title"> {{resetPro=='email'? 'Reset Email Processor' : resetPro=='text' ? 'Reset Text Processor' :'Reset Voice Processor' }} </h4>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>  Are you sure to reset - <b> {{resetPro}} </b> ?</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" (click)="confirmResetProcessor()" data-dismiss="modal" class="btn btn-primary">Reset</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>
+
+</div>

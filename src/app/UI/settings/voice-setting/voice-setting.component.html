@@ -1,0 +1,287 @@
+<div class="container-fluid mt-3">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Voice Recording Types</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+          </div>
+        </div>
+      </div>
+      <div class="wraper-body-panel">
+        <div class="full-width-container">
+          <div class="margin-all-area">
+            <div class="wraper-main-section">
+              <div class="global-card-section">
+                <!--Initial  View Mode Screen-->
+                <div *ngIf="voiceEdit==0">
+                  <div class="">
+                    <div class="inner-header-bg">
+                      <div class="inner-cards-panel header-inner-hidden">
+                        <span>Order</span>
+                        <span>Display</span>
+                        <span>Script</span>
+                        <span class="text-center" [hidden]="roleFeaturePermissions?.edit == false && roleFeaturePermissions?.delete == false">Action</span>
+                      </div>
+                      <div class="inner-detail-bg">
+                        <span>Details</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="global-body-section">
+                    <div class="wraper-body-panel" [formGroup]="voiceSettingsForm">
+                      <div class="wraper-body-left">
+                        <div class="">
+                          <div cdkDropList
+                               #frmList="cdkDropList"
+                               [cdkDropListData]="voiceFormCtls.controls"
+                               (cdkDropListDropped)="dropVoice($event)">
+                            <div class="inner-cards-grid-height" formArrayName="teamConfigs">
+                              <div *ngFor="let i of  voiceFormCtls.controls;trackBy:identifyVoice;let idx=index;" [formGroupName]="idx" cdkDrag>
+                                <div *ngIf="idx>=skipSize && idx<skipSize+pageSize">
+                                  <div class="inner-cards-grid">
+                                    <div class="inner-card-mobile">
+                                      <label>Order</label>
+                                      <div class="mobile-view-design">
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          {{idx+1}}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="inner-card-mobile">
+                                      <label>Display</label>
+                                      <div class="mobile-view-design">
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          <input *ngIf="editRowIndex > -1 && editRowIndex == idx" formControlName="display" maxlength="200" placeholder="Enter display" class="form-control">
+                                          <p *ngIf=" editRowIndex != idx">{{i.value.display}}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="inner-card-mobile">
+                                      <label>Script</label>
+                                      <div class="mobile-view-design">
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          <textarea cdkTextareaAutosize *ngIf="editRowIndex > -1 && editRowIndex == idx" [ngClass]="{ 'alpha-text-sort ': voiceSort, 'edit-text-sort': !voiceSort }" formControlName="script" placeholder="Enter display" class="form-control"></textarea>
+                                          <p *ngIf=" editRowIndex != idx">{{i.value.script ? i.value.script : '--'}}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="inner-card-mobile">
+                                      <label>Action</label>
+                                      <div class="mobile-view-design">
+                                        <div class="text-center" *ngIf="editRowIndex != idx">
+                                          <button type="button" [hidden]="roleFeaturePermissions?.edit == false" class="grid-common-btn" [disabled]=" showSpinner" (click)="settingItemtoEdit(idx)">
+                                            <i class="fa fa-pencil" title="Edit"></i>
+                                            <span class="grid-common-text">Edit</span>
+                                          </button>
+                                          <button type="button" [hidden]="roleFeaturePermissions?.delete == false" class="grid-delete-btn" [disabled]=" showSpinner" (click)="voiceToDelete(idx)" data-toggle="modal" data-target="#teamDeleteModal">
+                                            <i class="fa fa-trash-alt" title="Delete"></i>
+                                            <span class="grid-common-text">Delete</span>
+                                          </button>
+                                        </div>
+                                        <div class="text-center" *ngIf="editRowIndex > -1 && editRowIndex == idx">
+                                          <button type="button" [hidden]="roleFeaturePermissions?.edit == false" class="grid-common-btn" [disabled]=" showSpinner || voiceFormCtls.length<=0" (click)="saveVoices()">
+                                            <i class="fa fa-save" title="Save"></i>
+                                            <span class="grid-common-text">Save</span>
+                                          </button>
+                                          <button type="button" [hidden]="roleFeaturePermissions?.delete == false" class="grid-cancel-btn" [disabled]=" showSpinner" (click)="editRowIndex=-1">
+                                            <i class="fa fa-times" title="Cancel"></i>
+                                            <span class="grid-common-text">Cancel</span>
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="team-example-box" *ngIf="voiceFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div></div>
+                  <app-pagination *ngIf="voiceSettings" (newData)="emitPagination($event)" [total]="voiceSettings.length" [data]="voiceSettings" [originalData]="initVoiceSettingsFormCtrls"></app-pagination>
+
+                  <div class="margin-all-area" *ngIf="!sortTeamMode && editRowIndex <= -1">
+                    <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.edit == false" [disabled]="voiceFormCtls?.controls?.length<=0" (click)=" editVoices()"><i class="far fa-edit"></i> Edit All Items                    </button>
+                    <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false" (click)="addVoices(); scrollToNew()"> Add Items</button>
+                    <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.edit == false" [disabled]="voiceFormCtls.controls.length<=0" (click)="sortAlphaVoices()"> Sort Alphabetically</button>
+                  </div>
+                  <div class="margin-all-area" *ngIf="sortTeamMode || editRowIndex > -1">
+                    <button class="btn btn-primary" [disabled]="showSpinner || voiceFormCtls.length<=0" (click)="saveVoices()" type="submit"><i class="fas fa-save"></i> {{ voiceEdit==1 ? 'Update' : voiceEdit==2 ?  'Save' : 'Save' }}</button>
+                    <button class="btn btn-cancel" (click)="cancelVoiceSelect()"> Cancel</button>
+                  </div>
+                  <div class="modal fade" id="teamDeleteModal" tabindex="-1" role="dialog" aria-labelledby="teamDeleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog  modal-common-dialog" role="document">
+                      <div class="modal-content modal-common-content">
+                        <div class="modal-header modal-common-background">
+                          <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+                        </div>
+                        <div class="modal-body modal-common-body">
+                          <h5>Caution: This will be permanently deleted </h5>
+                          <h5>Are you sure you want to delete this item ? </h5>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" (click)="deleteVoice()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                          <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Edit All and Sort Alphabetical Screen -->
+                <div *ngIf="voiceEdit==1">
+                  <div class="">
+                    <div class="inner-header-bg">
+                      <div class="inner-cards-panel header-inner-hidden">
+                        <span>Order</span>
+                        <span>Display</span>
+                        <span>Script</span>
+                      </div>
+                      <div class="inner-detail-bg">
+                        <span>Details</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="global-body-section">
+                    <div class="wraper-body-panel" [formGroup]="voiceSettingsForm">
+                      <div class="wraper-body-left">
+                        <div class="">
+                          <div cdkDropList
+                               #frmList="cdkDropList"
+                               [cdkDropListData]="voiceFormCtls.controls"
+                               (cdkDropListDropped)="dropVoice($event)">
+                            <div class="inner-cards-grid-height" formArrayName="teamConfigs">
+                              <div *ngFor="let name of voiceFormCtls.controls;trackBy:identifyVoice; let i = index" [formGroupName]="i" cdkDrag>
+                                <div *ngIf="i>=skipSize && i<skipSize+pageSize">
+                                  <div class="inner-cards-grid">
+                                    <div class="inner-card-mobile">
+                                      <label>Order</label>
+                                      <div class="mobile-view-design">
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          {{i+1}}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="inner-card-mobile">
+                                      <label>Display</label>
+                                      <div class="mobile-view-design">
+                                        <div *ngIf="!isSorted" class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          <input formControlName="display" maxlength="200" placeholder="Enter display" class="form-control" *ngIf="editRowIndex == -1">
+                                          <input formControlName="display" maxlength="200" placeholder="Enter display" class="form-control" *ngIf="editRowIndex > -1 && editRowIndex == i">
+                                          <span *ngIf="editRowIndex > -1 && editRowIndex != i">{{name.value.display}}</span>
+                                        </div>
+                                        <div *ngIf="isSorted" class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          <span>{{name.value.display}}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="inner-card-mobile">
+                                      <label>Script</label>
+                                      <div class="mobile-view-design">
+                                        <div *ngIf="!isSorted" class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          <textarea [ngClass]="{ 'alpha-text-sort ': voiceSort, 'edit-text-sort': !voiceSort }" formControlName="script" placeholder="Enter display" class="form-control" *ngIf="editRowIndex == -1"></textarea>
+                                          <textarea [ngClass]="{ 'alpha-text-sort ': voiceSort, 'edit-text-sort': !voiceSort }" formControlName="script" placeholder="Enter display" class="form-control" *ngIf="editRowIndex > -1 && editRowIndex == i"></textarea>
+                                          <span *ngIf="editRowIndex > -1 && editRowIndex != i">{{name.value.script}}</span>
+                                        </div>
+                                        <div *ngIf="isSorted" class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          <span>{{name.value.script}}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="team-example-box" *ngIf="voiceFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <app-pagination *ngIf="voiceSettings" (newData)="emitPagination($event)" [total]="voiceSettings.length" [data]="voiceSettings" [originalData]="initVoiceSettingsFormCtrls"></app-pagination>
+                  <div class="margin-all-area">
+                    <button class="btn btn-primary" [disabled]="showSpinner || voiceFormCtls.length<=0" (click)="saveVoices()" type="submit">{{ voiceEdit==1 ? 'Update' : voiceEdit==2 ?  'Save' : 'Save' }}</button>
+                    <button class="btn btn-cancel" (click)="cancelVoiceSelect()">Cancel</button>
+                  </div>
+                </div>
+
+                <!-- Add Items Screen -->
+                <div *ngIf="voiceEdit==2">
+                  <div class="">
+                    <div class="inner-header-bg">
+                      <div class="inner-cards-panel header-inner-hidden">
+                        <span>Order</span>
+                        <span>Display</span>
+                        <span>Script</span>
+                      </div>
+                      <div class="inner-detail-bg">
+                        <span>Details</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="global-body-section">
+                    <div class="wraper-body-panel" >
+                      <div class="wraper-body-left">
+                        <div class="">
+                          <div class="inner-cards-grid-height">
+                            <div *ngFor="let i of  voiceFormCtls.controls;trackBy:identifyVoice; let idx=index;">
+                              <div *ngIf="idx>=skipSize && idx<skipSize+pageSize">
+                                <div class="inner-cards-grid" *ngIf="idx>=skipSize && idx<skipSize+pageSize">
+                                  <div class="inner-card-mobile">
+                                    <label>Order</label>
+                                    <div class="mobile-view-design">
+                                      <div class="">{{idx+1}}</div>
+                                    </div>
+                                  </div>
+                                  <div class="inner-card-mobile">
+                                    <label>Display</label>
+                                    <div class="mobile-view-design">
+                                      <div class=""><p> {{i.value.display}}</p></div>
+                                    </div>
+                                  </div>
+                                  <div class="inner-card-mobile">
+                                    <label>Script</label>
+                                    <div class="mobile-view-design">
+                                      <div class=""><p>{{i.value.script}}</p></div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="team-example-box" *ngIf="voiceFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                            <div class="cards-body-section" id="scrollId">
+                              <div class="cards-colunm-left">
+                                <span class="control-label" for="teamSName">New Item List </span>
+                              </div>
+                              <div class="cards-colunm-right">
+                                <textarea [(ngModel)]="voiceData" type="text" class="form-control" id="teamSName"></textarea>
+                                <label><span class="acc-info-red">Note: Do not exceed 25 lines.</span></label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <app-pagination *ngIf="voiceSettings" (newData)="emitPagination($event)" [total]="voiceSettings.length" [data]="voiceSettings" [originalData]="initVoiceSettingsFormCtrls"></app-pagination>
+                  <div class="margin-all-area">
+                    <button class="btn btn-primary" [disabled]="showSpinner" (click)="saveBulkVoices()" type="submit"> {{ voiceEdit==1 ? 'Update' : voiceEdit==2 ?  'Save' : 'Save' }}</button>
+                    <button class="btn btn-cancel" (click)="cancelVoiceSelect()"> Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

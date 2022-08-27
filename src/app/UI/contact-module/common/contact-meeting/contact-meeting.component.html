@@ -1,0 +1,393 @@
+<div class="create-email" [@filterAnimation]="showAnimation">
+  <fieldset>
+    <legend>Schedule Meeting</legend>
+    <div class="email-module">
+
+      <div class="tabs-module-panel">
+        <div class="tabs" (change)="onTabSelect($event)">
+
+          <input type="radio" name="meeting" id="General" checked="checked">
+          <label for="General" class="label-boder-custom-sub">General</label>
+          <div class="tab">
+            <form class="form-horizontal required-section" [formGroup]="generalForm" (ngSubmit)="generalFormSubmit()">
+
+              <div class="row">
+                <div class="col-sm-6 col-md-6">
+                  <div class=" form-group">
+                    <span class="control-label" for="subject">Subject</span>
+                    <div [ngClass]="{'has-error': generalFrm.subject.errors && (generalFrm.subject.touched ||  generalFrm.subject.dirty)}">
+                      <input type="text" class="form-control" id="subject" placeholder="Subject" formControlName="subject" />
+                    </div>
+                    <div class="search-query-error" *ngIf="generalFrm.subject.errors && ( generalFrm.subject.touched ||  generalFrm.subject.dirty)">
+                      <div *ngIf="generalFrm.subject.errors.required">Please describe the purpose of the appointment.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-6">
+                  <div class="form-group">
+                    <span class="control-label" for="start">Start</span>
+                    <div>
+                      <kendo-datetimepicker [format]="datePickerformat" formControlName="start"></kendo-datetimepicker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-6 col-md-6">
+                  <div class=" form-group">
+                    <span class="control-label" for="end">End</span>
+                    <div>
+                      <select id="end" class="form-control" formControlName="end">
+                        <option value="30" [selected]="true">30 minutes</option>
+                        <option value="1">1 hour</option>
+                        <option value="1.5">1.5 hours</option>
+                        <option value="2">2 hour</option>
+                        <option value="2.5">2.5 hours</option>
+                        <option value="3">3 hour</option>
+                        <option value="3.5">3.5 hours</option>
+                        <option value="4">4 hours</option>
+                        <option value="8">8 hours</option>
+                        <option value="1D">1 day</option>
+                        <option value="2D">2 days</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-6">
+                  <div class="form-group">
+                    <span class="control-label" for="contact">Contact</span>
+                    <div>
+                      <b>{{ contactFields.firstName.fieldValue }} {{ contactFields.lastName.fieldValue }}</b>
+                      <br />
+                      {{ contactFields.add1.fieldValue }} {{ contactFields.add2.fieldValue }} <span *ngIf="contactFields.add3.fieldValue">{{ contactFields.add3.fieldValue }}</span>&nbsp;
+                      <a href="javascript:void(0)" data-toggle="collapse" data-target="#contactInfo"> See more...</a>
+                      <br />
+                      <div id="contactInfo" class="collapse">
+                        {{ contactFields.city.fieldValue }}, {{ contactFields.state.fieldValue }} {{ contactFields.zip.fieldValue }} {{ contactFields.country.fieldValue }}
+                        <br />B: {{ contactFields.phone.fieldValue }} H: {{ contactFields.homePhone.fieldValue }} M: {{ contactFields.mobile.fieldValue }}
+                        <br />E: {{ contactFields.email.fieldValue }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-6 col-md-6">
+                  <div class=" form-group">
+                    <span class="control-label" for="category">Category</span>
+                    <div>
+                      <b>Contact &nbsp;</b>
+                      <span class="control-label" for="phoneCall">Phone call (will appear only as part of Call List)&nbsp;</span>
+                      <input #phoneCall type="checkbox" name="phoneCall" formControlName="chkPhoneCall" kendoCheckBox />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-6">
+                  <div class="form-group">
+                    <span class="control-label" for="type">Type</span>
+                    <div>
+                      <select id="type" class="form-control" formControlName="type">
+                        <option value="" [selected]="true">-None Selected-</option>
+                        <option value="1">1 hour</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-6 col-md-6">
+                  <div class=" form-group">
+                    <span class="control-label" for="location">Location</span>
+                    <div>
+                      <input type="text" class="form-control" id="location" placeholder="Location" formControlName="location" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-6">
+                  <div class="form-group">
+                    <span class="control-label" for="user">User</span>
+                    <div>
+                      <select id="user" class="form-control" formControlName="user" *ngIf="users && users.length > 0">
+                        <option *ngFor="let user of users" [value]="user.key">{{user.value}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12 col-md-12">
+                  <div class=" form-group">
+                    <span class="control-label" for="notes">Notes <small class="text-success">(limit 2000 characters)</small></span>
+                    <div>
+                      <textarea id="notes" class="form-control" row="2" cols="2" maxlength="2000" formControlName="notes"></textarea>
+
+                      <input #phoneCall type="checkbox" name="userReminder" formControlName="chkUserReminder" kendoCheckBox />
+                      <span class="control-label" for="userReminder">&nbsp;Include these notes in user reminder</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bottom-panel">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i>&nbsp;Save</button>
+                &nbsp;&nbsp;<button class="btn btn-primary" type="button" (click)="_localService.showCommonComp = ''"><i class="fas fa-times"></i>&nbsp;Cancel</button>
+              </div>
+
+            </form>
+          </div>
+
+          <input type="radio" name="meeting" id="Reminder">
+          <label for="Reminder">Reminder</label>
+          <div class="tab">
+            <form class="form-horizontal required-section" [formGroup]="reminderForm" (ngSubmit)="reminderFormSubmit()">
+              <div class="row">
+                <div class="col-sm-6 col-md-6">
+                  <div class=" form-group">
+                    <span class="control-label" for="schReminder">Schedule Reminder</span>
+                    <div>
+                      <select id="schReminder" class="form-control" formControlName="scheduleReminder">
+                        <option value="" [selected]="true">Do not schedule a reminder</option>
+                        <option value="0">0 minutes before</option>
+                        <option value="15">15 minutes before</option>
+                        <option value="30">30 minutes before</option>
+                        <option value="1">1 hour before</option>
+                        <option value="2">2 hour before</option>
+                        <option value="3">3 hour before</option>
+                        <option value="4">4 hour before</option>
+                        <option value="1D">1 day before</option>
+                        <option value="2D">2 days before</option>
+                        <option value="3D">3 days before</option>
+                        <option value="4D">4 days before</option>
+                        <option value="5D">5 days before</option>
+                        <option value="6D">6 days before</option>
+                        <option value="7D">7 days before</option>
+                        <option value="14D">14 days before</option>
+                        <option value="30D">30 days before</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-sm-6 col-md-6">
+                  <div class="form-group">
+                    <span class="control-label" for="reminderTxtTmp">Reminder Text Template</span>
+                    <div>
+                      <select id="reminderTxtTmp" class="form-control" formControlName="reminderTextTemplate">
+                        <option value="" [selected]="true">-None Selected-</option>
+                        <option value="1">$2000 off</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="row">
+                <div class="col-sm-6 col-md-6">
+                  <div class=" form-group">
+                    <span class="control-label" for="viaEmail">Via Email <input #viaEmail type="checkbox" name="chkViaEmail" formControlName="chkViaEmail" kendoCheckBox /></span>
+                    <div>
+                      <input type="text" class="form-control" id="viaAdditionalEmail" placeholder="Email" formControlName="viaAdditionalEmail" />
+                      <small><b>Additional Email Addresses (seperated by comma)</b></small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-6">
+                  <div class="form-group">
+                    <div>
+                      <span class="control-label font-weight-bold" for="viaMessageCenter" >
+                        Via Message Center
+                        <input #viaMessageCenter type="checkbox" name="viaMessageCenter" formControlName="viaMessageCenter" kendoCheckBox />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                
+              </div>
+
+              <div class="row">
+                <div class="col-sm-6 col-md-6">
+                  <div class=" form-group">
+                    <span class="control-label" for="reminderHtmlTmp">Reminder HTML Template</span>
+                    <div>
+                      <select id="reminderHtmlTmp" class="form-control" formControlName="reminderHtmlTemplate">
+                        <option value="" [selected]="true">-use plain text-</option>
+                        <option value="1">***Record of invention</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12 col-md-12">
+                  <div class=" form-group">
+                    <span class="control-label" for="notes">Reminder Notes <small class="text-success">(limit 2000 characters)</small></span>
+                    <div>
+                      <textarea id="notes" class="form-control" row="2" cols="2" maxlength="2000" formControlName="reminderNotes"></textarea>
+
+                      <input #phoneCall type="checkbox" name="chkReminderNotes" formControlName="chkReminderNotes" kendoCheckBox />
+                      <small class="control-label text-danger" for="chkReminderNotes">&nbsp;This will send a reminder using the settings above immediately after saving this appointment.</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bottom-panel">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i>&nbsp;Save</button>
+                &nbsp;&nbsp;<button class="btn btn-primary" type="button" (click)="_localService.showCommonComp = ''"><i class="fas fa-times"></i>&nbsp;Cancel</button>
+              </div>
+
+            </form>
+          </div>
+
+          <input type="radio" name="meeting" id="NewTask">
+          <label for="NewTask">New Task</label>
+          <div class="tab">
+            <form class="form-horizontal required-section" [formGroup]="newTaskForm" (ngSubmit)="newTaskFormSubmit()">
+
+              <div class="row">
+                <div class="col-sm-12 col-md-12">
+                  <div class=" form-group">
+                    <span class="control-label" for="task">Task <small class="text-success">(limit 2000 characters)</small></span>
+                    <div [ngClass]="{'has-error': newTaskFrm.task.errors && (newTaskFrm.task.touched ||  newTaskFrm.task.dirty)}">
+                      <textarea id="task" class="form-control" row="2" cols="2" maxlength="2000" formControlName="task"></textarea>
+                    </div>
+                    <div class="search-query-error" *ngIf="newTaskFrm.task.errors && ( newTaskFrm.task.touched ||  newTaskFrm.task.dirty)">
+                      <div *ngIf="newTaskFrm.task.errors.required">Please describe the task.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12 col-md-12">
+                  <div class=" form-group">
+                    <span class="control-label" for="taskDate">Task Date</span>
+                    <div>
+                      <kendo-datepicker formControlName="taskDate"></kendo-datepicker>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bottom-panel">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i>&nbsp;Save</button>
+                &nbsp;&nbsp;<button class="btn btn-primary" type="button" (click)="_localService.showCommonComp = ''"><i class="fas fa-times"></i>&nbsp;Cancel</button>
+              </div>
+
+            </form>
+          </div>
+
+          <input type="radio" name="meeting" id="Attendees">
+          <label for="Attendees">Attendees</label>
+          <div class="tab">
+            <form class="form-horizontal required-section" [formGroup]="attendeesForm" (ngSubmit)="attendeesFormSubmit()">
+
+              <div class="row">
+                <div class="col-sm-6 col-md-6">
+                  <div class=" form-group">
+                    <span class="control-label" for="user">User</span>
+                    <div class="attendees-select">
+                      <select id="user" class="form-control" formControlName="team">
+                        <option value="30" [selected]="true">-Any Team-</option>
+                        <option value="1">Affordable boating of</option>
+                      </select>                   
+                      <select id="end" class="form-control" formControlName="office">
+                        <option value="30" [selected]="true">-Any Office-</option>
+                        <option value="1">Corporate Headquarters</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-6">
+                  <div class="form-group">
+                    <span class="control-label" for="messages">Messages</span>
+                    <div>
+                      Messages
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12 col-md-12">
+                  <div>
+
+                    <div class="example-container">
+                      <h2>User</h2>
+
+                      <div cdkDropList
+                           #usrList="cdkDropList"
+                           [cdkDropListData]="userList"
+                           [cdkDropListConnectedTo]="[atteList]"
+                           class="example-list"
+                           (cdkDropListDropped)="drop($event)">
+                        <div class="example-box" *ngFor="let item of userList" cdkDrag>{{item}}</div>
+                      </div>
+                    </div>
+
+                    <div class="example-container">
+                      <h2>Attendees</h2>
+
+                      <div cdkDropList
+                           #atteList="cdkDropList"
+                           [cdkDropListData]="attendeesList"
+                           [cdkDropListConnectedTo]="[usrList]"
+                           class="example-list"
+                           (cdkDropListDropped)="drop($event)">
+                        <div class="example-box" *ngFor="let item of attendeesList" cdkDrag>{{item}}</div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="bottom-panel">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i>&nbsp;Save</button>
+                &nbsp;&nbsp;<button class="btn btn-primary" type="button" (click)="_localService.showCommonComp = ''"><i class="fas fa-times"></i>&nbsp;Cancel</button>
+              </div>
+
+            </form>
+          </div>
+
+          <input type="radio" name="meeting" id="CustomAction">
+          <label for="CustomAction" class="label-boder-custom">Custom Action</label>
+          <div class="tab">
+            <form class="form-horizontal required-section" [formGroup]="customActionForm" (ngSubmit)="customActionFormSubmit()">
+
+              <div class="row">
+                <div class="col-sm-6 col-md-6">
+                  <div class=" form-group">
+                    <span class="control-label" for="emailTemplate">Email Template</span>
+                    <div>
+                      <select id="emailTemplate" class="form-control" formControlName="emailTemplate">
+                        <option value="" [selected]="true">-Select an email template-</option>
+                        <option value="1">***Record of invention</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bottom-panel">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i>&nbsp;Save</button>
+                &nbsp;&nbsp;<button class="btn btn-primary" type="button" (click)="_localService.showCommonComp = ''"><i class="fas fa-times"></i>&nbsp;Cancel</button>
+              </div>
+
+            </form>
+          </div>
+
+
+        </div>
+      </div>
+
+    </div>
+  </fieldset>
+</div>

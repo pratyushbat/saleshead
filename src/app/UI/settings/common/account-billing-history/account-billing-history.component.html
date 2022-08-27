@@ -1,0 +1,795 @@
+<div class="">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/salesoptimatitle.svg" class="mr-1"/> Billing Setup</div>
+      </div>
+      <div *ngIf="billingMainView && !userView">
+        <div *ngIf="!isUgradeStatus">
+          <ng-container [ngSwitch]="isUserAdded">
+            <ng-container *ngSwitchCase="0">
+              <div class="global-body-section">
+                <div class="wraper-body-panel">
+                  <div class="wraper-body-left">
+                    <div *ngIf="false" class="row">
+                      <div class="col-md-12" style="background-color:green">
+                        <p style="color: wheat; padding: 10px 0px 0px 7px;">Hello</p>
+                        <p style="color: wheat; padding: 10px 0px 0px 7px;">Hello</p>
+                        <p style="color: wheat; padding: 10px 0px 0px 7px;">Hello</p>
+                      </div>
+                    </div>                    
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left"><span>Current Monthly Fee</span></div>
+                      <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.monthlyFeeCalc?.color)"><b [style.color]="getColor(billingMainView.feeMonthly?.color)">{{ billingMainView.feeMonthly?.fieldText }}</b> ( {{ billingMainView.monthlyFeeCalc?.fieldText}} )</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left"><span>Current Solution</span></div>
+                      <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.clpRoleDisplay?.color)">{{ billingMainView.clpRoleDisplay?.fieldText }}</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                        <div class="cards-colunm-left"><span>Number of Users</span></div>
+                        <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.currentUsers?.color)">{{ billingMainView.currentUsers?.fieldText }}</p></div>
+                      </div>
+                    <mat-divider></mat-divider>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left"><span>SalesOptima Mobile</span></div>
+                      <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.mobileIncluded?.color)">{{ billingMainView.mobileIncluded?.fieldText }}</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left"><span>Sales Optimization	</span></div>
+                      <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.sfaIncluded?.color)">{{ billingMainView.sfaIncluded?.fieldText }}</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div style="display: flex; flex-direction: column;">
+                          <span class="billing-tag-bottom">Email Marketing</span>
+                          <span class="billing-label">(High Volume)</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.htmlEmailIncluded?.color)">{{ billingMainView.htmlEmailIncluded?.fieldText }}</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div style="display: flex; flex-direction: column;">
+                          <span class="billing-tag-bottom">Text Message Marketing</span>
+                          <span class="billing-label">(High Volume)</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.txtMsgMarketingActive?.color)">{{billingMainView.txtMsgMarketingActive?.fieldText}}</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                        <div class="cards-colunm-left"><span>Outlook Add-in</span></div>
+                        <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.outlookIncluded?.color)">{{billingMainView.outlookIncluded?.fieldText}}</p></div>
+                      </div>
+                    <mat-divider></mat-divider>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left"><span>Billing Option</span></div>
+                      <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.contract?.color)">{{billingMainView.contract?.fieldText}}</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left"><span>Contract Expiration Date</span></div>
+                      <div class="cards-colunm-right"><p>Installed</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left"><span>Account Status</span></div>
+                      <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.accountStatus?.color)">{{billingMainView.accountStatus?.fieldText}}</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div style="display: flex; flex-direction: column;">
+                          <span class="billing-tag-bottom">User Fee Discount</span>
+                          <span class="billing-label">(Applied per user.)</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.discountUser?.color)">{{billingMainView.discountUser?.fieldText}}</p></div>
+                    </div>
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left"><span>Next Billing Date</span></div>
+                      <div class="cards-colunm-right">
+                        <div style="display: flex; flex-direction: column;">
+                          <p class="billing-tag-bottom" [style.color]="getColor(billingMainView.nextCycleDate?.color)">{{billingMainView.nextCycleDate?.fieldText}}</p>
+                          <label>Your account will be billed next on this date.</label>
+                        </div>
+                      </div>
+                    </div>                    
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left"></div>
+                      <div class="cards-colunm-right">
+                        <button class="btn btn-primary" *ngIf="showUpgrade && roleFeaturePermissions?.edit == true" (click)="isUgradeStatus=true;" type="button"><i class="fas fa-check"></i> Upgrade</button>
+                        <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false" (click)="addUserBillingAdd()" type="submit"><i class="fas fa-check"></i> Add User</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="1">
+              <div>                
+                <div class="success-alert">
+                  <p *ngIf="messageDisplayOnAddStep">{{messageDisplayOnAddStep}} </p>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Current Monthly Fee</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.monthlyFeeCalc?.color)"><b [style.color]="getColor(billingMainView.feeMonthly?.color)">{{ billingMainView.feeMonthly?.fieldText }}</b> ( {{ billingMainView.monthlyFeeCalc?.fieldText}} )</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Current Solution</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.clpRoleDisplay?.color)">{{ billingMainView.clpRoleDisplay?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Number of Users</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.currentUsers?.color)">{{ billingMainView.currentUsers?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Billing Option</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.contract?.color)">{{billingMainView.contract?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Account Status</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.accountStatus?.color)">{{billingMainView.accountStatus?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Next Billing Date</span></div>
+                  <div class="cards-colunm-right">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom" [style.color]="getColor(billingMainView.nextCycleDate?.color)">{{billingMainView.nextCycleDate?.fieldText}}</p>
+                      <label>Your account will be billed next on this date.</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <span class="billing-tag-bottom">Number of New Users</span>
+                      <span class="billing-label">(How many users would you like to add?)	</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><input style="width: 50%;" name="userNumbers" [(ngModel)]="userCount" id="userNumbers" /></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <button class="btn btn-primary" (click)="addUserBillingAddContinue()" type="submit"><i class="fas fa-check"></i> Continue</button>
+                    <button class="btn btn-cancel" (click)="cancelBillingSetup();" type="submit"><i class="fas fa-times"></i> Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="2">
+              <div>
+                <div class="success-alert">
+                  <p *ngIf="messageDisplayOnAddStep">{{messageDisplayOnAddStep}} </p>
+                </div>               
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Billing Option</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.contract?.color)">{{billingMainView.contract?.fieldText}} contract</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>User Fee</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.feeUser?.color)">{{billingMainView.feeUser?.fieldText}}</p></div>
+                </div>
+                <div class="margin-all-area" *ngIf="expandDetailsFee">
+                  <!--<mat-divider></mat-divider>
+                  <mat-divider></mat-divider>-->
+                  <div class="wraper-main-section">
+                    <div class="global-card-section">
+                      <div class="global-header-section">
+                        <span class="text-visibale">Calculation for prorated user fee</span>
+                      </div>
+                      <div class="">
+                        <div class="billing-row">
+                          <div class="col-md-6 billing-left-sub-section"><p>Prorated billing period	</p></div>
+                          <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.uperiod?.color)">{{billingMainView.uperiod?.fieldText}}</p></div>
+                          <div class="col-md-6 billing-left-sub-section"><p>Prorated time span  (A)</p></div>
+                          <div class="col-md-6 billing-right-sub-section "><p [style.color]="getColor(billingMainView?.ua?.color)">{{billingMainView.ua?.fieldText}}</p></div>
+                          <div class="col-md-6 billing-left-sub-section"><p>Number of Additional Users (B)</p></div>
+                          <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.ub?.color)">{{billingMainView.ub?.fieldText}}</p></div>
+                          <div class="col-md-6 billing-left-sub-section">
+                            <div style="display: flex; flex-direction: column;">
+                              <p class="billing-tag-bottom">Additional User Fee (C)</p>
+                              <label>(additional amount for new users)</label>
+                            </div>
+                          </div>
+                          <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.uc?.color)">{{billingMainView.uc?.fieldText}} <span [style.color]="getColor(billingMainView.ucDetails?.color)">{{billingMainView.ucDetails?.fieldText}} </span></p></div>
+                          <div class="col-md-6 billing-left-sub-section">
+                            <div style="display: flex; flex-direction: column;">
+                              <p class="billing-tag-bottom">User Fee Daily Rate (D)</p>
+                              <label>C / 31(# of days in a month)</label>
+                            </div>
+                          </div>
+                          <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.ud?.color)">{{billingMainView.ud?.fieldText}}</p></div>
+                          <div class="col-md-6 billing-left-sub-section">
+                            <div style="display: flex; flex-direction: column;">
+                              <p class="billing-tag-bottom">Prorated User Fee</p>
+                              <label>Today's Total= D x A</label>
+                            </div>
+                          </div>
+                          <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.ue?.color)">{{billingMainView.ue?.fieldText}}</p></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <mat-divider></mat-divider>
+                </div>
+
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <span class="billing-tag-bottom">Today's Total</span>
+                      <span class="billing-label">(This is what you will pay today.)</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.feeToday?.color)">{{billingMainView.feeToday?.fieldText}}<span [style.color]="getColor(billingMainView.feeTodayCalc?.color)">{{billingMainView.feeTodayCalc?.fieldText}}  </span> <span class="billing-link" (click)="expandDetailsFee=!expandDetailsFee">{{ expandDetailsFee?'Hide Detail': 'View Detail'}}</span> </p></div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <span class="billing-tag-bottom">On-going Monthly Total</span>
+                      <span class="billing-label">(This is what you will pay on your next billing date.)		</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.feeMonthly?.color)">{{billingMainView.feeMonthly?.fieldText}}<span [style.color]="getColor(billingMainView.monthlyFeeCalc?.color)">{{billingMainView.monthlyFeeCalc.fieldText}}</span> </p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Next Billing Date</span></div>
+                  <div class="cards-colunm-right">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom" [style.color]="getColor(billingMainView.nextCycleDate?.color)">{{billingMainView.nextCycleDate?.fieldText}}</p>
+                      <label>Your account will be billed next on this date.</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <button class="btn btn-primary" (click)="placeOrderBilling()" type="submit"><i class="fas fa-check"></i> Place Order</button>
+                    <button class="btn btn-cancel" (click)="cancelBillingSetup();" type="submit"><i class="fas fa-times"></i> Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngSwitchDefault>
+              <div>
+                <div *ngIf="false" class="success-alert">
+                  <p style="color: wheat; padding: 10px 0px 0px 7px;">Hello</p>
+                  <p style="color: wheat; padding: 10px 0px 0px 7px;">Hello</p>
+                  <p style="color: wheat; padding: 10px 0px 0px 7px;">Hello</p>
+                </div>
+                
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Current Monthly Fee</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.monthlyFeeCalc?.color)"><b [style.color]="getColor(billingMainView.feeMonthly?.color)">{{ billingMainView.feeMonthly?.fieldText }}</b> ( {{ billingMainView.monthlyFeeCalc?.fieldText}} )</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Current Solution</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.clpRoleDisplay?.color)">{{ billingMainView.clpRoleDisplay?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                    <div class="cards-colunm-left"><span>Number of Users</span></div>
+                    <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.currentUsers?.color)">{{ billingMainView.currentUsers?.fieldText }}</p></div>
+                  </div>
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>SalesOptima Mobile</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.mobileIncluded?.color)">{{ billingMainView.mobileIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span>Sales Optimization	</span></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.sfaIncluded?.color)">{{ billingMainView.sfaIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <span class="billing-tag-bottom">Email Marketing</span>
+                      <span class="billing-label">(High Volume)</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.htmlEmailIncluded?.color)">{{ billingMainView.htmlEmailIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <span class="billing-tag-bottom">Text Message Marketing</span>
+                      <span class="billing-label">(High Volume)</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.txtMsgMarketingActive?.color)">{{billingMainView.txtMsgMarketingActive?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                    <div class="cards-colunm-left"><p>Outlook Add-in</p></div>
+                    <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.outlookIncluded?.color)">{{billingMainView.outlookIncluded?.fieldText}}</p></div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Billing Option</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.contract?.color)">{{billingMainView.contract?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Contract Expiration Date</p></div>
+                  <div class="cards-colunm-right"><p>Installed</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Account Status</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.accountStatus?.color)">{{billingMainView.accountStatus?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">User Fee Discount</p>
+                      <label class="billing-label">(Applied per user.)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.discountUser?.color)">{{billingMainView.discountUser?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Next Billing Date</p></div>
+                  <div class="cards-colunm-right">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom" [style.color]="getColor(billingMainView.nextCycleDate?.color)">{{billingMainView.nextCycleDate?.fieldText}}</p>
+                      <label>Your account will be billed next on this date.</label>
+                    </div>
+                  </div>
+                </div>                
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false" (click)="addUserBillingAdd()" type="submit"><i class="fas fa-check"></i> Add User</button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+        <div *ngIf="isUgradeStatus">
+          <ng-container [ngSwitch]="isUpgradeAdded">
+            <ng-container *ngSwitchCase="0">
+              <div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p></p></div>
+                  <div class="cards-colunm-right"><p></p></div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>SalesOptima Mobile</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.mobileIncluded?.color)">{{ billingMainView.mobileIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Sales Optimization	</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.sfaIncluded?.color)">{{ billingMainView.sfaIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">Email Marketing</p>
+                      <label class="billing-label">(High Volume)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.htmlEmailIncluded?.color)">{{ billingMainView.htmlEmailIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">Text Message Marketing</p>
+                      <label class="billing-label">(High Volume)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.txtMsgMarketingActive?.color)">{{billingMainView.txtMsgMarketingActive?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Outlook Add-in</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.outlookIncluded?.color)">{{billingMainView.outlookIncluded?.fieldText}}</p></div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="col-md-12">
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left"><p>Billing Option</p></div>
+                    <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.contract?.color)">{{billingMainView.contract?.fieldText}}</p></div>
+                  </div>
+                </div>           
+                <div class="col-md-12">
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left"><p>Next Billing Date</p></div>
+                    <div class="cards-colunm-right">
+                      <div style="display: flex; flex-direction: column;">
+                        <p class="billing-tag-bottom" [style.color]="getColor(billingMainView.nextCycleDate?.color)">{{billingMainView.nextCycleDate?.fieldText}}</p>
+                        <label>Your account will be billed next on this date.</label>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="text-center " style="padding:10px">
+                    <button class="btn btn-primary" (click)="upgradeStart();" type="submit"><i class="fas fa-check"></i> Continue</button>
+                    <button class="btn btn-primary" (click)="cancelUpgradeSetup();" type="submit"><i class="fas fa-check"></i> Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="1">
+              <div>
+                <div class="success-alert">
+                  <p *ngIf="messageDisplayOnAddStep">{{messageDisplayOnAddStep}} </p>
+                </div>
+               
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p></p></div>
+                  <div class="cards-colunm-right"><p></p></div>
+                </div>
+                <mat-divider></mat-divider>
+                            
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>SalesOptima Mobile</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.mobileIncluded?.color)">{{ billingMainView.mobileIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Sales Optimization	</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.sfaIncluded?.color)">{{ billingMainView.sfaIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">Email Marketing</p>
+                      <label class="billing-label">(High Volume)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.htmlEmailIncluded?.color)">{{ billingMainView.htmlEmailIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">Text Message Marketing</p>
+                      <label class="billing-label">(High Volume)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.txtMsgMarketingActive?.color)">{{billingMainView.txtMsgMarketingActive?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Outlook Add-in</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.outlookIncluded?.color)">{{billingMainView.outlookIncluded?.fieldText}}</p></div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Billing Option</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.contract?.color)">{{billingMainView.contract?.fieldText}} contract</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Setup  Fee</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.feeUser?.color)">{{billingMainView.feeUser?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">User Fee Discount</p>
+                      <label class="billing-label">(Applied per user.)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.txtMsgMarketingActive?.color)">{{billingMainView.txtMsgMarketingActive?.fieldText}}</p></div>
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">User Fee</p>
+                      <label class="billing-label">(This is billed monthly per user.)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.txtMsgMarketingActive?.color)">{{billingMainView.txtMsgMarketingActive?.fieldText}}</p></div>
+                </div>
+
+                <div *ngIf="expandDetailsFee">
+                  <mat-divider></mat-divider>
+                  <mat-divider></mat-divider>
+                  <div class="wraper-main-section">
+                    <div class="global-card-section">
+                      <div class="global-header-section">
+                        <span class="text-visibale">Calculation for prorated user fee</span>
+                      </div>
+                    </div>
+                    <div class="">
+                      <div class="billing-row">
+                        <div class="col-md-6 billing-left-sub-section"><p>Prorated billing period	</p></div>
+                        <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.uperiod?.color)">{{billingMainView.uperiod?.fieldText}}</p></div>
+                        <div class="col-md-6 billing-left-sub-section"><p>Prorated time span  (A)</p></div>
+                        <div class="col-md-6 billing-right-sub-section "><p [style.color]="getColor(billingMainView?.ua?.color)">{{billingMainView.ua?.fieldText}}</p></div>
+                        <div class="col-md-6 billing-left-sub-section"><p>Number of Additional Users (B)</p></div>
+                        <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.ub?.color)">{{billingMainView.ub?.fieldText}}</p></div>
+                        <div class="col-md-6 billing-left-sub-section">
+                          <div style="display: flex; flex-direction: column;">
+                            <p class="billing-tag-bottom">Additional User Fee (C)</p>
+                            <label>(additional amount for new users)</label>
+                          </div>
+                        </div>
+                        <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.uc?.color)">{{billingMainView.uc?.fieldText}} <span [style.color]="getColor(billingMainView.ucDetails?.color)">{{billingMainView.ucDetails?.fieldText}} </span></p></div>
+
+                        <div class="col-md-6 billing-left-sub-section">
+                          <div style="display: flex; flex-direction: column;">
+                            <p class="billing-tag-bottom">User Fee Daily Rate (D)</p>
+                            <label>C / 31(# of days in a month)</label>
+                          </div>
+                        </div>
+                        <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.ud?.color)">{{billingMainView.ud?.fieldText}}</p></div>
+
+                        <div class="col-md-6 billing-left-sub-section">
+                          <div style="display: flex; flex-direction: column;">
+                            <p class="billing-tag-bottom">Prorated User Fee</p>
+                            <label>Today's Total= D x A</label>
+                          </div>
+                        </div>
+                        <div class="col-md-6 billing-right-sub-section"><p [style.color]="getColor(billingMainView?.ue?.color)">{{billingMainView.ue?.fieldText}}</p></div>
+                      </div>
+                    </div>
+                  </div>
+                  <mat-divider></mat-divider>
+                </div>
+
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">Today's Total</p>
+                      <label class="billing-label">(This is what you will pay today.)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <p [style.color]="getColor(billingMainView?.feeToday?.color)">{{billingMainView.feeToday?.fieldText}}<span [style.color]="getColor(billingMainView.feeTodayCalc?.color)">{{billingMainView.feeTodayCalc?.fieldText}}  </span> <span class="billing-link" (click)="expandDetailsFee=!expandDetailsFee">{{ expandDetailsFee?'Hide Detail': 'View Detail'}}</span> </p>
+                  </div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">On-going Monthly Total</p>
+                      <label class="billing-label">(This is what you will pay on your next billing date.)		</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.feeMonthly?.color)">{{billingMainView.feeMonthly?.fieldText}}<span [style.color]="getColor(billingMainView.monthlyFeeCalc?.color)">{{billingMainView.monthlyFeeCalc?.fieldText}}</span> </p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Next Billing Date</p></div>
+                  <div class="cards-colunm-right">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom" [style.color]="getColor(billingMainView.nextCycleDate?.color)">{{billingMainView.nextCycleDate?.fieldText}}</p>
+                      <label>Your account will be billed next on this date.</label>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Place Order</button>
+                    <button class="btn btn-danger" (click)="cancelUpgradeSetup();" type="submit"><i class="fas fa-times"></i> Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <div>
+                <div *ngIf="false" class="success-alert">
+                  <p style="color: wheat; padding: 10px 0px 0px 7px;">Hello</p>
+                  <p style="color: wheat; padding: 10px 0px 0px 7px;">Hello</p>
+                  <p style="color: wheat; padding: 10px 0px 0px 7px;">Hello</p>
+                </div>
+                
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Current Monthly Fee</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.monthlyFeeCalc?.color)"><b [style.color]="getColor(billingMainView.feeMonthly?.color)">{{ billingMainView.feeMonthly?.fieldText }}</b> ( {{ billingMainView.monthlyFeeCalc?.fieldText}} )</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Current Solution</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.clpRoleDisplay?.color)">{{ billingMainView.clpRoleDisplay?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Number of Users</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.currentUsers?.color)">{{ billingMainView.currentUsers?.fieldText }}</p></div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>SalesOptima Mobile</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.mobileIncluded?.color)">{{ billingMainView.mobileIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Sales Optimization	</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.sfaIncluded?.color)">{{ billingMainView.sfaIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">Email Marketing</p>
+                      <label class="billing-label">(High Volume)</label>
+                    </div>
+
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.htmlEmailIncluded?.color)">{{ billingMainView.htmlEmailIncluded?.fieldText }}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">Text Message Marketing</p>
+                      <label class="billing-label">(High Volume)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.txtMsgMarketingActive?.color)">{{billingMainView.txtMsgMarketingActive?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Outlook Add-in</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.outlookIncluded?.color)">{{billingMainView.outlookIncluded?.fieldText}}</p></div>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Billing Option</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.contract?.color)">{{billingMainView.contract?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Contract Expiration Date</p></div>
+                  <div class="cards-colunm-right"><p>Installed</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Account Status</p></div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.accountStatus?.color)">{{billingMainView.accountStatus?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div style="display: flex; flex-direction: column;">
+                      <p class="billing-tag-bottom">User Fee Discount</p>
+                      <label class="billing-label">(Applied per user.)</label>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right"><p [style.color]="getColor(billingMainView.discountUser?.color)">{{billingMainView.discountUser?.fieldText}}</p></div>
+                </div>
+                <div class="cards-body-section">
+                    <div class="cards-colunm-left"><p>Next Billing Date</p></div>
+                    <div class="cards-colunm-right">
+                      <div style="display: flex; flex-direction: column;">
+                        <p class="billing-tag-bottom" [style.color]="getColor(billingMainView.nextCycleDate?.color)">{{billingMainView.nextCycleDate?.fieldText}}</p>
+                        <label>Your account will be billed next on this date.</label>
+                      </div>
+                    </div>
+
+                  </div>
+
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <button class="btn btn-primary" (click)="addUserBillingAdd()" type="submit"><i class="fas fa-check"></i> Add User</button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+      <div *ngIf="userView">
+        <user-setup *ngIf="user" [isNewUserList]="true" [user]="user" [companyIdBilling]="companyIdBilling" [roleFeaturePermissions]="roleFeaturePermissions"></user-setup>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mt-3">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="top-txtmsg">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../../assets/salesoptimatitle.svg" class="mr-1" />Billing History</div>
+          <div class="header-button-panel">
+            <div class="button-wrapper">
+              <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputSearch.value=''"><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+              <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onBillingHistoryFilter($event.target.value)" #inputSearch />
+              <select class="ml-1 form-control" (change)="billingYearFilterChange($event)">
+                <option value="-1">-All-</option>
+                <option *ngFor="let year of filterYears" [ngValue]="year.value" [selected]="year.key == selectedYear">{{year.key}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="global-body-section">
+          <kendo-grid #grid id="gridId" class="billing-history-grid"
+            [kendoGridBinding]="billingHistory"
+            [pageSize]="_gridCnfgService.pageSize"
+            [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+            [sortable]="{mode: 'multiple'}"
+            [scrollable]="'scrollable'"
+            [sort]="_gridCnfgService.sort"
+            [columnMenu]="{ filter: true }"
+            [resizable]="true"
+            [reorderable]="true"
+            [ngStyle]="gridHeight"
+            (columnReorder)="_gridCnfgService.columnsOrderChanged('billing_history_grid', $event)"
+            (sortChange)="_gridCnfgService.sortChange('billing_history_grid', $event)"
+            (pageChange)="_gridCnfgService.pageChange('billing_history_grid', $event)"
+            (columnResize)="_gridCnfgService.columnResize(5,'billing_history_grid', $event)"
+            (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'billing_history_grid',grid)">
+            <div class="grid-scroll-bar">
+              <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                [field]="column.field"
+                [title]="column.title | titlecase"
+                [width]="column.width"
+                [filterable]="true"
+                [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                [includeInChooser]="column.field=='$' ? false : true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                  <div *ngIf="column.field == 'dtCreated'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy' }}</div>
+                  <div *ngIf="column.field == 'txnType'"><a (click)="showBillingInvoice(dataItem);" style="color: #3fb6dc; text-decoration: none; font-weight: 500 !important; font-size: 12px;">{{ dataItem[column.field] == 3 ? 'Invoice' + dataItem.cLPCompanyID + dataItem.cLPInvoiceID  : dataItem[column.field] == 1 ? 'Payment' : dataItem[column.field] == 2 ? 'Credit' : 'None' }}</a></div>
+                  <div *ngIf="column.field == 'txnDescription'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</div>
+                  <div *ngIf="column.field == 'txnAmount'" [ngClass]="dataItem[column.field] < 0 ? 'text-danger':''">${{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</div>
+                  <div *ngIf="column.field == 'status'" [ngClass]="dataItem[column.field] == 2 ? 'text-success' : 'text-danger' ">{{ !dataItem[column.field] ? '--' : dataItem[column.field] == 1 ? 'Pending' : dataItem[column.field] == 2 ? 'Success' : 'Failure' }}</div>
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-grid-messages [pagerItemsPerPage]="'Bills per page'" [pagerItems]="'Bills'"> </kendo-grid-messages>
+            </div>
+          </kendo-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="billingInvoiceModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="custom-modal-panel" role="document">
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content user-body-section" style="border-radius: 13px;">
+        <div class="modal-header user-body-header">
+          <h5 class="modal-title" id="exampleModalLabel" style="color:#fff;">Billing Invoice</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true" style="color:#fff;">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="showInvoiceEmailText">
+            <div class="email-box-panel">
+              <mat-form-field class="example-chip-list" appearance="fill">
+                <mat-label>Emails...</mat-label>
+                <mat-chip-list #chipList aria-label="Email selection">
+                  <mat-chip *ngFor="let email of emailsList"
+                            (removed)="removeEmail(email)">
+                    {{email}}
+                      <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                  <input type="email" pattern="[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,4}$" placeholder="Enter email..."
+                          #emailInput
+                          [formControl]="emailCtrl"
+                          [matAutocomplete]="auto"
+                          [matChipInputFor]="chipList"
+                          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                          (matChipInputTokenEnd)="addEmail($event)">
+                </mat-chip-list>
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedEmail($event)">
+                  <mat-option *ngFor="let email of filteredEmail | async" [value]="email">
+                    {{email}}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+            <a (click)="showInvoiceEmailText = !showInvoiceEmailText; clearEmail();"><i class="fa fa-times mr-2"></i></a>
+            <button type="button" class="btn btn-primary" (click)="sendInvoiceEmail();"><i class="fa fa-envelope-open"></i> Send Email</button>
+          </div>
+          <div class="email-print-btn">
+            <button type="button" class="btn btn-primary" *ngIf="!showInvoiceEmailText" (click)="showInvoiceEmailText = !showInvoiceEmailText; getEmailList();"><i class="fa fa-envelope-open"></i> Email</button>
+            <button type="button" class="btn btn-primary" (click)="print();"><i class="fa fa-print"></i> Print</button>
+          </div>
+          <iframe *ngIf="billingInvoice" [srcdoc]="billingInvoice.html | safeHtml" class="iframe-invoice"></iframe>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+    <div class="loader-body" *ngIf="showSpinnerSendEmail">
+      <div class="lds-ripple"><div></div><div></div></div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

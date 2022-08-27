@@ -1,0 +1,62 @@
+<div class="container-fluid mt-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="text-center">
+        <img src="../assets/so_logo.png" class="contract-signup-img">
+        <h4>Company Name</h4>
+      </div>
+      <div class="row mt-5">
+        <div class="col-md-4 offset-md-3">
+          <form [formGroup]="userSignupForm" (ngSubmit)="userSignupFormSubmit()">
+            <div class="form-group">
+              <label for="exampleInputEmail1">User Name</label>
+              <input type="email" class="form-control" formControlName="userName">
+            </div>
+            <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"><i class="fas fa-save mr-1"></i>Save</button>
+          </form>
+
+        </div>
+      </div>
+      <form [formGroup]="contractSignupForm" (ngSubmit)="contractSignupFormSubmit()">
+        <div class="row mt-5">
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="exampleInputEmail1">Legal Franchise Name</label>
+              <input type="email" class="form-control" formControlName="nameFranchise">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="exampleInputEmail1">Name of Signatory</label>
+              <input type="email" class="form-control" formControlName="nameSignatory">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="exampleInputEmail1">Title of Signatory</label>
+              <input type="email" class="form-control" formControlName="titleSignatory">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="exampleInputEmail1">Date</label>
+              <input type="email" class="form-control" formControlName="date">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <input type="checkbox" class="checkbox" formControlName="signCheck" />
+              <span>&nbsp;&nbsp;eSign: I am electronically signing this agreement by filling in the fields above.</span>
+            </div>
+            <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"><i class="fas fa-save mr-1"></i>Agree and Sign Agreement</button>
+            <button class="btn btn-primary float-right" type="button"><i class="fas fa-save mr-1"></i>Download Pdf</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    </div>
+  </div>
+
+

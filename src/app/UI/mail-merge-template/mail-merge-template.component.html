@@ -1,0 +1,305 @@
+<div class="container-fluid mt-3 common-alignment" *ngIf="isShowView == true">
+  <div class="custom-security-link">
+    <a (click)="backToList()">Back To List</a>
+  </div>
+</div>
+<div class="container-fluid mt-3 common-alignment">
+  <div class="row">
+    <div class="col-md-12" *ngIf="isShowView == false">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel"><img src="../../../../assets/tagtitle.svg" class="mr-1" /> Mail Merge Templates</div>
+            <div class="header-button-panel">
+              <div class="button-wrapper">
+                <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputMailSearch.value = ''">Reset Grid Setting</button>
+                <input class="" placeholder="Search in all columns..." kendoTextBox (input)="onMailMergeTemplateFilter($event.target.value)" #inputMailSearch />
+                <select class="form-control" (change)="getTemplatesByEditor($event.target.value)">
+                  <option value="-1"> -Any Editor- </option>
+                  <option value="1"> Advanced Editor Only </option>
+                  <option value="0"> Basic Editor Only </option>
+                </select>
+                <select class="form-control" [(ngModel)]="selectedUserId" (change)="getTemplatesByUser($event.target.value)">
+                  <option value="-1"> -All Users- </option>
+                  <option *ngFor="let users of userList; let i = index" [value]="users.value">{{users.text }}</option>
+                </select>
+                <button type="button" [hidden]="roleFeaturePermissions?.create == false" matTooltip="Add" class="icon-btn" (click)="addNew()">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                  <span class="btn-text">Add</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="global-body-section">
+            <kendo-grid class="mail-merge-grid" #grid id="gridId"
+              [kendoGridBinding]="mailMergeTemplateList"
+              [sortable]="{mode: 'multiple'}"
+              [sort]="_gridCnfgService.sort"
+              [pageSize]="_gridCnfgService.pageSize"
+              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+              [scrollable]="'false'"
+              [reorderable]="true"
+              [resizable]="true"
+              [columnMenu]="{ filter: true }"
+              [ngStyle]="gridHeight"
+              (columnReorder)="_gridCnfgService.columnsOrderChanged('mail_merge_template_grid', $event)"
+              (sortChange)="_gridCnfgService.sortChange('mail_merge_template_grid', $event)"
+              (pageChange)="_gridCnfgService.pageChange('mail_merge_template_grid', $event)"
+              (columnResize)="_gridCnfgService.columnResize(6,'mail_merge_template_grid', $event)"
+              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'mail_merge_template_grid',grid)">
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                  [field]="column.field"
+                  [title]="column.title | titlecase"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [width]="column.width"
+                  [filterable]="true"
+                  [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                  [includeInChooser]="column.field=='$' ? false : true">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.title == ''">{{ rowIndex+1 }}</div>
+                    <div *ngIf="column.field == 'templateName'"><a (click)="fillDataAndLoad(dataItem.mailMergeTemplateID,'viewPanel')">{{dataItem[column.field]}}</a></div>
+                    <div *ngIf="column.field == 'previewTemplate'"><a (click)="setHtmlText(dataItem.mailMergeTemplateID)">open in new window</a></div>
+                    <div *ngIf="column.field == 'userLastFirst'">{{dataItem[column.field]}}</div>
+                    <div *ngIf="column.field == 'shareable'">{{dataItem[column.field] == true ? 'shared' : 'not shared'}}</div>
+                    <div *ngIf="column.field == 'isUseBee'">{{dataItem[column.field]}}</div>
+                    <div *ngIf="column.field == 'dtCreated'">{{dataItem[column.field] | date: 'MM/dd/yy'}}</div>
+                  </ng-template>
+                </kendo-grid-column>
+              </div>
+            </kendo-grid>
+          </div>
+        </div>
+      </div>
+
+      <div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+        <div class="lds-ripple"><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wraper-main-section" *ngIf="isShowView == true">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/tagtitle.svg" class="mr-1" /> Mail Merge Template Configuration</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <button type="button" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" *ngIf="showEditFieldsBasic() && isShowEditPanel == true" matTooltip="Make a copy" (click)="saveMailMergeTemplate(mailMergeId, isUseBee, htmlDisplay);" class="icon-btn">
+              <i class="fa fa-save" aria-hidden="true"></i>
+              <span class="btn-text">Save</span>
+            </button>
+            <button type="button" [hidden]="roleFeaturePermissions?.delete == false" *ngIf="isShow == 'editMailMerge' && isShowEditPanel == true && isShowDelete == false" (click)="deleteMailMerge()" matTooltip="Delete" class="icon-btn">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+              <span class="btn-text">Delete</span>
+            </button>
+            <button type="button" *ngIf="showEditFields()" matTooltip="Cancel" (click)="backFromEditPanel()" class="icon-btn">
+              <i class="fa fa-arrow-left" aria-hidden="true"></i>
+              <span class="btn-text">Back</span>
+            </button>
+            <button [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" *ngIf="isShow == 'editMailMerge' && isShowEditPanel == false && user?.userRole > 3" type="button" matTooltip="Save As" (click)="fillDataAndLoad(mailMergeId,'copyPanel');" class="icon-btn">
+              <i class="fa fa-save" aria-hidden="true"></i>
+              <span class="btn-text">Save</span>
+            </button>
+            <button [hidden]="roleFeaturePermissions?.edit == false" *ngIf="isShow == 'editMailMerge' && isShowEditPanel == false && user?.userRole > 3" type="button" matTooltip="Edit" (click)="fillDataAndLoad(mailMergeId,'editPanel');" class="icon-btn">
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+              <span class="btn-text">Edit</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <div class="wraper-body-panel" *ngIf="isShow == 'addNew' && isShowEditPanel == false">
+          <div class="wraper-body-left">
+            <button class="btn btn-primary" type="button" (click)="startFromScratch()">Start from Scratch</button><br />
+          </div>
+          <div class="wraper-body-right">
+            <button class="btn btn-primary" type="button" (click)="useOwnHtml()">Use my own HTML</button><br />
+          </div>
+        </div>
+        <div class="wraper-body-panel">
+          <div [ngClass]="(isShowEditPanel == false) ? 'wraper-body-left' : 'wraper-body-left'">
+            <div class="cards-body-section">
+              <div class="cards-colunm-left" *ngIf="isNewTemplate == false">
+                <div class="align-center">
+                  <span class="control-label">Template Name</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <p *ngIf="isNewTemplate == false && isShowEditPanel == false">{{templateName}}</p>
+                <input *ngIf="showEditFields()" class="form-control" type="text" [(ngModel)]="templateName">
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left" *ngIf="isNewTemplate == false">
+                <div class="align-center">
+                  <span class="control-label" *ngIf="!(showEditFields() && showEditFieldsAdvanced())" id="bee-plugin-container">HTML Display</span><br />
+                  <button *ngIf="showEditFields() && isHtmlEditor == false && showEditFieldsBasic()" class="btn btn-primary" type="button" (click)="openHtmlEditor()">Use HTML Editor</button><br />
+                  <button *ngIf="showEditFields() && isHtmlEditor == true && showEditFieldsBasic()" class="btn btn-primary" type="button" (click)="openTextEditor()">Use Text Editor</button><br />
+                  <button *ngIf="showEditFields() && showEditFieldsBasic()" class="btn btn-primary"> Save Progress</button>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <a *ngIf="isNewTemplate == false && isShowEditPanel == false" (click)="setHtmlTextForNewTemp(mailMergeId,htmlDisplay)">click here to preview template</a>
+                <kendo-editor [(ngModel)]="htmlDisplay" style="height: 450px;" *ngIf="showEditFields() && isHtmlEditor == true && showEditFieldsBasic()">
+                  <kendo-toolbar>
+                    <kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorBoldButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorItalicButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorUnderlineButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorStrikethroughButton></kendo-toolbar-button>
+                    </kendo-toolbar-buttongroup>
+                    <kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorSubscriptButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorSuperscriptButton></kendo-toolbar-button>
+                    </kendo-toolbar-buttongroup>
+                    <kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorAlignLeftButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorAlignCenterButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorAlignRightButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorAlignJustifyButton></kendo-toolbar-button>
+                    </kendo-toolbar-buttongroup>
+                    <kendo-toolbar-dropdownlist kendoEditorFormat></kendo-toolbar-dropdownlist>
+                    <kendo-toolbar-dropdownlist kendoEditorFontSize></kendo-toolbar-dropdownlist>
+                    <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                    <kendo-toolbar-colorpicker kendoEditorForeColor></kendo-toolbar-colorpicker>
+                    <kendo-toolbar-colorpicker kendoEditorBackColor
+                                               view="gradient"></kendo-toolbar-colorpicker>
+                    <kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorInsertUnorderedListButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorInsertOrderedListButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorIndentButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorOutdentButton></kendo-toolbar-button>
+                    </kendo-toolbar-buttongroup>
+                    <kendo-toolbar-button kendoEditorBlockquoteButton></kendo-toolbar-button>
+                    <kendo-toolbar-button kendoEditorSelectAllButton></kendo-toolbar-button>
+                    <kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorUndoButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorRedoButton></kendo-toolbar-button>
+                    </kendo-toolbar-buttongroup>
+                    <kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorCreateLinkButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorUnlinkButton></kendo-toolbar-button>
+                    </kendo-toolbar-buttongroup>
+                    <kendo-toolbar-button kendoEditorInsertFileButton></kendo-toolbar-button>
+                    <kendo-toolbar-button kendoEditorInsertImageButton></kendo-toolbar-button>
+                    <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                    <kendo-toolbar-button kendoEditorCleanFormattingButton></kendo-toolbar-button>
+                    <kendo-editor-insert-table-button></kendo-editor-insert-table-button>
+                    <kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorAddColumnBeforeButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorAddColumnAfterButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorAddRowBeforeButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorAddRowAfterButton></kendo-toolbar-button>
+                    </kendo-toolbar-buttongroup>
+                    <kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorDeleteColumnButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorDeleteRowButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorDeleteTableButton></kendo-toolbar-button>
+                    </kendo-toolbar-buttongroup>
+                    <kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorMergeCellsButton></kendo-toolbar-button>
+                      <kendo-toolbar-button kendoEditorSplitCellButton></kendo-toolbar-button>
+                    </kendo-toolbar-buttongroup>
+                    <kendo-toolbar-button kendoEditorPrintButton></kendo-toolbar-button>
+                  </kendo-toolbar>
+                </kendo-editor>
+                <textarea *ngIf="showEditFields() && isHtmlEditor == false && showEditFieldsBasic()" [(ngModel)]="htmlDisplay" style="height:400px;"></textarea>
+              </div>
+            </div>
+            <div *ngIf="showEditFields() && showEditFieldsAdvanced()" id="bee-plugin-container" name="bee-plugin-container" style="height:800px;" #beeContainer></div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left" *ngIf="isNewTemplate == false">
+                <div class="align-center">
+                  <span class="control-label">Shareable</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <p *ngIf="isNewTemplate == false && isShowEditPanel == false">{{isShareable == true ? 'All users for your company will be able to use this mail merge template.' : 'Only you will have access to use this template.'}}</p>
+                <input *ngIf="showEditFields()" type="checkbox" class="checkbox ml-2" [(ngModel)]="isShareable"> <span *ngIf="showEditFields()"> Share this with all users</span>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left" *ngIf="isNewTemplate == false">
+                <div class="align-center">
+                  <span class="control-label">Owner</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <p *ngIf="isNewTemplate == false && isShowEditPanel == false"> {{userLastFirst}}</p>
+                <select *ngIf="showEditFields()" class="form-control select-option ml-2" [(ngModel)]="owner">
+                  <option value="-1"> -All Users- </option>
+                  <option *ngFor="let users of userList; let i = index" [value]="users.value">{{users.text }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="wraper-body-right" *ngIf="isShowEditPanel == false">
+            <div [innerHTML]="htmlDisplay | safeHtml"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="loader-body" *ngIf="showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>
+</div>
+
+<div class="container-fluid" *ngIf="isShowView == false">
+  <div class="important-msg-section">
+    <div class="important-msg-panel">
+      <table>
+        <tbody>
+          <tr>
+            <td><b>Important Notes</b></td>
+          </tr>
+          <tr>
+            <td>1.  The first time you view or edit a template, the page may take a minute to load</td>
+          </tr>
+          <tr>
+            <td>2.  You cannot edit Templates that are owned by others. If you want to edit it, you must first create a duplicate version by clicking the Save As button.</td>
+          </tr>
+          <tr>
+            <td>3.  Refer to <a href="https://www.salesoptima.com/support/email-placeholder-list" target="_blank">Email Merge Place Holder List </a>for a list of valid place holders.</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid" *ngIf="isShowView == true">
+  <div class="important-msg-section">
+    <div class="important-msg-panel">
+      <table>
+        <tbody>
+          <tr>
+            <td><b>Important Notes</b></td>
+          </tr>
+          <tr>
+            <td>1.  PH_MailMergeSubject: Use this place holder anywhere in your template to substitute the subject text of a document.</td>
+          </tr>
+          <tr>
+            <td>2.  PH_MailMergeBody: Use this place holder anywhere in your template to substitute the body text of a document.</td>
+          </tr>
+          <tr>
+            <td>3.  PH_MailMergeDate: Use this place holder anywhere in your template to substitute the current date.</td>
+          </tr>
+          <tr>
+            <td>4.  PH_MailMergePageBreak: Use this place holder inside an HTML table row to force a page break.</td>
+          </tr>
+          <tr>
+            <td>5.  Refer to <a href="https://www.salesoptima.com/support/email-placeholder-list" target="_blank">Email Merge Place Holder List </a>for a list of valid place holders.</td>
+          </tr>
+          <tr>
+            <td>6.  You cannot edit Templates that are owned by others. You must first Save As a new Template and then you can make changes.</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

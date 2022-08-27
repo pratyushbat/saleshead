@@ -1,0 +1,286 @@
+<div class="container-fluid mt-3">
+  <div class="margin-all-area">
+    <div class="row">
+      <div class="col-lg-4 col-sm-12">
+        <label *ngIf="appointmentTypeResponse?.isUserDropdown"><b>User</b></label>
+        <select class="form-control select-option" style="display: initial;" [(ngModel)]="selectedUserId" *ngIf="appointmentTypeResponse?.isUserDropdown">
+          <option *ngFor="let users of appointmentTypeResponse.filterUserList; let i = index" [value]="users.cLPUserID">{{users.lastName}},&nbsp;{{users.firstName}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="custom-security-link">
+    <a (click)="setAppCategoryfields(1);">View General Appts Only</a>
+    <a (click)="setAppCategoryfields(2);">View Contact Appts Only</a>
+    <a (click)="setAppCategoryfields(3);">View Lead Appts Only</a>
+  </div>
+  <div class="order-row-inner">
+    <div class="txt-right">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel "><img src="../../../../../assets/appttitle.svg" class="mr-1" />Appointment Type</div>
+            <div class="header-button-panel">
+              <div class="button-wrapper">
+                <button class="btn btn-primary" type="button" (click)="resetGridSetting();">Reset Grid Setting</button>
+              </div>
+            </div>
+          </div>
+          <div class="p-2">
+            <div class="wraper-main-section">
+              <div class="global-card-section">
+                <div class="common-inner-header">
+                  <div class="inner-header-bg">
+                    <div class="inner-cards-panel header-inner-hidden">
+                      <span>Start Date</span>
+                      <span>End Date</span>
+                      <span>Category</span>
+                      <span class="text-right">Action</span>
+                    </div>
+                    <div class="inner-detail-bg">
+                      <span>Details</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="common-inner-cards">
+                  <form [formGroup]="appointmentTypeForm" (ngSubmit)="getApptTypeSummary(appointmentTypeForm.controls.appCategory.value,false,true);">
+                    <div class="inner-cards-grid">
+                      <div class="inner-card-mobile">
+                        <label>Start Date</label>
+                        <div class="mobile-view-design">
+                          <kendo-datepicker formControlName="fromDate" [ngClass]="{'has-error': appointmentTypeForm.controls.fromDate.errors && (appointmentTypeForm.controls.fromDate.touched || appointmentTypeForm.controls.fromDate.dirty)}"></kendo-datepicker>
+                          <div class="login-error" *ngIf="appointmentTypeForm.controls.fromDate.errors && (appointmentTypeForm.controls.fromDate.touched || appointmentTypeForm.controls.fromDate.dirty)">
+                            <span *ngIf="appointmentTypeForm.controls.fromDate.errors.required">Start Date is required </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="inner-card-mobile">
+                        <label>End Date</label>
+                        <div class="mobile-view-design">
+                          <kendo-datepicker formControlName="toDate" [ngClass]="{'has-error': appointmentTypeForm.controls.toDate.errors && (appointmentTypeForm.controls.toDate.touched || appointmentTypeForm.controls.toDate.dirty)}"></kendo-datepicker>
+                          <div class="login-error" *ngIf="appointmentTypeForm.controls.toDate.errors && (appointmentTypeForm.controls.toDate.touched || appointmentTypeForm.controls.toDate.dirty)">
+                            <span *ngIf="appointmentTypeForm.controls.toDate.errors.required">End Date is required </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="inner-card-mobile">
+                        <label>Category</label>
+                        <div class="mobile-view-design">
+                          <select class="form-control" formControlName="appCategory">
+                            <option value="1">Personal/Company</option>
+                            <option value="2">Contact</option>
+                            <option value="3">Lead</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <button type="submit" class="grid-common-btn" [disabled]="appointmentTypeForm.invalid">
+                          <i class="fa fa-refresh"></i>
+                          <span class="grid-common-text">Refresh</span>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="global-body-section">
+            <kendo-grid #grid id="gridId"
+              [kendoGridBinding]="appointmentTypeDataMonth"
+              [sortable]="{mode: 'multiple'}"
+              [sort]="_gridCnfgService.sort"
+              [pageSize]="_gridCnfgService.pageSize"
+              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+              [scrollable]="'false'"
+              [reorderable]="true"
+              [resizable]="true"
+              [columnMenu]="{ filter: true }"
+              [ngStyle]="gridHeight"
+              (columnReorder)="_gridCnfgService.columnsOrderChanged('appt_type_summary_grid', $event)"
+              (sortChange)="_gridCnfgService.sortChange('appt_type_summary_grid', $event)"
+              (pageChange)="_gridCnfgService.pageChange('appt_type_summary_grid', $event)"
+              (columnResize)="_gridCnfgService.columnResize(4,'appt_type_summary_grid', $event)"
+              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'appt_type_summary_grid',grid)">
+              <ng-template kendoGridToolbarTemplate>
+                <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+                  <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                  <span>Download Excel</span>
+                </button>
+                <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+                  <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                  <span>Download PDF</span>
+                </button>
+              </ng-template>
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                  [field]="column.field"
+                  [title]="column.title"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [width]="column.width"
+                  [filterable]="true"
+                  [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1">
+                  <ng-template kendoGridHeaderTemplate let-column let-columnIndex="columnIndex">
+                    <div *ngIf="column.field == 'display'">
+                      Type
+                    </div>
+                    <div *ngIf="column.field == 'pending'">
+                      <img src="../../../../../assets/rptapptpending_sm.svg" />
+                    </div>
+                    <div *ngIf="column.field == 'completed'">
+                      <img src="../../../../../assets/rptapptcompleted_sm.svg" />
+                    </div>
+                    <div *ngIf="column.field == 'cancelled'">
+                      <img src="../../../../../assets/rptapptcancelled_sm.svg" />
+                    </div>
+                  </ng-template>
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.field == 'display'" [innerHtml]="dataItem[column.field]"></div>
+                    <div class="customer-name" *ngIf="column.field == 'pending'">{{ dataItem[column.field] }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'completed'">{{ dataItem[column.field] }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'cancelled'">{{ dataItem[column.field]}}</div>
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-excelexport #excelexport [data]="appointmentTypeDataMonth" fileName='AppointmentType-Month'>
+                  <kendo-excelexport-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                    <ng-template let-value="rowIndex">
+                      <div class="customer-name" *ngIf="col.field != '$'" [innerHtml]="dataItem[col.field]"></div>
+                    </ng-template>
+                  </kendo-excelexport-column>
+                </kendo-excelexport>
+                <kendo-grid-pdf fileName="AppointmentType-Month.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                  <kendo-grid-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name" *ngIf="col.field != '$'" [innerHtml]="dataItem[col.field]"></div>
+                    </ng-template>
+                  </kendo-grid-column>
+                </kendo-grid-pdf>
+              </div>
+            </kendo-grid>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-width-panel">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel"><img src="../../../../../assets/appttitle.svg" class="mr-1" />Appointment Type - YTD</div>
+            <div class="header-button-panel">
+              <div class="button-wrapper">
+                <button class="btn btn-primary" type="button" (click)="resetYTDGridSetting();">Reset Grid Setting</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-2">
+            <div class="wraper-main-section">
+              <div class="global-card-section">
+                <div class="inner-header-bg">
+                  <div class="inner-cards-panel">
+                    <span>Category</span>
+                    <span class="text-right">Action</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="inner-cards-grid">
+                    <div class="">
+                      <select class="form-control" [(ngModel)]="appCategoryYTD" >
+                        <option value="1">Personal/Company</option>
+                        <option value="2">Contact</option>
+                        <option value="3">Lead</option>
+                      </select>
+                    </div>
+                    <div class="text-right">
+                      <button type="button" class="common-colunm-btn" (click)="getApptTypeSummary(appCategoryYTD,true,false);"><i class="fa fa-refresh"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="global-body-section">
+            <kendo-grid #grid2 id="gridId2"
+              [kendoGridBinding]="appointmentTypeDataYTD"
+              [sortable]="{mode: 'multiple'}"
+              [sort]="_gridCnfgServiceYTD.sort"
+              [pageSize]="_gridCnfgServiceYTD.pageSize"
+              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+              [scrollable]="'false'"
+              [reorderable]="true"
+              [resizable]="true"
+              [columnMenu]="{ filter: true }"
+              [ngStyle]="gridHeight"
+              (columnReorder)="_gridCnfgServiceYTD.columnsOrderChanged('appt_type_summary_YTD_grid', $event)"
+              (sortChange)="_gridCnfgServiceYTD.sortChange('appt_type_summary_YTD_grid', $event)"
+              (pageChange)="_gridCnfgServiceYTD.pageChange('appt_type_summary_YTD_grid', $event)"
+              (columnResize)="_gridCnfgServiceYTD.columnResize(4,'appt_type_summary_YTD_grid', $event)"
+              (columnVisibilityChange)="_gridCnfgServiceYTD.onVisibilityChange($event,'appt_type_summary_YTD_grid',grid)">
+              <ng-template kendoGridToolbarTemplate>
+                <button type="button" class="k-button export-icon-YTD" title="Export list in excel" (click)="saveExcel(excelexportYTD)">
+                  <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                  <span>Download Excel</span>
+                </button>
+                <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="k-button export-icon-YTD">
+                  <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                  <span>Download PDF</span>
+                </button>
+              </ng-template>
+
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgServiceYTD.columns"
+                  [field]="column.field"
+                  [title]="column.title"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [width]="column.width"
+                  [filterable]="true"
+                  [hidden]="_gridCnfgServiceYTD.hiddenColumns.indexOf(column.field) > -1">
+                  <ng-template kendoGridHeaderTemplate let-column let-columnIndex="columnIndex">
+                    <div *ngIf="column.field == 'display'">
+                      Type
+                    </div>
+                    <div *ngIf="column.field == 'pending'">
+                      <img src="../../../../../assets/rptapptpending_sm.svg" />
+                    </div>
+                    <div *ngIf="column.field == 'completed'">
+                      <img src="../../../../../assets/rptapptcompleted_sm.svg" />
+                    </div>
+                    <div *ngIf="column.field == 'cancelled'">
+                      <img src="../../../../../assets/rptapptcancelled_sm.svg" />
+                    </div>
+                  </ng-template>
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.field == 'display'" [innerHtml]="dataItem[column.field]"></div>
+                    <div class="customer-name" *ngIf="column.field == 'pending'">{{ dataItem[column.field] }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'completed'">{{ dataItem[column.field] }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'cancelled'">{{ dataItem[column.field]}}</div>
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-excelexport #excelexportYTD [data]="appointmentTypeDataYTD" fileName='AppointmentType-YTD'>
+                  <kendo-excelexport-column *ngFor="let col of _gridCnfgServiceYTD.columns" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+                </kendo-excelexport>
+                <kendo-grid-pdf fileName="AppointmentType-YTD.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                  <kendo-grid-column *ngFor="let col of _gridCnfgServiceYTD.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name" *ngIf="col.field != '$'" [innerHtml]="dataItem[col.field]"></div>
+                    </ng-template>
+                  </kendo-grid-column>
+                </kendo-grid-pdf>
+              </div>
+            </kendo-grid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

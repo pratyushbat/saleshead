@@ -1,0 +1,327 @@
+<div class="container-fluid mt-3">
+  <div class="custom-security-link">
+    <a>My Calender</a>
+    <a>My Appt List</a>
+    <a>My Tasks</a>
+    <a>My Call List</a>
+  </div>
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="top-txtmsg">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../assets/tagtitle.svg" class="mr-1" />Appointment</div>
+        </div>
+        <div class="wrapper-panel kendo-section">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="appointment-section">
+                <div class="appointment-panel">
+                  <kendo-tabstrip [keepTabContent]="true">
+                    <kendo-tabstrip-tab [title]="'General'" [selected]="true">
+                      <ng-template kendoTabContent>
+                        <div class="user-setup-section1">
+                          <div class="admin-option-section">
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Subject</span>
+                                  </div>
+                                  <div class="col-md-4 txt-left">
+                                    <input type="text" class="form-control" />
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Start</span>
+                                  </div>
+                                  <div class="col-md-2 txt-left">
+                                    <kendo-datetimepicker></kendo-datetimepicker>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>End</span>
+                                  </div>
+                                  <div class="col-md-3 txt-left">
+                                    <select class="form-control">
+                                      <option>30 minutes</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Category</span>
+                                  </div>
+                                  <div class="col-md-8 txt-left d-flex">
+                                    <select class="form-control w-25">
+                                      <option>Personal</option>
+                                    </select>
+                                    <input type="checkbox" class="checkbox mx-2" />
+                                    <span>Phone Call (will appear only as part of Call List)</span>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Type</span>
+                                  </div>
+                                  <div class="col-md-3 txt-left">
+                                    <select class="form-control">
+                                      <option>-None Selected</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Location</span>
+                                  </div>
+                                  <div class="col-md-3 txt-left">
+                                    <input type="text" class="form-control">
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>User</span>
+                                  </div>
+                                  <div class="col-md-3 txt-left">
+                                    <select class="form-control">
+                                      <option>-None Selected</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Notes</span>
+                                  </div>
+                                  <div class="col-md-8 txt-left">
+                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                                    <p class="text-success">(limit 2000 characters)</p>
+                                    <input type="checkbox" class="checkbox mx-2" />
+                                    <span>Include these notes in user reminder.</span>
+                                  </div>
+                                </div>
+                                <div class="teamoffice-bottom">
+                                  <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"><i class="fas fa-save mr-1"></i>Save</button>
+                                  <button class="btn btn-danger" type="button" (click)="cancelTextMsg()">Cancel</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </kendo-tabstrip-tab>
+                    <kendo-tabstrip-tab [title]="'Reminder'">
+                      <ng-template kendoTabContent>
+                        <div class="user-setup-section1">
+                          <div class="admin-option-section">
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Schedule Reminder</span>
+                                  </div>
+                                  <div class="col-md-4 txt-left">
+                                    <select class="form-control">
+                                      <option>Do not scheduel a reminder</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Via Message Center</span>
+                                  </div>
+                                  <div class="col-md-2 txt-left">
+                                    <input type="checkbox" class="checkbox" />
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Via Email</span>
+                                  </div>
+                                  <div class="col-md-3 txt-left ">
+                                    <input type="checkbox" class="checkbox" />&nbsp;
+                                    <div>
+                                      <span class="text-dark">Additional Email Addresses (seperated by comma)</span>
+                                      <input type="text" class="form-control" />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Via Text Message</span>
+                                  </div>
+                                  <div class="col-md-8 txt-left d-flex">
+                                    <input type="checkbox" class="checkbox mx-2" />
+                                    <span>To Testing Account ()</span>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Reminder Text Template</span>
+                                  </div>
+                                  <div class="col-md-3 txt-left">
+                                    <select class="form-control">
+                                      <option>-None Selected</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Reminder Email Template</span>
+                                  </div>
+                                  <div class="col-md-3 txt-left">
+                                    <select class="form-control">
+                                      <option>-None Selected</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Reminder Notes</span>
+                                  </div>
+                                  <div class="col-md-8 txt-left">
+                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                                    <p class="text-success">(limit 2000 characters)</p>
+                                    <span>Note: This reminder note will be included in all reminder emails (including to any Additional Email Addresses specified above).</span>
+                                    <br />
+                                    <input type="checkbox" class="checkbox mx-2" />
+                                    <span class="text-danger">This will send a reminder using the settings above<u> immediately</u> after saving this appointment.</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="teamoffice-bottom">
+                              <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"><i class="fas fa-save mr-1"></i>Save</button>
+                              <button class="btn btn-danger" type="button" (click)="cancelTextMsg()">Cancel</button>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </kendo-tabstrip-tab>
+                    <kendo-tabstrip-tab [title]="'Attachments'">
+                      <ng-template kendoTabContent>
+                        <div class="user-setup-section1">
+                          <div class="admin-option-section">
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Linked Files</span>
+                                  </div>
+                                  <div class="col-md-4 txt-left">
+                                    <span>None exist.</span>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <span>Attached Files</span>
+                                  </div>
+                                  <div class="col-md-2 txt-left">
+                                    <span>Please attach files once this appointment has been created.</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="teamoffice-bottom">
+                              <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"><i class="fas fa-save mr-1"></i>Save</button>
+                              <button class="btn btn-danger" type="button" (click)="cancelTextMsg()">Cancel</button>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </kendo-tabstrip-tab>
+                    <kendo-tabstrip-tab [title]="'Attendees'">
+                      <ng-template kendoTabContent>
+                        <div class="user-setup-section1">
+                          <div class="admin-option-section">
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="row">
+                                  <div class="col-md-4 txt-right">
+                                    <img src="../../../../../assets/leadstitle.svg" />
+                                  </div>
+                                  <div class="col-md-4 txt-left">
+                                    <div class="switch-section">
+                                      <div class="switch-left">
+                                        <div class="example-container">
+                                          <div cdkDropList
+                                               #frmList="cdkDropList"
+                                               [cdkDropListData]="fromUserlist"
+                                               [cdkDropListConnectedTo]="[tolist]"
+                                               class="example-list"
+                                               (cdkDropListDropped)="drop($event)"
+                                               (click)="fromList_Onclick($event)">
+                                            <div class="example-box" *ngFor="let i of fromUserlist" cdkDrag (click)="fromList_Onclick($event)">
+                                              {{i.value}}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="switch-middle-btn">
+                                        <button class="btn btn-primary" (click)="selectAll()"><i class="fas fa-angle-double-down"></i> <i class="fas fa-angle-double-right"></i></button>
+                                        <button class="btn btn-primary" (click)="unSelectAll()"><i class="fas fa-angle-double-up"></i> <i class="fas fa-angle-double-left"></i></button>
+                                      </div>
+                                      <div class="switch-right">
+                                        <div class="example-container">
+                                          <div cdkDropList
+                                               #tolist="cdkDropList"
+                                               [cdkDropListData]="toUserlist"
+                                               [cdkDropListConnectedTo]="[frmList]"
+                                               class="example-list"
+                                               (cdkDropListDropped)="drop($event)">
+                                            <div class="example-box" *ngFor="let i of toUserlist" cdkDrag>{{i.value}}</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div>
+                                      <input type="checkbox" class="checkbox" /> &nbsp;
+                                      <span>Perform Free/Busy Check</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="teamoffice-bottom">
+                              <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"><i class="fas fa-save mr-1"></i>Save</button>
+                              <button class="btn btn-danger" type="button" (click)="cancelTextMsg()">Cancel</button>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </kendo-tabstrip-tab>
+                    <kendo-tabstrip-tab [title]="'Custom Action'" *ngIf="roleFeaturePermissions?.isSuperAdmin">
+                      <ng-template kendoTabContent>
+                        <div class="user-setup-section1">
+                          <div class="admin-option-section">
+                            <div class="row">
+                              <div class="col-md-12">
+                                <select>
+                                  <option></option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="teamoffice-bottom">
+                              <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false"  type="submit"><i class="fas fa-save mr-1"></i>Save</button>
+                              <button class="btn btn-danger" type="button" (click)="cancelTextMsg()">Cancel</button>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+                    </kendo-tabstrip-tab>
+                  </kendo-tabstrip>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

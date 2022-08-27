@@ -1,0 +1,128 @@
+<div class="user-tabs-panel">
+  <form [formGroup]="creditCardForm" (ngSubmit)="creditCardFormSubmit()">
+    <div class="contract-card-section">
+      <div class="card-design-panel">
+        <div class="">
+          <div class="">
+            <div class="checkout-header">
+              <span class="mthheading">Card Details</span>
+            </div>
+            <div class="card-details-panel">
+              <div class="cards-icon">
+                <div class="font-icon">
+                  <i [ngClass]="[sel_brand === 'unknown' ? 'fas fa-credit-card' : 'fab fa-cc-' + sel_brand ]"></i>
+                </div>
+                <div>
+                  <input type="text" [ngClass]="{'has-error': creditCardFrm.creditCard.errors && (creditCardFrm.creditCard.touched || creditCardFrm.creditCard.dirty)}" (keyup)="cc_brand_id($event)" class="checkout-input form-control" id="creditCard" formControlName="creditCard" placeholder="Credit Card Number" mask="0000 0000 0000 0000 0000" />
+                  <div *ngIf="creditCardFrm.creditCard.errors && (creditCardFrm.creditCard.touched || creditCardFrm.creditCard.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.creditCard.errors.required">Card Number is required </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-info-fields">
+                <div>
+                  <input [ngClass]="{'has-error': creditCardFrm.cCExDate.errors && (creditCardFrm.cCExDate.touched || creditCardFrm.cCExDate.dirty)}" type="text" mask="00/00" class="checkout-input form-control" id="cCExDate" formControlName="cCExDate" placeholder="MM/YY" (blur)="creditCardExp();" />
+                  <div *ngIf="creditCardFrm.cCExDate.errors && (creditCardFrm.cCExDate.touched || creditCardFrm.cCExDate.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.cCExDate.errors?.message">{{creditCardFrm.cCExDate.errors.message}}</div>
+                    <div class="required-error" *ngIf="creditCardFrm.cCExDate.errors.required">Expiry is required </div>
+                    <div class="required-error" *ngIf="creditCardFrm.cCExDate.errors.pattern">Invalid Expiry Date</div>
+                  </div>
+                </div>
+                <div>
+                  <input type="text" [ngClass]="{'has-error': creditCardFrm.securityCode.errors && (creditCardFrm.securityCode.touched || creditCardFrm.securityCode.dirty)}" class="checkout-input form-control" id="securityCode" formControlName="securityCode" maxlength="4" placeholder="CVC" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" />
+                  <div *ngIf="creditCardFrm.securityCode.errors && (creditCardFrm.securityCode.touched || creditCardFrm.securityCode.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.securityCode.errors.required">CVV is required </div>
+                    <div class="required-error" *ngIf="creditCardFrm.securityCode.errors.pattern">Invalid CVV</div>
+                  </div>
+                </div>
+                <div>
+                  <input type="text" [ngClass]="{'has-error': creditCardFrm.name.errors && (creditCardFrm.name.touched || creditCardFrm.name.dirty)}" class=" checkout-input form-control" id="name" formControlName="name" placeholder="Name" />
+                  <div *ngIf="creditCardFrm.name.errors && (creditCardFrm.name.touched || creditCardFrm.name.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.name.errors.required">Name is required </div>
+                  </div>
+                </div>
+                <div class="credit-icon"><a data-toggle="modal" data-target="#whatThisModal" matTooltip="What is this?"><i class="fa fa-info"></i></a></div>
+              </div>              
+              <div class="cards-info-fields">
+                <div>
+                  <span class="control-label" for="billingAddress">Billing Address<span class="text-danger">*</span></span>
+                  <input type="text" [ngClass]="{'has-error': creditCardFrm.billingAddress.errors && (creditCardFrm.billingAddress.touched || creditCardFrm.billingAddress.dirty)}" class=" checkout-input form-control" id="billingAddress" formControlName="billingAddress" placeholder="Billing Address" />
+                  <div *ngIf="creditCardFrm.billingAddress.errors && (creditCardFrm.billingAddress.touched || creditCardFrm.billingAddress.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.billingAddress.errors.required">Billing Address is required </div>
+                  </div>
+                </div>
+                <div>
+                  <span class="control-label" for="address2">Billing Address 2<span class="text-danger">*</span></span>
+                  <input type="text" [ngClass]="{'has-error': creditCardFrm.address2.errors && (creditCardFrm.address2.touched || creditCardFrm.address2.dirty)}" class="checkout-input form-control" id="address2" formControlName="address2" placeholder="Billing Address 2" />
+                  <div *ngIf="creditCardFrm.address2.errors && (creditCardFrm.address2.touched || creditCardFrm.address2.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.address2.errors.required">Billing Address 2 is required </div>
+                  </div>
+                </div>                
+              </div>
+              <div class="cards-info-fields">
+                <div>
+                  <span class="control-label" for="zip">Zip<span class="text-danger">*</span></span>
+                  <input type="text" [ngClass]="{'has-error': creditCardFrm.zip.errors && (creditCardFrm.zip.touched || creditCardFrm.zip.dirty)}" class=" checkout-input form-control" id="zip" formControlName="zip" placeholder="Zip" minlength="3" maxlength="10" (blur)="getCityState($event,'creditCard');" />
+                  <div *ngIf="creditCardFrm.zip.errors && (creditCardFrm.zip.touched || creditCardFrm.zip.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.zip.errors.required">Zip is required </div>
+                  </div>
+                </div>
+                <div>
+                  <span class="control-label" for="country">Country<span class="text-danger">*</span></span>
+                  <select class="form-control custom-select checkout-input" [ngClass]="{'has-error': creditCardFrm.country.errors && (creditCardFrm.country.touched || creditCardFrm.country.dirty)}" id="country" formControlName="country" (change)="changeCountry($event)">
+                    <option *ngFor="let country of countryList" [value]="country.code2" [attr.data-code2]="country.code2">{{country.name}}</option>
+                  </select>
+                  <div *ngIf="creditCardFrm.country.errors && (creditCardFrm.country.touched || creditCardFrm.country.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.country.errors.required">Country is required </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-info-fields">
+                <div>
+                  <span class="control-label" for="city">City<span class="text-danger">*</span></span>
+                  <input type="text" [ngClass]="{'has-error': creditCardFrm.city.errors && (creditCardFrm.city.touched || creditCardFrm.city.dirty)}" class=" checkout-input form-control" id="city" formControlName="city" placeholder="City" />
+                  <div *ngIf="creditCardFrm.city.errors && (creditCardFrm.city.touched || creditCardFrm.city.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.city.errors.required">City is required </div>
+                  </div>
+                </div>
+                <div>
+                  <span class="control-label" for="state">State<span class="text-danger">*</span></span>
+                  <input type="text" [ngClass]="{'has-error': creditCardFrm.state.errors && (creditCardFrm.state.touched || creditCardFrm.state.dirty)}" class="checkout-input form-control" id="state" formControlName="state" placeholder="State" />
+                  <div *ngIf="creditCardFrm.state.errors && (creditCardFrm.state.touched || creditCardFrm.state.dirty)">
+                    <div class="required-error" *ngIf="creditCardFrm.state.errors.required">State is required </div>
+                  </div>
+                </div>
+              </div>
+              <div class="expiry-panel-btn">
+                <button [disabled]="isCreditCard?true:false" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" class="btn btn-primary" type="submit"> Save</button>
+                <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" (click)="onResetCredit()" type="button"> Reset</button>
+                <button class="btn btn-cancel" [routerLink]="['/contacts']"> Cancel</button>                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal fade overflow-hidden" id="whatThisModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h5>CC Security Code</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body modal-common-body">
+        <img src="../../../../assets/ccsecuritycode.png" class="w-100" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

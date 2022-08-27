@@ -1,0 +1,212 @@
+<div class="mb-2">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/tickettitle.svg" class="mr-1" />Support Ticket</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <button *ngIf="isShowDiv == 'grid'" class="btn btn-primary" type="button" (click)="resetGridSetting();"><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+            <input *ngIf="isShowDiv == 'grid'" class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onTicketListFilter($event.target.value)" #inputTicketSearch />
+            <select *ngIf="isShowDiv == 'grid'" class="form-control select-option ml-2" [(ngModel)]="filteredCategory" (change)="filterTickets('category', $event);">
+              <option value="0" [selected]="true"> -All- </option>
+              <option *ngFor="let cat of categoryArr; let i = index" [ngValue]="cat.value">{{cat.key }}</option>
+            </select>
+            <select *ngIf="isShowDiv == 'grid'" class="form-control select-option ml-2" [(ngModel)]="filteredStatus" (change)="filterTickets('status', $event);">
+              <option *ngFor="let status of statusArr; let i = index" [ngValue]="status.value">{{status.key }}</option>
+              <option value="0" [selected]="true"> -All- </option>
+            </select>
+            <button type="button" class="icon-btn" kendoButton [primary]="true" (click)="showDiv('new');" [hidden]="isShowDiv == 'new' || this.roleFeaturePermissions?.create == false  || roleFeaturePermissions?.edit == false">
+              <i class="fa fa-plus"></i>
+              <span class="btn-text">Add</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="global-body-section">
+        <div class="wraper-body-panel">
+          <div class="wraper-body-left">
+            <form [formGroup]="ticketForm" (ngSubmit)="ticketFormSubmit()" *ngIf="isShowDiv == 'new'">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Describe Ticket</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <textarea type="text" class="form-control text-area-height" rows="4" id="ticketDesc" name="ticketDesc" formControlName="ticketDesc" placeholder="" [ngClass]="{'has-error': !ticketForm.controls.ticketDesc?.valid && (ticketForm.controls.ticketDesc.touched || ticketForm.controls.ticketDesc.dirty)}"></textarea>
+                  <div class="">
+                    <div *ngIf="!ticketForm.controls.ticketDesc?.valid && (ticketForm.controls.ticketDesc?.touched || ticketForm.controls.ticketDesc?.dirty)">
+                      <div class="login-error" *ngIf="ticketForm.controls.ticketDesc.errors?.required">Description is required </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section" *ngIf="isEdit">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Finder</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="text" class="form-control" id="finder" name="finder" formControlName="finder" placeholder="Finder" readonly />
+                </div>
+              </div>
+              <div class="cards-body-section" *ngIf="isEdit">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Response</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <textarea type="text" class="form-control text-area-height" rows="4" id="ticketResponse" name="ticketResponse" formControlName="ticketResponse" placeholder="Response"></textarea>
+                </div>
+              </div>
+              <div class="cards-body-section" *ngIf="isEdit">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Response By</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="text" class="form-control" id="fixer" name="fixer" formControlName="fixer" placeholder="Response By" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Category</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="ticketCategory" [ngClass]="{'has-error': !ticketForm.controls.ticketCategory?.valid && (ticketForm.controls.ticketCategory.touched || ticketForm.controls.ticketCategory.dirty)}">
+                    <option value="" [selected]="!isEdit ? true : false" [hidden]="!isEdit"> -Select one- </option>
+                    <option *ngFor="let cat of categoryArr; let i = index" [value]="cat.value">{{cat.key }}</option>
+                  </select>
+                  <div class="">
+                    <div *ngIf="!ticketForm.controls.ticketCategory?.valid && (ticketForm.controls.ticketCategory?.touched || ticketForm.controls.ticketCategory?.dirty)">
+                      <div class="login-error" *ngIf="ticketForm.controls.ticketCategory.errors?.required">Category is required </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section" *ngIf="isEdit">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Status</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="ticketStatus">
+                    <option value="1">Active</option>
+                    <option value="2">Being Handled</option>
+                    <option value="4">Under Consideration</option>
+                    <option value="5">User Feedback Required</option>
+                    <option value="3">Resolved</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Send Email</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="checkbox" class="checkbox" id="sendMail" name="sendMail" formControlName="sendMail" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Mark as Unread</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="checkbox" class="checkbox" id="unread" name="unread" formControlName="unread" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"></div>
+                <div class="cards-colunm-right">
+                  <button [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" class="btn btn-primary" id="primarySave" type="submit">Save</button>
+                  <button class="btn btn-cancel" type="button" (click)="showDiv('cancel')"> Cancel</button>
+                </div>
+              </div>
+            </form>
+            <kendo-grid *ngIf="isShowDiv == 'grid'" #grid id="gridId"
+              [kendoGridBinding]="tickets"
+              [pageSize]="_gridCnfgService.pageSize"
+              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+              [sortable]="{mode: 'multiple'}"
+              [scrollable]="'scrollable'"
+              [sort]="_gridCnfgService.sort"
+              [columnMenu]="{ filter: true }"
+              [resizable]="true"
+              [reorderable]="true"
+              (edit)="editHandler($event)"
+              (remove)="removeHandler($event)"
+              (columnReorder)="_gridCnfgService.columnsOrderChanged('ticket_grid', $event)"
+              (sortChange)="_gridCnfgService.sortChange('ticket_grid', $event)"
+              (pageChange)="_gridCnfgService.pageChange('ticket_grid', $event)"
+              (columnResize)="_gridCnfgService.columnResize(5,'ticket_grid', $event)"
+              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'ticket_grid',grid)">
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                  [field]="column.field"
+                  [title]="column.title | titlecase"
+                  [width]="column.field == '$' ? '40' : column.width"
+                  [filterable]="true"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                  [includeInChooser]="column.field=='$' ? false : true">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'ticketID'" [ngClass]="dataItem.unread ? 'color-orange' : ''">{{dataItem[column.field] ? dataItem[column.field] : '0'}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'ticketDesc'">
+                      {{dataItem[column.field] ? dataItem[column.field] : '--'}}
+                      <br /><span *ngIf="dataItem.ticketResponse" [ngClass]="dataItem.unread ? 'color-orange' : 'color-green'" [innerHtml]="dataItem.ticketResponse"></span>
+                    </div>
+                    <div class="customer-name" *ngIf="column.field == 'finder'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'fixer'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'dtLastModified'">{{ dataItem[column.field] | date:'M/d/yy h:MM:ss a' }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'ticketCategory'">{{getTicketCategory(dataItem[column.field])}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'ticketStatus'"> {{ getTicketStatus(dataItem[column.field])}}</div>
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-command-column title="Action" width="100" min="100" [style]="{'text-align': 'center'}" [includeInChooser]="false" [reorderable]="false" [columnMenu]="{ filter: false }">
+                  <ng-template kendoGridCellTemplate>
+                    <button kendoGridEditCommand [primary]="true" [hidden]="roleFeaturePermissions?.edit == false" icon="edit" title="Edit"></button>
+                    <button kendoGridRemoveCommand [primary]="true" [hidden]="roleFeaturePermissions?.delete == false" data-toggle="modal" data-target="#deleteTicketModal" icon="delete" title="Remove"></button>
+                  </ng-template>
+                </kendo-grid-command-column>
+              </div>
+            </kendo-grid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="deleteTicketModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h5>Caution: This ticket will be permanently deleted. Consider marking the status as resolved insted.</h5>
+          <h5>Are you sure you want to do this?</h5>
+        </div>
+        <div class="modal-footer">
+          <button type="button" [hidden]="roleFeaturePermissions?.delete == false" (click)="confirmDeleteTicket()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

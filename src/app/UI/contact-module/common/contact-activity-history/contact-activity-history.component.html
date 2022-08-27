@@ -1,0 +1,783 @@
+<div class="activity-module" *ngIf="user">
+  <fieldset>
+    <legend>Activity Module</legend>
+    <div class="activity-panel">
+      <div class="activity-filter">
+        <label for="filterActivityId">Sort by: </label>
+        <select class="form-control" id="filterActivityId" (change)="changeContactActivitySort($event);">
+          <option value="newest">Date Newest</option>
+          <option value="oldest">Date Oldest</option>
+        </select>
+      </div>
+
+      <div class="tabs-module-panel" *ngIf="contactHistory"> 
+        <div class="tabs" (change)="onTabSelect($event)">
+
+          <input type="radio" name="tabs" id="AllActivity" checked="checked">
+          <label  for="AllActivity" class="border-contact-left-radius" >All Activity</label>
+          <div class="tab">
+            <div id="allActivityHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="Notes">
+          <label for="Notes">Notes</label>
+          <div class="tab">
+            <div id="notesHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="Mailings">
+          <label for="Mailings">Mailings</label>
+          <div class="tab">
+            <div id="mailingsHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="Calls">
+          <label for="Calls">Calls</label>
+          <div class="tab">
+            <div id="callsHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="Texts">
+          <label for="Texts">Texts</label>
+          <div class="tab">
+            <div id="textsHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="Appointments">
+          <label for="Appointments">Appointments</label>
+          <div class="tab">
+            <div id="appointmentsHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="Tasks">
+          <label for="Tasks">Tasks</label>
+          <div class="tab">
+            <div id="tasksHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="InboundTexts">
+          <label for="InboundTexts">Inbound Texts</label>
+          <div class="tab">
+            <div id="inboundTextsHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="VoiceDrops">
+          <label for="VoiceDrops">Voice Drops</label>
+          <div class="tab">
+            <div id="voiceDropsHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="SkypeCalls">
+          <label for="SkypeCalls">Skype Calls</label>
+          <div class="tab">
+            <div id="skypeCallsHtml"></div>
+          </div>
+
+          <input type="radio" name="tabs" id="Slidecast">
+          <label for="Slidecast" class="border-contact-right-radius">Slidecast</label>
+          <div class="tab">
+            <div id="slidecastHtml"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+      
+        <div #activityDiv id="activityDiv">
+          <h6 class="text-dark" *ngIf="contactHistory?.length == 0">No items found</h6>
+          <div class="all-sechudule-module">
+            <div class="all-sechudule-panel" *ngxtFor="let history of contactHistory; itemsAtOnce: 6; intervalLength: 30">
+              <!--TxtMsgs-->
+              <div class="kCard textmsg-header-border" *ngIf="history.type == 8">
+                <kendo-card>
+                  <kendo-card-body>
+                    <div class="content-header">
+                      <h6 class="header-clr">
+                        <span *ngIf="!history.txtMsg_isToUser"><img src="../../../../assets/activity/txtmsg/txtmsgtitle.svg" class="title-img" /></span>
+                        <span *ngIf="history.txtMsg_isToUser"><img src="../../../../assets/activity/txtmsg/txtmsgtousertitle.svg" class="title-img" /></span>
+                        {{history.txtMsg_strDay}}
+                        <span *ngIf="history.txtMsg_isToUser == true">
+                          <span *ngIf="history.txtMsg_ToCLPUserID == 0 || user.cLPUserID == history.txtMsg_ToCLPUserID else elseUser">Alert To User: {{history.txtMsg_MobileNumber | phoneFormat}}</span>
+                          <ng-template #elseUser *ngIf="history.txtMsg_UserFullName && history.txtMsg_UserFullName != ''">User Text From:({{history.txtMsg_UserFullName}})</ng-template>
+                        </span>
+                        <span *ngIf="history.txtMsg_isToUser == false">
+                          <span *ngIf="history.txtMsg_UserTxtMsgLongCode && history.txtMsg_UserTxtMsgLongCode != ''"> <span class='smallblack'>From: {{history.txtMsg_UserTxtMsgLongCode}}</span></span>
+                          <span *ngIf="history.txtMsg_UserFullName && history.txtMsg_UserFullName != ''"> <span class='smallblack'> ({{history.txtMsg_UserFullName}})</span></span>
+                          <span> To: {{history.txtMsg_MobileNumber | phoneFormat}}</span>
+                          <span *ngIf="history.txtMsg_ContactFullName && history.txtMsg_ContactFullName != ''"> ({{history.txtMsg_ContactFullName}})</span>
+                        </span>
+                      </h6>
+                      <span class="status-info" >
+                        {{ history.txtMsg_Status == 0 ? 'Completed' : history.txtMsg_Status == 3 ? 'Sent' : history.txtMsg_Status == 1 || history.txtMsg_Status == 4 ? 'Pending' : history.txtMsg_Status == 2 ? 'InProgress' : history.txtMsg_Status == 6 ? 'Responded' : history.txtMsg_Status == 5 && history.txtMsg_RequestComment == "Timed out" ? 'Delivery unverifiable' : 'Cancel'  }}
+                        <span>
+                          <img *ngIf="history.txtMsg_Status == 3" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                          <img *ngIf="history.txtMsg_Status == 1 || history.txtMsg_Status == 4" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                          <img *ngIf="history.txtMsg_Status == 2 || history.txtMsg_Status == 5 || history.txtMsg_Status == 9 || history.txtMsg_Status == -1" src="../../../../assets/activity/main/statuscancelled.svg" class="status-img" />
+                          <img *ngIf="history.txtMsg_Status == 0 || history.txtMsg_Status == 6" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                        </span>
+                      </span>
+                    </div>
+                    <div class="content-body">
+                      <p>
+                        <img src='../../../../assets/trans1x1.gif' border='0' />
+                        <span *ngIf="history.txtMsg_Msg">Message: {{history.txtMsg_Msg}}</span>
+                      </p>
+                    </div>
+                  </kendo-card-body>
+                </kendo-card>
+              </div>
+
+              <!--VoiceCall-->
+              <div class="kCard voicecall-header-border" *ngIf="history.type == 11">
+                <kendo-card>
+                  <kendo-card-body>
+                    <div class="content-header">
+                      <h6 class="header-clr">
+                        <span>
+                          <img *ngIf="history.vCall_Direction" src="../../../../assets/activity/voice/voicecallouttitle.svg" class="title-img" />
+                          <img *ngIf="!history.vCall_Direction" src="../../../../assets/activity/voice/voicecallintitle.svg" class="title-img" />
+                        </span>
+                        {{ history.vCall_strDay }}
+                        <span *ngIf="history.vCall_Direction else elseBlock">
+                          <a class="contact-cursor-pointer"  title='Voice Call' (click)="voiceCallLink(history.vCall_VoiceCallID, history.dtToSort);"></a>
+                          <span> From: {{history.vCall_FromNumber | phoneFormat}}</span>
+                          <span *ngIf="history.vCall_UserFullName"> ({{history.vCall_UserFullName}})</span>
+                          <span> To:{{history.vCall_ToNumber | phoneFormat}}</span>
+                          <span *ngIf="history.vCall_ContactFullName"> ({{history.vCall_ContactFullName}})</span>
+                        </span>
+                        <ng-template #elseBlock>
+                          <span> From: {{history.vCall_FromNumber | phoneFormat}}</span>
+                          <span *ngIf="history.vCall_ContactFullName"> ({{history.vCall_ContactFullName}})</span>
+                          <span> To:{{history.vCall_ToNumber | phoneFormat}}</span>
+                          <span *ngIf="history.vCall_UserFullName"> ({{history.vCall_UserFullName}})</span>
+                        </ng-template>
+                      </h6>
+                      <span class="status-info" >
+                        {{ history.vCall_Status == 0 ? 'Completed' : history.vCall_Status == 7 ? 'Ended' : history.vCall_Status == 5 && !history.vCall_RequestComment ? 'Failed' : history.vCall_Status == 5 && history.vCall_RequestComment ? 'Failed Reason:' + history.vCall_RequestComment : history.vCall_Status == 1 || history.vCall_Status == 3 || history.vCall_Status == 4 ? 'Pending' : history.vCall_Status == 6 ? 'Initiated' : 'Cancel'  }}
+                        <span>
+                          <img *ngIf="history.vCall_Status == 0 || history.vCall_Status == 7" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                          <img *ngIf="history.vCall_Status == 5" src="../../../../assets/activity/main/statuscancelled.svg" class="status-img" />
+                          <img *ngIf="history.vCall_Status == 1 || history.vCall_Status == 3 || history.vCall_Status == 4" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                          <img *ngIf="history.vCall_Status == 6" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                          <img *ngIf="history.vCall_Status == 2" src="../../../../assets/activity/main/statuscancelled.svg" class="status-img" />
+                        </span>
+                      </span>
+                    </div>
+                    <div class="content-body">
+                      <p *ngIf="history.vCall_Status != 1 && history.vCall_Duration > 0 || history.vCall_CallNotes != '' ">
+                        Duration:{{history.vCall_Duration}}Min
+                        Call Notes: {{history.vCall_CallNotes}}
+                        <span *ngIf="history.vCall_isRecorded">
+                          <button type="button" (click)="voiceCallRecording(history.vCall_VoiceCallID);"><i class="fas fa-volume-up"></i> Call Recordings</button>
+                        </span>
+                      </p>
+                      <div>
+                        <button type="button" (click)="VoiceCallLogWindowLink(history.vCall_VoiceCallID)" title='Voice Call Log'><i class="fas fa-search"></i> log</button>
+                      </div>
+                    </div>
+                  </kendo-card-body>
+                </kendo-card>
+              </div>
+
+              <!--Emails, Mailings-->
+              <div class="kCard mailing-header-border" *ngIf="history.type == 6 || history.type == 4">
+                <kendo-card>
+                  <div class="email-content">
+                    <kendo-card-body>
+                      <div class="content-header">
+                        <div>
+                          <a (click)="mailingContactLink('day', history.m_MailingID)" title='view tasks'>
+                            <span *ngIf="history.m_Category == 1 else elseBlock">
+                              <img title="Edit email" src="../../../../assets/activity/marketing/mailingtitle.svg" class="title-img" />
+                            </span>
+                            <ng-template #elseBlock>
+                              <!--<img title="Edit email" src="../../../../assets/activity/email/emailtitle.png" class="title-img" />-->
+                              <i  class="fas fa-envelope-open-text title-img email-edit-format" title="Edit email"></i>
+                            </ng-template>
+                            {{ history.m_strDay }}
+                          </a>
+                          <span>&nbsp;<b>Mailing:</b> {{history.m_Category == 0 ? 'None' : history.m_Category == 1 ? 'Mail' : history.m_Category == 2 ? 'Email' : history.m_Category == 3 ? 'Contact Update' : history.m_Category == 4 ? 'Referral Request' : history.m_Category == 5 ? 'CLP Referral' : history.m_Category == 6 ? 'Txt Msg' : ''}}</span>
+                        </div>
+
+                        <span class="status-info" >
+                          {{history.m_Status == 0 ? 'Pending' : history.m_Status == 1 ? 'Cancelled' : history.m_Status == 2 ? 'Completed' : history.m_Status == 3 ? 'None' : history.m_Status == 4 ? 'In Proggrss' : history.m_Status == 5 ? 'Awaiting MMDoc' : history.m_Status == 6 ? 'Awaiting Configuration' : 'Being Configured' }}
+                          <a class="contact-cursor-pointer" (click)="mailingContactLink('status', history.m_MailingID)" title='view mailing'>
+                            <span *ngIf="history.m_Status == 0 || history.m_Status == 5 || history.m_Status == 3 || history.m_Status == 4 || history.m_Status == 6 || history.m_Status == 7"><img src='../../../../assets/activity/main/statuspending.svg' class='status-img' border='0' /></span>
+                            <span *ngIf="history.m_Status == 1"><img src='../../../../assets/activity/main/statuscancelled.svg' class='status-img' border='0' /></span>
+                            <span *ngIf="history.m_Status == 2"><img src='../../../../assets/activity/main/statuscompleted.svg' class='status-img' border='0' /></span>
+                          </a>
+                        </span>
+
+                      </div>
+                      <div class="content-body">
+                        <p *ngIf="history.m_UserFullName">User: <span>{{history.m_UserFullName}}</span></p>
+                        <p *ngIf="routeContactId && routeContactId > 0">
+                          <span *ngIf="history.m_FromAddress != ''"><br /><b>From: </b>{{history.m_FromAddress}}</span>
+                          <span *ngIf="history.m_FromAddress == '' && history.m_Status == 2"><br /><b>From: </b>Mailing Owner </span>
+                          <span><br /><b>Contact:</b>&nbsp;<a (click)="mailingContactLink('contact')">{{history.m_ContactFullName}}</a></span>
+
+                          <span *ngIf="blnIncludeCompany else elseBlock">
+                            <span *ngIf="history.m_CompanyID == 0"><br /><b>Company:</b> {{history.m_CompanyName}}</span>
+                          </span>
+                          <ng-template #elseBlock>
+                            <span *ngIf="history.m_CompanyID && history.m_MailingTypeCode == 1 else mailingElseBlock"><br /><b>Company:</b> <a class="contact-cursor-pointer" (click)="mailingContactLink('company', history.m_CompanyID)">{{history.m_CompanyName}}</a></span>
+                            <ng-template mailingElseBlock><br /><b>Company:</b> {{history.m_CompanyName}}</ng-template>
+                          </ng-template>
+                        </p>
+                        <p *ngIf="history.m_Category != 0"><b>Category: </b>{{history.m_Category == 1 ? 'Mail' : history.m_Category == 2 ? 'Email' : history.m_Category == 3 ? 'Contact Update' : history.m_Category == 4 ? 'Referral Request' : history.m_Category == 5 ? 'CLP Referral' : history.m_Category == 6 ? 'Txt Msg' : 'None' }}</p>
+                        <p *ngIf="history.m_MailingTypeCode > 0 && history.m_MailingTypeDisplay"><br /><b>Type: </b>{{history.m_MailingTypeDisplay}}</p>
+                        <p>Subject: <span>{{history.m_Subject}}</span></p>
+                        <p *ngIf="history.m_EmailTemplateID && history.m_EmailTemplateID > 0">
+                          <b>Template:</b>&nbsp;<a class="contact-cursor-pointer" (click)="mailingContactLink('template', history.m_MailingID)">{{history.m_EmailTemplateName}}</a>
+                        </p>
+                        <p *ngIf="history.m_MailMergeTemplateID && history.m_MailMergeTemplateID > 0">
+                          <b>Mail Merge Template:</b>&nbsp;<a class="contact-cursor-pointer" (click)="mailingContactLink('template', history.m_MailingID)">{{history.m_MailMergeTemplateName}}</a>
+                        </p>
+                        <p *ngIf="history.m_Status == 2 && history.m_Result && history.m_Result != 4">
+                          <span *ngIf="history.m_Result == 5"><br /><b>Email Result: </b>Opened</span>
+                          <span *ngIf="history.m_Result == 2"><br /><b>Email Result: </b>Sent</span>
+                          <span *ngIf="history.m_Result != 5 && history.m_Result != 2"><br /><b>Email Result: </b>{{history.m_Result == 0 ? 'Pending' : history.m_Result == 1 ? 'Cancelled' : history.m_Result == 3 ? 'Failed' : history.m_Result == 4 ? 'Unknown' : 'In Progress' }}</span>
+                        </p>
+                        <p *ngIf="history.m_Category == 1">
+                          <a class="contact-cursor-pointer" title='view mailing in new window' (click)="mailingContactLink('image', history.m_MailingID)"><img src='../../../../assets/trans1x1.gif' class='mailingtitle' /></a>
+                        </p>
+                        <p *ngIf="history.m_Body && history.m_Category == 1">
+                          {{history.m_Body}}
+                        </p>
+                      </div>
+                    </kendo-card-body>
+                  </div>
+                </kendo-card>
+              </div>
+
+              <!--Appointments-->
+              <div class="kCard appointment-header-border" *ngIf="history.type == 2">
+                <kendo-card>
+                  <div class="email-content">
+                    <kendo-card-body>
+                      <div class="content-header">
+                        <div>
+                          <a (click)="gotoAppointment(history.app_ApptID, history.app_Category, true);">
+                            <img title="edit appointment" src="../../../../assets/activity/calendar/appttype.png" class="title-img" /> {{history.app_strDay}}
+                          </a>
+                          <small  class="ml-8"><b>Appointment:<span><a href="" (click)="gotoAppointment(history.app_ApptID, history.app_Category, true);"> {{history.app_strTime}}</a></span></b></small>
+                        </div>
+
+                        <span *ngIf="history.app_Status == 0 && history.app_ReminderEmail && history.app_ReminderCLP">
+                          <a href="" title='A reminder is set.' (click)="gotoAppointment(history.app_ApptID, history.app_Category, true);"><img src='../../../../assets/trans1x1.gif' class='apptreminderset' border=0 /></a>
+                        </span>
+                        <span class="float-right" [ngClass]="{'text-danger':history.app_Status == 0}">
+                          {{history.app_Status == 0 ? 'Pending' : history.app_Status == 1 ? 'Cancelled' : history.app_Status == 2 ? 'Completed' : history.app_Status == 3 ? 'None' : history.app_Status == 4 ? 'Bumped' : history.app_Status == 5 ? 'Completed and Campaign stop' : 'To be deleted' }}
+
+                          <span>
+                            <a class="contact-cursor-pointer" (click)="gotoAppointment(history.app_ApptID, true);">
+                              <img *ngIf="history.app_Status == 1" src="../../../../assets/activity/main/statuscancelled.svg" class="status-img" />
+                              <img *ngIf="history.app_Status == 2" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                              <img *ngIf="history.app_Status == 0 || history.app_Status == 3 || history.app_Status == 4 || history.app_Status == 5 || history.app_Status == 6" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                            </a>
+                          </span>
+
+                        </span>
+                      </div>
+
+                      <div class="note-section">
+                        <div class="content-body">
+                          <div class="note-panel">
+                            <p>User: <span>{{history.app_UserFullName}}</span></p>
+                            <p>Subject: <span>{{ history.app_Subject }}</span></p>
+                            <p>
+                              <span *ngIf="history.app_Category == 2">
+                                <span *ngIf="blnIncludeContact"><br /><b>Contact:</b>&nbsp;<a (click)="goToApptContact('contact', history.app_ContactID)">{{history.app_ContactFullName}}</a></span>
+                                <br /><b>Type: </b>{{history.app_TypeCodeDisplay}}
+                              </span>
+
+                              <span *ngIf="history.app_Category == 3">
+                                <span *ngIf="blnIncludeContact"> <br /><b>Contact:</b>&nbsp;<a (click)="goToApptContact('contact', history.app_ContactID)">{{history.app_ContactFullName}}</a></span>
+                                <br /><b>Lead: </b><a (click)="goToApptContact('lead', history.app_LeadID)" title="">Lead</a>
+                              </span>
+                            </p>
+
+                            <p *ngIf="blnIncludeContact && blnIncludeCompany">
+                              <span *ngIf="history.app_CompanyID == 0"><br /><b>Company:</b> {{history.app_CompanyName}}</span>
+                              <span *ngIf="history.app_CompanyID != 0; else elseBlock">
+                                <br /><b>Company:</b>
+                                <a (click)="goToApptContact('company', history.app_CompanyID)">{{history.app_CompanyName}}</a>
+                              </span>
+                              <ng-template #elseBlock>
+                                <br /><b>Company:</b>&nbsp;{{history.app_CompanyName}}
+                              </ng-template>
+                            </p>
+
+                            <p *ngIf="history.app_Location && history.app_Location != ''"><b>Location:</b> {{history.app_Location}}</p>
+                          </div>
+
+                          <div class="note-panel right-box-height">
+                            <p>
+                              Notes:<br />
+                              <span [innerHTML]="history.app_Notes"></span>
+                            </p>
+                          </div>
+
+                        </div>
+                      </div>
+                    </kendo-card-body>
+                  </div>
+                </kendo-card>
+              </div>
+
+              <!--Notes-->
+              <div class="kCard notes-header-border" *ngIf="history.type == 1">
+                <kendo-card>
+                  <div class="email-content">
+                    <kendo-card-body>
+                      <div class="content-header">
+                        <div>
+                          <a (click)="notesLink('dayTime', history.note_NoteID, history.note_OwnerType);">
+                            <span *ngIf="history.note_ToChoice == 1 || history.note_ToChoice == 2 || history.note_ToChoice == 3 || history.note_ToChoice == 6">
+                              <img title="Edit email" src="../../../../../assets/activity/email/emailtitle.svg" class="title-img" />
+                            </span>
+                            <span *ngIf="history.note_ToChoice == 0 || history.note_ToChoice == 5">
+                              <img title="Edit note" src="../../../../../assets/activity/note/notetitle.svg" class="title-img" />
+                            </span>
+                            {{ history.note_strDay }}
+                          </a>
+                          <span *ngIf="history.note_NoteTypeDisplay"> <small>{{ history.note_ToChoice == 0 || history.note_ToChoice == 5 ? 'Note' : 'Email' }}:</small>{{ history.note_NoteTypeDisplay }} </span>
+                          <span *ngIf="history.note_ToChoice == 1 || history.note_ToChoice == 2 || history.note_ToChoice == 3 || history.note_ToChoice == 6">
+                            <a (click)="notesLink('emailTemplate', history.note_NoteID);">
+                              <img title="Preview email" src="../../../../../assets/activity/note/printpreview.svg" class="preview-email" />
+                            </a>
+                          </span>
+                        </div>
+                        <p *ngIf="history.note_OwnerType == 2">
+                          <span *ngIf="blnIncludeContact">
+                            <b>Contact:</b> <a class="contact-cursor-pointer" (click)="notesLink('contact', history.note_OwnerID)">{{history.note_ContactFullName}}</a>
+                          </span>
+                          <span *ngIf="blnIncludeCompany">
+                            <span *ngIf="history.note_CompanyID == 0"><b>Company:</b> {{history.note_CompanyName}}</span>
+                          </span>
+                        </p>
+                        <p *ngIf="history.note_OwnerType == 3">
+                          <span *ngIf="blnIncludeContact">
+                            <b>Contact:</b>&nbsp;<a class="contact-cursor-pointer" (click)="notesLink('contact', history.note_OwnerID)">{{history.note_ContactFullName}}</a>
+                          </span>
+                          <span *ngIf="history.note_CompanyID == 0"><b>Lead:</b> {{history.note_CompanyName}}</span>
+                        </p>
+                        <span class="status-info" >
+                          <span class="small">{{ history.note_Status == 0 ? 'Completed' : history.note_Status == 1 ? 'Pending' : history.note_Status == 2 ? 'In Processing' : history.note_Status == 3 ? 'Failed' : history.note_Status == 9 ? 'To be deleted' : 'Unknown' }} </span>
+                          <span *ngIf="history.note_Status == 1 || history.note_Status == 2 else elseStatus">
+                            <a class="contact-cursor-pointer" title="pending" (click)="notesLink('dayTime', history.note_NoteID, history.note_OwnerType)">
+                              <img src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                            </a>
+                          </span>
+                          <ng-template #elseStatus>
+                            <a class="contact-cursor-pointer" title="pending" (click)="notesLink('dayTime', history.note_NoteID, history.note_OwnerType)">
+                              <img src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                            </a>
+                          </ng-template>
+
+                        </span>
+                      </div>
+
+                      <div class="note-section">
+                        <div class="content-body">
+                          <div class="note-panel">
+                            <p *ngIf="history.note_UserFullName">User: <span> {{history.note_UserFullName}}</span></p>
+                            <p><b>Subject: </b>{{history.note_NoteSubject}}</p>
+
+                            <p *ngIf="history.note_ToChoice != 0 && history.note_ToField">
+                              <span *ngIf="history.note_ToChoice == 1 || history.note_ToChoice == 6">
+                                <span *ngIf="history.note_OwnerID != 0 && blnIncludeContact else elseBlock">
+                                  <span *ngIf="history.note_ToChoice == 6">
+                                    <b>To: </b>Contact - {{history.note_ContactFullName}} (All Email Addresses)
+                                  </span>
+                                  <span *ngIf="history.note_ToChoice != 6">
+                                    <b>To: </b>Contact - {{history.note_ContactFullName}}
+                                  </span>
+                                </span>
+                                <ng-template #elseBlock>
+                                  <b>To: </b>Contact
+                                </ng-template>
+                              </span>
+
+                              <span *ngIf="history.note_ToChoice == 3"> <br /><b>To: </b>{{history.note_ToField}} </span>
+                              <span *ngIf="history.note_ToChoice == 2">
+                                <span *ngIf="+history.note_ToField != +history.note_CLPUserID"><b>To: </b>User - {{user.lastName}} {{user.firstName}}</span>
+                                <span *ngIf="+history.note_ToField == +history.note_CLPUserID"><b>To: </b>User - {{history.note_UserFullName}}</span>
+                              </span>
+
+                              <span *ngIf="history.note_ToChoice == 4"> <br /><b>To: </b>Link - {{history.note_ToField}} </span>
+
+                              <span *ngIf="history.note_ToChoice == 5"> <br /><b>Fax To: </b> {{history.note_ToField}} </span>
+
+                              <span *ngIf="history.note_CCField && history.note_CCField != ''"> <br /><b>CC: </b> {{history.note_CCField}} </span>
+                              <span *ngIf="history.note_BCCField && history.note_BCCField != ''"> <br /><b>BCC: </b> {{history.note_BCCField}} </span>
+                            </p>
+
+                            <p *ngIf="history.note_DocumentList && history.note_DocumentList != '' && history.note_DocumentList != ','">
+                              <b>Attachments:</b>
+                            </p>
+
+                            <p *ngIf="history.note_EmailTemplateID > 0 && history.note_EmailTemplateID != 'Unknown'">
+                              <b>Template:<br /></b><a class="contact-cursor-pointer" (click)="notesLink('emailTemplate', history.note_NoteID);">{{history.note_EmailTemplateName}}</a>
+                            </p>
+
+                            <p *ngIf="history.note_MailMergeTemplateID > 0 && history.note_MailMergeTemplateID != 'Unknown'">
+                              <b>Mail Merge Template:<br /></b><a class="contact-cursor-pointer" (click)="notesLink('mailMergeTemplate', history.note_NoteID);">{{history.note_MailMergeTemplateName}}</a>
+                            </p>
+
+                            <p *ngIf="history.note_Status == 0">
+                              <span *ngIf="history.note_EmailStatus == 3 || history.note_EmailStatus == 4">
+                                <b>Email Result: </b><span class="text-danger">Failed</span>
+                              </span>
+                              <span *ngIf="history.note_EmailStatus == 1">
+                                <b>Email Result: </b><span class="text-success">Sent</span>
+                              </span>
+                              <span *ngIf="history.note_EmailStatus == 5">
+                                <b>Email Result: </b><span class="text-warning">Opened</span>
+                              </span>
+                            </p>
+                          </div>
+
+                          <div class="note-panel right-box-height">
+                            <p>
+                              <span *ngIf="history.note_EmailTemplateID > 0">
+                                <b *ngIf="history.note_ToChoice == 1 || history.note_ToChoice == 2 || history.note_ToChoice == 3 || history.note_ToChoice == 6">Email: </b><br /><span [innerHTML]="history.note_NoteDesc"></span>
+                              </span>
+                              <span *ngIf="history.note_EmailTemplateID <= 0">
+                                <b *ngIf="history.note_ToChoice == 0 || history.note_ToChoice == 5">Note: </b><br /><span [innerHTML]="history.note_NoteDesc"></span>
+                              </span>
+                            </p>
+                          </div>
+
+                        </div>
+                      </div>
+                    </kendo-card-body>
+                  </div>
+                </kendo-card>
+              </div>
+
+              <!--Tasks-->
+              <div class="kCard task-header-border" *ngIf="history.type == 3">
+                <kendo-card>
+                  <div class="email-content">
+                    <kendo-card-body>
+                      <div class="content-header">
+                        <div>
+                          <a (click)="taskLink('viewTask', history.t_TaskID);">
+                            <img title="Edit email" src="../../../../assets/activity/task/tasktitle.svg" class="title-img" />
+                            {{ history.t_strDay }}
+                          </a>
+                          <b>Task:</b>
+                          <span class="task-status" [ngClass]="{'text-success':history.t_Priority == 1,'text-warning':history.t_Priority == 2,'text-danger':history.t_Priority == 3}">
+                            {{history.t_Priority == 0 ? 'None' : history.t_Priority == 1 ? 'Low' : history.t_Priority == 2 ? 'Medium' : 'High' }}
+                          </span>
+                        </div>
+                        <span class="status-info" [ngClass]="{'text-danger':history.txtMsg_Status == 0}">
+                          {{history.t_Status == 0 ? 'Pending' : history.t_Status == 1 ? 'Completed' : history.t_Status == 2 ? 'On Hold' : history.t_Status == 3 ? 'None' : 'To Be Deleted' }}
+                          &nbsp;<a title="view tasks" (click)="taskLink('viewTask', history.t_TaskID);">
+                            <img *ngIf="history.t_Status == 0 || history.t_Status == 3 || history.t_Status == 9" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                            <img *ngIf="history.t_Status == 1" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                            <img *ngIf="history.t_Status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                          </a>
+                        </span>
+                      </div>
+                      <div class="content-body">
+                        <div class="note-panel">
+                          <p><b>User:</b><span> {{history.t_UserFullName}}</span></p>
+                          <span *ngIf="history.t_Category == 2">
+                            <span *ngIf="blnIncludeContact"><br /><b>Contact:</b> <a class="contact-cursor-pointer" (click)="taskLink('contact', history.t_OwnerID);">{{history.t_ContactFullName}}</a></span>
+                            <span *ngIf="blnIncludeContact && blnIncludeCompany">
+                              <span *ngIf="history.t_CompanyID == 0"><br /><b>Company:</b> {{history.t_CompanyName}}</span>
+                              <span *ngIf="history.t_CompanyID != 0"><br /><b>Company:</b> <a class="contact-cursor-pointer" (click)="taskLink('company', history.t_CompanyID);">{{history.t_CompanyName}}</a></span>
+                            </span>
+                          </span>
+
+                          <span *ngIf="history.t_Category == 3">
+                            <span *ngIf="blnIncludeContact"><br /><b>Contact:</b> <a class="contact-cursor-pointer" (click)="taskLink('leadCompany');"> {{history.t_ContactFullName}}</a></span>
+                            <span *ngIf="!blnIncludeContact">"<br /><b>Lead:</b> <a class="contact-cursor-pointer" (click)="taskLink('lead');"> {{history.t_ContactFullName}}</a></span>
+                            <span *ngIf="blnIncludeContact && blnIncludeCompany && history.t_OwnerID > 0">
+                              <span *ngIf="history.t_CompanyID == 0"><br /><b>Company:</b> {{history.t_CompanyName}}</span>
+                              <span *ngIf="history.t_CompanyID != 0"><br /><b>Company:</b> <a class="contact-cursor-pointer" (click)="taskLink('leadcompany2', history.t_CompanyID);">{{history.t_CompanyName}}</a></span>
+                            </span>
+                          </span>
+                        </div>
+
+                        <div class="note-panel">
+                          <p *ngIf="history.t_TaskDesc">
+                            <b>Task: </b>
+                            <span>
+                              {{history.t_TaskDesc}}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </kendo-card-body>
+                  </div>
+                </kendo-card>
+              </div>
+
+              <!--TxtMsgIBs-->
+              <div class="kCard textmsgib-header-border" *ngIf="history.type == 9">
+                <kendo-card>
+                  <kendo-card-body>
+                    <div class="content-header">
+                      <h6 class="header-clr">
+                        <img src="../../../../assets/activity/txtmsg/txtmsgibtitle.svg" class="title-img" />
+                        {{history.iBTxtMsg_strDay}}
+                        <span> <b>From:</b> <span> {{history.iBTxtMsg_MobileNumber | phoneFormat}}</span></span>
+                        <span *ngIf="history.iBTxtMsg_FromName && history.iBTxtMsg_FromName != ''"> ({{history.iBTxtMsg_FromName}})</span>
+                        <span *ngIf="history.iBTxtMsg_RECIPIENT && history.iBTxtMsg_RECIPIENT != ''"> To:{{history.iBTxtMsg_RECIPIENT | phoneFormat}}</span>
+                        <span *ngIf="history.iBTxtMsg_ToName && history.iBTxtMsg_ToName != ''"> ({{history.iBTxtMsg_ToName}})</span>
+                      </h6>
+                      <span class="status-info" >
+                        Completed <img src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                      </span>
+                    </div>
+                    <div class="content-body">
+                      <p>
+                        <span *ngIf="history.iBTxtMsg_CONTENTS && history.iBTxtMsg_CONTENTS != ''">
+                          CONTENTS: <span [innerHTML]="history.iBTxtMsg_CONTENTS"></span>
+                        </span>
+                        <span *ngIf="history.iBTxtMsg_KEYWORD && history.iBTxtMsg_KEYWORD != ''">
+                          KEYWORD: <span [innerHTML]="history.iBTxtMsg_KEYWORD"></span>
+                        </span>
+                      </p>
+                    </div>
+                  </kendo-card-body>
+                </kendo-card>
+              </div>
+
+              <!--VoiceDrop-->
+              <div class="kCard voicedrop-header-border" *ngIf="history.type == 10">
+                <kendo-card>
+                  <kendo-card-body>
+                    <div class="content-header">
+                      <span>
+                        <img src="../../../../assets/activity/voice/voicedroptitle.svg" class="title-img" />
+                        <b>
+                          {{ history.vDrop_strDay }}
+                          {{history.vDrop_MobileNumber | phoneFormat}}
+                          <span *ngIf="history.vDrop_VoiceRecordingTypeID && history.vDrop_VoiceRecordingTypeID > 0"> Type: {{history.vDrop_VoiceRecordingTypeDisplay}}</span>
+                        </b>
+                      </span>
+                      <span class="status-info" >
+                        {{ history.vDrop_Status == 0 || history.vDrop_Status == 4 ? 'Delivered' : history.vDrop_Status == 5 ? 'Not Delivered' : history.vDrop_Status == 3 && history.vDrop_RequestComment != '' ? 'Failed Reason:' + history.vDrop_RequestComment : history.vDrop_Status == 1 ? 'Pending' : history.vDrop_Status == 2 ? 'In Progress' : 'Cancelled' }}
+                        <span>
+                          <img *ngIf="history.vDrop_Status == 0 || history.vDrop_Status == 4" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                          <img *ngIf="history.vDrop_Status == 5" src="../../../../assets/activity/main/statuscancelled.svg" class="status-img" />
+                          <img *ngIf="history.vDrop_Status == 3 && history.vDrop_RequestComment != ''" src="../../../../assets/activity/main/statuscancelled.svg" class="status-img" />
+                          <img *ngIf="history.vDrop_Status == 1" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                          <img *ngIf="history.vDrop_Status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                          <img *ngIf="history.vDrop_Status == -1 || history.vDrop_Status == 9" src="../../../../assets/activity/main/statuscancelled.svg" class="status-img" />
+                        </span>
+                      </span>
+                    </div>
+                    <div class="content-body">
+
+                    </div>
+                  </kendo-card-body>
+                </kendo-card>
+              </div>
+
+              <!--SkypeCalls-->
+              <div class="kCard skypecall-header-border" *ngIf="history.type == 5">
+                <kendo-card>
+                  <kendo-card-body>
+                    <div class="content-header">
+                      <img src="../../../../../assets/activity/skype/skypetitle.svg" class="title-img" />
+                      <h6 class="header-clr">
+                        {{ history.skype_strDay }}
+                        <span class='smallblack'> Skype Call: {{history.skype_strTime}}</span>
+                      </h6>
+                      <span class="text-right status-info" >
+                        <span>Completed</span>
+                        <span>
+                          <img src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                        </span>
+                      </span>
+                    </div>
+                    <div class="content-body" *ngIf="contactFields">
+                      <span *ngIf="blnIncludeUser"><b>User: </b>{{user.firstName}} {{user.lastName}}</span>
+                      <span *ngIf="blnIncludeContact"><br><b>Contact:</b> <a (click)="skypeCallLink('contact', contactFields.contactID.fieldValue)">{{contactFields.firstName.fieldValue}} {{contactFields.lastName.fieldValue}}</a></span>
+
+                      <span *ngIf="blnIncludeContact && blnIncludeCompany && contactFields">
+                        <span *ngIf="contactFields.companyID.fieldValue == 0 else elseCompany">
+                          <br /><b>Company:</b> {{contactFields.companyName.fieldValue}}
+                        </span>
+                        <ng-template #elseCompany>
+                          <span>
+                            <br /><b>Company:</b> <a (click)="skypeCallLink('company', contactFields.contactID.fieldValue)">{{contactFields.companyName.fieldValue}}</a>
+                          </span>
+                        </ng-template>
+                      </span>
+                      <p><b>Number: </b><span class="activity-green"> {{history.skype_Notes}}</span></p>
+                    </div>
+                  </kendo-card-body>
+                </kendo-card>
+              </div>
+
+              <!--Slidecast (VIPSession)-->
+              <div class="kCard slidecast-header-border" *ngIf="history.type == 12">
+                <kendo-card>
+                  <kendo-card-body>
+                    <div class="content-header">
+                      <span>
+                        <img src="../../../../assets/activity/vip/vipicon.svg" class="title-img activity-auto"  />
+                        <span>{{ history.vip_strDay }}</span>
+                        <span>{{ history.vip_isSelfGuided ? "Self-Guided SlideCast:" : "SlideCast:"  }}&nbsp;<a (click)="slidecastLink('title', history.vIPID)">{{history.vIPTitle}}</a></span>
+                      </span>
+                      <span class="status-info" >
+                        <span>{{history.vip_Status == 0 ? 'Ended' : history.vip_Status == 1 ? 'In Progress' : history.vip_Status == 2 ? 'Initiated' : 'Unknown'}}</span>
+                        <span>
+                          <img *ngIf="history.vip_Status == 0" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                          <img *ngIf="history.vip_Status == 1" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                          <img *ngIf="history.vip_Status == 2" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                        </span>
+                      </span>
+                    </div>
+                    <div class="content-body">
+                      <div class="note-panel">
+                        <p><b>User:</b> {{user?.firstName}} {{user?.lastName}}</p>
+                        <p><b>Contact:</b> {{contactFields?.firstName.fieldValue}} {{contactFields?.lastName.fieldValue}}</p>
+                        <div *ngIf="history.vIPSessionContact_list && history.vIPSessionContact_list.length > 0">
+                          <span *ngFor="let contact of history.vIPSessionContact_list">
+                            {{ contact.contactFullName }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div class="note-panel slidecast-panel container">
+                        <div class="row" *ngIf="history.vIPSessionLog_list && history.vIPSessionLog_list.length > 0">
+                          <div class="col-sm-12 col-md-3 col-lg-3 mb-12" *ngFor="let sessionLog of history.vIPSessionLog_list" >
+                            <div *ngIf="sessionLog.vIPSlideID != -1">
+                              <!-- Image -->
+                              <div class="text-center" *ngIf="sessionLog.contentType == 2">
+                                <a data-toggle="modal" data-target="#imageModal" (click)="showSlideCastImageModal(sessionLog); slidecastLink('logImage', sessionLog.vIPSlideID);">
+                                  <img class="img-slidecast" src="{{ sessionLog.slideContent}}" title="{{sessionLog.slideTitle}}" />
+                                </a>
+                                <br /><span *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</span>
+                              </div>
+                              <!-- HTML -->
+                              <div class="text-center" *ngIf="sessionLog.contentType == 1">
+                                <div *ngIf="sessionLog.imageBankID && sessionLog.imageBankID > 0">
+                                  <a data-toggle="modal" data-target="#imageModal" (click)="showSlideCastImageModal(sessionLog); slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                    <img class="img-slidecast" src="{{ soImageSite + sessionLog.imageBankID}}" title="{{sessionLog.slideTitle}}" />
+                                  </a>
+                                  <br /><span *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</span>
+                                </div>
+                                <div *ngIf="!sessionLog.imageBankID && sessionLog.imageBankID <= 0">
+                                  <a (click)="slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                    HTML Slide {{sessionLog.slideTitle}}
+                                  </a>
+                                  <br /><span *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</span>
+                                </div>
+                              </div>
+                              <!-- YouTube -->
+                              <div class="text-center" *ngIf="sessionLog.contentType == 3">
+                                <a (click)="slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                  Video Slide {{sessionLog.slideTitle}}
+                                </a>
+                                <br /><span *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</span>
+                              </div>
+                              <!-- Mail_Merge -->
+                              <div class="text-center" *ngIf="sessionLog.contentType == 4">
+                                <div *ngIf="sessionLog.imageBankID && sessionLog.imageBankID > 0">
+                                  <a (click)="slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                    <img class="img-slidecast" src="{{ soImageSite + sessionLog.imageBankID}}" title="{{sessionLog.slideTitle}}" />
+                                  </a>
+                                  <div *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</div>
+                                </div>
+                                <div *ngIf="!sessionLog.imageBankID && sessionLog.imageBankID <= 0">
+                                  <a (click)="slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                    Document {{sessionLog.slideTitle}}
+                                  </a>
+                                  <div *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</div>
+                                </div>
+                              </div>
+                              <!-- Email_Template -->
+                              <div class="text-center" *ngIf="sessionLog.contentType == 5">
+                                <div *ngIf="sessionLog.imageBankID && sessionLog.imageBankID > 0">
+                                  <a data-toggle="modal" data-target="#imageModal" (click)="showSlideCastImageModal(sessionLog); slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                    <img class="img-slidecast" src="{{ soImageSite + sessionLog.imageBankID}}" title="{{sessionLog.slideTitle}}" />
+                                  </a>
+                                  <div *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</div>
+                                </div>
+                                <div *ngIf="!sessionLog.imageBankID && sessionLog.imageBankID <= 0">
+                                  <a (click)="slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                    Email Template {{sessionLog.slideTitle}}
+                                  </a>
+                                  <div *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</div>
+                                </div>
+                              </div>
+                              <!-- Web_Page -->
+                              <div class="text-center" *ngIf="sessionLog.contentType == 6">
+                                <div *ngIf="sessionLog.imageBankID && sessionLog.imageBankID > 0">
+                                  <a (click)="slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                    <img class="img-slidecast" src="{{ soImageSite + sessionLog.imageBankID}}" title="{{sessionLog.slideTitle}}" />
+                                  </a>
+                                  <div *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</div>
+                                </div>
+                                <div class="webpage-slide" *ngIf="!sessionLog.imageBankID && sessionLog.imageBankID <= 0">
+                                  <a (click)="slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                    <span class="webpage-slideTitle">Web Page Slide</span>
+                                    <p class="mt-5">{{sessionLog.slideTitle}}</p>
+                                  </a>
+                                  <div *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</div>
+                                </div>
+                              </div>
+                              <!-- Unknown -->
+                              <div class="text-center" *ngIf="sessionLog.contentType == 0">
+                                <a (click)="slidecastLink('logImage', sessionLog.vIPSlideID)">
+                                  {{sessionLog.contentType}} {{sessionLog.slideTitle}}
+                                </a>
+                                <div *ngIf="sessionLog.secondsOnSlide && sessionLog.secondsOnSlide != null">{{ sessionLog.secondsOnSlide }} secs</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div *ngIf="history.vIPSessionLog_list && history.vIPSessionLog_list.length == 0">
+                          No log entries available.
+                        </div>
+
+                      </div>
+                    </div>
+                  </kendo-card-body>
+                </kendo-card>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Image Modal -->
+  <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div>
+        <div>
+          <button type="button" class="close img-modal-close-btn" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body modal-common-body text-center">
+          <span *ngIf="slidecastModalImageData && slidecastModalImageData.slideContent && slidecastModalImageData.contentType == 2">
+            <img class="img-slidecast-modal" src="{{ slidecastModalImageData.slideContent}}" title="{{slidecastModalImageData.slideTitle}}" />
+          </span>
+          <span *ngIf="slidecastModalImageData && slidecastModalImageData.imageBankID && slidecastModalImageData.contentType != 2">
+            <img class="img-slidecast-modal" src="{{ soImageSite + slidecastModalImageData.imageBankID}}" title="{{slidecastModalImageData.slideTitle}}" />
+          </span>
+          <h5 *ngIf="slidecastModalImageData && slidecastModalImageData.slideTitle" class="img-modal-title">{{ slidecastModalImageData.slideTitle }} <span *ngIf="slidecastModalImageData && slidecastModalImageData.secondsOnSlide">({{ slidecastModalImageData.secondsOnSlide }} secs)</span></h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+

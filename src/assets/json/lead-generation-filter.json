@@ -1,0 +1,66 @@
+{
+    "filter": [
+
+        {
+            "value": "0",
+            "name": "2021",
+            "link": ""
+        },
+        {
+            "value": "1",
+            "name": "2020",
+            "link": ""
+        },
+        {
+            "value": "2",
+            "name": "2019",
+            "link": ""
+        },
+        {
+            "value": "3",
+            "name": "2018",
+            "link": ""
+        }
+
+    ],
+
+    "DateRange": [
+        {
+            "value": "1",
+            "name": "This Month",
+            "link": ""
+        },
+        {
+            "value": "2",
+            "name": "Last Month",
+            "link": ""
+        },
+        {
+            "value": "3",
+            "name": "[current_month] [previous_year] vs [current_month] [current_year]",
+            "link": ""
+        },
+        {
+            "value": "4",
+            "name": "[current_quarter1] [previous_year] vs [current_quarter1] [current_year]",
+            "link": ""
+        },
+        {
+            "value": "5",
+            "name": "[current_quarter] [previous_year] vs [current_quarter] [current_year]",
+            "link": ""
+        },
+        {
+            "value": "6",
+            "name": "[previous_year] vs [current_year]",
+            "link": ""
+        },
+        {
+            "value": "7",
+            "name": "Custom",
+            "link": ""
+        }
+    ]
+
+
+}

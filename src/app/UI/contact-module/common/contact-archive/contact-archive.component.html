@@ -1,0 +1,113 @@
+<div>
+  <contact-common-search [isArchive]="true" [sendMailInfo]="sendMailInfo"></contact-common-search>
+</div>
+
+<div class="col-md-12">
+  <ul class="step">
+    <li class="active">Search Contacts</li>
+    <li [ngClass]="{'active': step >= 2}">Select Contacts</li>
+    <li [ngClass]="{'active': step == 3}">Select Action</li>
+  </ul>
+</div>
+
+<div class="container-fluid">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/bulkcontactstitle.svg" class="mr-1" /> Restore Deleted Contacts</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <label class="info-text" *ngIf="!restoreAllContacts">Contacts selected: {{mySelection.length}}</label>
+            <label class="info-text" *ngIf="restoreAllContacts">Contacts selected: {{contactsArchiveData.length}}</label>
+            <button class="btn btn-primary" [disabled]="mySelection.length<=0 ||contactsArchiveData.length<=0" type="button" (click)="step=3; ">Restore Selected</button>
+            <button class="btn btn-primary" [disabled]="contactsArchiveData.length<=0" type="button" (click)="step=3; restoreAllContacts=true;">Restore All</button>
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputContactSearch.value = ''">Reset Grid Setting</button>
+            <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onContactArchiveListFilter($event.target.value)" #inputContactSearch />
+          </div>
+        </div>
+      </div>
+
+      <div class="global-body-section">
+        <div class="">
+          <div class="alert-panel" *ngIf="step == 1">
+            <p>Please use the Quick Search panel on the right to search for contacts.</p>
+          </div>
+          <div class="alert-panel" *ngIf="step == 2">
+            <p>Please use the Quick Search panel on the right to search for contacts.</p>
+          </div>
+
+          <kendo-grid #grid id="gridId" class="bulk-contact-grid"
+            [kendoGridBinding]="contactsArchiveData"
+            kendoGridSelectBy="contactID"
+            [(selectedKeys)]="mySelection"
+            [pageSize]="_gridCnfgService.pageSize"
+            [selectable]="{enabled: true, checkboxOnly: true }"
+            [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+            [sortable]="{mode: 'multiple'}"
+            [scrollable]="'scrollable'"
+            [sort]="_gridCnfgService.sort"
+            [columnMenu]="{ filter: true }"
+            [resizable]="true"
+            [reorderable]="true"
+            [ngStyle]="gridHeight"
+            (columnReorder)="_gridCnfgService.columnsOrderChanged('contact_restore_grid', $event)"
+            (sortChange)="_gridCnfgService.sortChange('contact_restore_grid', $event)"
+            (pageChange)="_gridCnfgService.pageChange('contact_restore_grid', $event)"
+            (columnResize)="_gridCnfgService.columnResize(5,'contact_restore_grid', $event)"
+            (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'contact_restore_grid',grid)">
+            <div class="grid-scroll-bar">
+              <kendo-grid-checkbox-column [width]="45"
+                [headerClass]="{ 'text-center': true }"
+                [class]="{ 'text-center': true }"
+                [resizable]="false"
+                [columnMenu]="false"
+                showSelectAll="true"></kendo-grid-checkbox-column>
+              <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                [field]="column.field"
+                [title]="column.title | titlecase"
+                [width]="column.field == '$' ? '40' : column.width"
+                [filterable]="true"
+                [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                [includeInChooser]="column.field=='$' ? false : true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                  <div class="customer-name" *ngIf="column.title == '  '"><a class="contact-cursor-pointer" (click)="gotoLink('address-card', dataItem);" title="View Contact"><i class="icon_contact"><img src="../../../assets/icon_contact.svg" /></i></a></div>
+                  <div class="customer-name" *ngIf="column.field == 'email'"><a class="contact-cursor-pointer" (click)="gotoLink('email', dataItem);" title="send email to {{dataItem.email}}" *ngIf="dataItem.email"><i class="email_new"><img src="../../../assets/email_new.svg" /></i></a></div>
+                  <div class="customer-name" *ngIf="column.field == 'phone'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--'"></span></div>
+                  <div class="customer-name" [ngClass]="[column.field=='name' ? 'text-left' : '',  column.field=='companyName' ? 'text-left' : '']" *ngIf="showColumn(column.field)" [hidden]="column.field=='$'">
+                    <a class="webkit-any-link" (click)="gotoLink(column.field, dataItem);" [style.color]="column.field == 'userName'? '#1c0dbf':''" *ngIf="column.field == 'name' || column.field == 'userName'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</a>
+                    <span [hidden]="column.field == 'name' || column.field == 'userName' || column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</span>
+                    <span *ngIf="column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy' }}</span>
+                  </div>
+                </ng-template>
+              </kendo-grid-column>
+            </div>
+          </kendo-grid>
+
+          <div *ngIf="step == 3">
+            <div class="alert-panel"><p>Caution: You are about to restore all checked contacts. Please confirm .</p></div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left"></div>
+              <div class="cards-colunm-right">
+                <div class="bottom-button-bar">
+                  <button class="btn btn-primary" type="button" (click)="restoreContacts()">Confirm</button>
+                  <button class="btn btn-cancel" type="button" (click)="cancelArchive()">Cancel</button>
+                </div>
+              </div>
+            </div>
+            <div class="alert-panel" *ngIf="!restoreAllContacts"> Total records selected: {{mySelection.length}}</div>
+            <div class="alert-panel" *ngIf="restoreAllContacts"> Total records selected: {{contactsArchiveData.length}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

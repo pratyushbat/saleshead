@@ -1,0 +1,82 @@
+<div class="p-3">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/emailtitle.svg" class="mr-1" />SMTP Settings</div>
+      </div>
+      <div>
+        <div *ngIf="smtpEditMode===0 && !cancelEditSmtp" class="apply-credit-subHeader">Please select a user.</div>
+        <div *ngIf="smtpEditMode===0 && cancelEditSmtp" class="apply-credit-subHeader">Select a user to edit SMTP settings..</div>
+        <div *ngIf="smtpEditMode===1" class="apply-credit-subHeader">Select a user to edit SMTP settings..</div>
+        <div *ngIf="smtpEditMode===2" class="apply-credit-subHeader">Send a test email by clicking Test..</div>
+      </div>
+
+      <div *ngIf="smtpEditMode <=1" class="smtp-row ">
+        <div class="p-3">
+          <select [(ngModel)]="selectedUser" class="ddStandard-tagsettings mt-10" (change)="smtpUserChange($event.target.value)">
+            <option [ngValue]="null">Select </option>
+            <option *ngFor="let arrTagSettings of smtpUserList" [selected]="arrTagSettings.key === selectedUser" [value]="arrTagSettings.key">{{arrTagSettings.value}}</option>
+          </select>
+        </div>
+      </div>
+      <div *ngIf="smtpEditMode >= 1">
+        <form [formGroup]="smtpForm" (ngSubmit)="smtpFormSubmit()">
+          <div class="wraper-body-panel">
+            <div class="wraper-body-left">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"><span>User</span></div>
+                <div class="cards-colunm-right"><input type="text" [readonly]="smtpEditMode === 2" class="form-control" id="cLPUserID" name="cLPUserID" formControlName="cLPUserID" /></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"><span>SMTP Server</span></div>
+                <div class="cards-colunm-right"><input type="text" [readonly]="smtpEditMode === 2" class="form-control" id="sMTPServer" name="sMTPServer" formControlName="sMTPServer" /></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"><span>Username</span></div>
+                <div class="cards-colunm-right"><input type="text" [readonly]="smtpEditMode === 2" class="form-control" id="username" name="username" formControlName="username" /></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"><span>Password</span></div>
+                <div class="cards-colunm-right"><input type="text" [readonly]="smtpEditMode === 2" class="form-control" id="password" name="password" formControlName="password" /></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"><span>SMTP Port</span></div>
+                <div class="cards-colunm-right"><input type="text" [readonly]="smtpEditMode === 2" class="form-control" id="sMTPPort" name="sMTPPort" formControlName="sMTPPort" /></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"><span>SMTP Authentication</span></div>
+                <div class="cards-colunm-right"><input type="text" [readonly]="smtpEditMode === 2" class="form-control" id="sMTPAuthenticate" name="sMTPAuthenticate" formControlName="sMTPAuthenticate" /></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"><span>Use SSL</span></div>
+                <div class="cards-colunm-right"><input type="checkbox" class="checkbox" id="useSSL" formControlName="useSSL" /></div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"><span>Activate</span></div>
+                <div class="cards-colunm-right"><input type="checkbox" class="checkbox" id="enableCLPSMTP" formControlName="enableCLPSMTP" /></div>
+              </div>
+            </div>
+          </div>
+          <div class="cards-body-section">            
+            <div class="cards-colunm-left">
+            </div>
+            <div class="cards-colunm-right">
+              <div *ngIf="smtpEditMode === 1">
+                <button class="btn btn-primary" id="primarySaveWeb" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" type="submit"><i class="fas fa-check"></i> Next</button>
+              </div>
+              <div *ngIf="smtpEditMode === 2">
+                <button class="btn btn-primary" id="primarySaveWeb" type="button"><i class="fas fa-check"></i> Test</button>
+                <button class="btn btn-cancel" id="primarySaveWeb" type="button" (click)="cancelSmtp();"><i class="fas fa-check"></i> Cancel</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner ">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+

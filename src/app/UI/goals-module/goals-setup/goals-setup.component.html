@@ -1,0 +1,82 @@
+<div class="row">
+  <div class="col-md-10">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../assets/goaltitle.svg" class="mr-1" />My Goals for August 2022</div>
+        </div>
+        <div class="margin-all-area">
+          <div class="global-card-section">
+            <div class="global-header-section">
+              <div class="svg-icon-panel">General Related Goals</div>
+              <div class="header-button-panel">
+                <div class="button-wrapper">
+                  <button type="button" [matTooltip]="isExpdTypeGoals && index === 0 ? 'Save' : 'View'" class="icon-btn" (click)="index = 0; expendStrip('General Related Goals')">
+                    <i class="fa " [ngClass]="isExpdTypeGoals && index === 0 && expdTypeGoalsName == 'General Related Goals' ? 'fa-save' : 'fa-search'"></i>
+                    <span class="btn-text">Expand</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="margin-all-area" *ngIf="expdTypeGoalsName == 'General Related Goals'">
+              <goal-setup-list #child  (onSaveGoals)="refreshSetupGoals($event)" *ngIf="user && isShowGoalsChild"  [buttonSave]="saveGoal.asObservable()" [sectionHeading]="'General Related Goals'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user"></goal-setup-list>
+            </div>
+          </div>
+        </div>
+        <div class="margin-all-area">
+          <div class="global-card-section">
+            <div class="global-header-section">
+              <div class="svg-icon-panel">Contact Related Goals</div>
+              <div class="header-button-panel">
+                <div class="button-wrapper">
+                  <button type="button" [matTooltip]="isExpdTypeGoals && index === 1 ? 'Save' : 'View'" class="icon-btn" (click)="index = 1; expendStrip('Contact Related Goals')">
+                    <i class="fa " [ngClass]="isExpdTypeGoals && index === 1 && expdTypeGoalsName == 'Contact Related Goals' ? 'fa-save' : 'fa-search'"></i>
+                    <span class="btn-text">Expand</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="margin-all-area" *ngIf="expdTypeGoalsName == 'Contact Related Goals'">
+              <goal-setup-list #child  (onSaveGoals)="refreshSetupGoals($event)" *ngIf="user && isShowGoalsChild" [buttonSave]="saveGoal.asObservable()" [sectionHeading]="'Contact Related Goals'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user"></goal-setup-list>
+            </div>
+          </div>
+        </div>
+        <div class="margin-all-area">
+          <div class="global-card-section">
+            <div class="global-header-section">
+              <div class="svg-icon-panel">Lead Related Goals</div>
+              <div class="header-button-panel">
+                <div class="button-wrapper">
+                  <button type="button" [matTooltip]="isExpdTypeGoals && index === 2 ? 'Save' : 'View'" class="icon-btn" (click)="index = 2; expendStrip('Lead Related Goals')">
+                    <i class="fa " [ngClass]="isExpdTypeGoals && index === 2 && expdTypeGoalsName == 'Lead Related Goals' ? 'fa-save' : 'fa-search'"></i>
+                    <span class="btn-text">Expand</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="margin-all-area" *ngIf="expdTypeGoalsName == 'Lead Related Goals'">
+              <goal-setup-list #child (onSaveGoals)="refreshSetupGoals($event)" *ngIf="user && isShowGoalsChild" [buttonSave]="saveGoal.asObservable()" [sectionHeading]="'Lead Related Goals'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user"></goal-setup-list>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><span>Quick Goals</span></div>
+        </div>
+        <div class="mt-1">
+          <div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body"  [hidden]="!goalSetupList?.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

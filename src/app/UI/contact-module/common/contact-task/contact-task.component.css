@@ -1,0 +1,3 @@
+.border-panel { border: 1px solid lightgray; padding: 10px; margin-bottom: 10px; }
+::ng-deep.k-grid-header .k-header{text-transform: capitalize;}
+

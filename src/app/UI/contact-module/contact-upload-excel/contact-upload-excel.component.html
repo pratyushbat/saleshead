@@ -1,0 +1,1696 @@
+<div class="container-fluid mt-3">
+  <div class="wraper-main-section">
+    <div class="">
+      <ul class="step">
+        <li class="active vertical-center"> <img src="../../../../assets/trans1x1.gif" class="steps1_4" border="0"><p class="transform-heading-map"> Upload Microsoft Excel Document</p></li>
+        <li class="vertical-center" [ngClass]="{'active': step >= 2}"><img src="../../../../assets/trans1x1.gif" class="steps2_4" border="0"><p class="transform-heading-map"> Verify Field Mapping</p></li>
+        <li class="vertical-center" [ngClass]="{'active': step >= 3}"><img src="../../../../assets/trans1x1.gif" class="steps3_4" border="0"><p class="transform-heading-map"> Configure Your Upload</p></li>
+        <li class="vertical-center" [ngClass]="{'active': step >= 4}"><img src="../../../../assets/trans1x1.gif" class="steps4_4" border="0"><p class="transform-heading-map"> Finalize and Confirm Upload</p></li>
+      </ul>
+    </div>
+    <div class="global-card-section mb-2">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/bulkcontactstitle.svg" class="mr-1" /> Excel Contact Upload Wizard</div>
+      </div>
+      <ng-container [ngSwitch]="step">
+        <ng-container *ngSwitchCase="1">
+          <div class="">
+            <div class="margin-all-area text-right" *ngIf="showWorkSheet">
+              <button class="btn btn-primary" type="button" [disabled]="showSpinner" (click)="contactUploadStep1();"><i class="fa-solid fa-arrow-right"></i> Go To Next Step</button>
+            </div>
+          </div>
+          <div class="">
+            <div class="success-alert" *ngIf="!showWorkSheet">
+              <p>Click Select to find the Microsoft Excel document containing contacts you want imported into your SalesOptima account. Then click the Validate File button. </p>
+            </div>
+            <div class="success-alert" *ngIf="showWorkSheet">
+              <p [innerHTML]="confirmMessage"></p>
+            </div>
+          </div>
+          <div class="wraper-body-panel">
+            <div class="wraper-body-left">
+              <div class="excel-main-panel label-align-div">
+                <div class="cards-body-section" *ngIf="!showWorkSheet">
+                  <div class="cards-colunm-left"><p>Select file to upload</p></div>
+                  <div class="cards-colunm-right">
+                    <div>
+                      <angular-file-uploader [config]="contactDocConfig" (ApiResponse)="apiResponse($event)" #excelUpload></angular-file-uploader>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section" *ngIf="showWorkSheet">
+                  <div class="cards-colunm-left"><p>Select worksheet to import</p></div>
+                  <div class="cards-colunm-right">
+                    <div>
+                      <select class="form-control" type="submit" [(ngModel)]="sheetSelected">
+                        <option disabled value="">-No Mapping-</option>
+                        <option *ngFor="let option of contactSheets" [ngValue]="option.key">{{ option.value }}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Important Notes	</p></div>
+                  <div class="cards-colunm-right">
+                    <div class="listing-panel">
+                      <p><img src="../../../../assets//bullet.svg" /><a> Click here for step-by-step instructions on how to upload your excel file.</a></p>
+                      <p><img src="../../../../assets//bullet.svg" /> There is a 4000 contact maximum per upload.</p>
+                      <p><img src="../../../../assets//bullet.svg" /> Please deduplicate the file before you use this wizard.</p>
+                      <p><img src="../../../../assets//bullet.svg" /> Please close the excel document before uploading.</p>
+                      <p><img src="../../../../assets//bullet.svg" /> The first row of the sheet should contain field names.</p>
+                      <p><img src="../../../../assets//bullet.svg" />	If First Name, Last Name, and Company Name, are all empty or not mapped, then the record will not be uploaded.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section" *ngIf="showToSuperUser();">
+                  <div class="cards-colunm-left"><p>Opt In SMS	</p></div>
+                  <div class="cards-colunm-right">
+                    <div class="cb-align">
+                      <input class="cb-align-margin" type="checkbox" [(ngModel)]="cbOPtin" id="cbOPtin" />
+                      <span> Opt in Sms</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><p>Classification Code Lookup</p></div>
+                  <div class="cards-colunm-right">
+                    <div class="wraper-main-section mb-4" *ngFor="let item of groupByClassCode | keyvalue">
+                      <div class="global-card-section">
+                        <div class="inner-header-bg">
+                          <div class="inner-cards-panel">
+                            <span> {{item.key}}</span>
+                          </div>
+                        </div>
+                        <div class="inner-header-bg">
+                          <div class="inner-cards-panel">
+                            <span>Code</span>
+                            <span>Display</span>
+                          </div>
+                        </div>
+                        <div class="inner-cards-grid-height">
+                          <div class="" *ngFor="let item2 of item.value ">
+                            <div class="inner-cards-grid">
+                              <div><p>{{item2.code}}</p></div>
+                              <div><p>{{item2.display}}</p></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="2">
+          <div class="">
+            <div class="margin-all-area text-right">
+              <button class="btn btn-primary" (click)="contactUploadFormSubmit();" [disabled]="showSpinner" type="button"><i class="fa-solid fa-arrow-right"></i> Go To Next Step</button>
+            </div>
+          </div>
+          <div class="">
+            <div class="success-alert">
+              <p [innerHTML]="stepTwoMessage"></p>
+            </div>
+            <div class="details-user-section">
+              <div class="details-user-panel">
+                <form [formGroup]="contactUploadForm" (ngSubmit)="contactUploadFormSubmit()" *ngIf="!showSpinner">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left padding-left-none">
+                      <div class="excel-main-panel">
+                        <div class="full-row-width">
+                          <div class="full-row-text">
+                            <h5>Field Mapping</h5>
+                          </div>
+                        </div>
+                        <div class="cards-body-section">
+                          <div class="cards-colunm-left"><p>Recent Uploads *</p></div>
+                          <div class="cards-colunm-right">
+                            <select [(ngModel)]="recentUpload" [ngModelOptions]="{standalone: true}" (change)="onValueChangeMulti($event,'recentUploads')" class="form-control" type="submit">
+                              <option disabled value="0">--Best Guess--</option>
+                              <option *ngFor="let option of lookUpExistingMappings" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section">
+                          <div class="cards-colunm-left"><p>Mapping Name  </p></div>
+                          <div class="cards-colunm-right">
+                            <input type="text" class="form-control" formControlName="mappingName" />
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.cbContactID">
+                          <div class="cards-colunm-left"><p> CLP Contact Id</p></div>
+                          <div class="cards-colunm-right">
+                            <div class="align-vertical-layout">
+                              <div class="cb-align">
+                                <input class="cb-align-margin" type="checkbox" formControlName="cbContactID" id="cbContactID" /> <span> Use CLP Contact ID field</span>
+                              </div>
+                              <label class="text-danger">Use this only when you are updating contacts that you downlaoded from salesOptima</label>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="full-row-width">
+                          <div class="full-row-text">
+                            <h5>General</h5>
+                          </div>
+                        </div>
+
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapFirstName ">
+                          <div class="cards-colunm-left"><p> First Name</p></div>
+                          <div class="cards-colunm-right">
+                            <div class="align-vertical-layout">
+                              <select formControlName="mapFirstName" class="form-control" type="submit">
+                                <option  value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapFirstName.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                              <div class="cb-align">
+                                <input class="cb-align-margin" type="checkbox" formControlName="splitFirstName" id="splitFirstName" />
+                                <span> Split this field</span>
+                              </div>
+                              <label>Your account will be billed next on this date.</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapLastName">
+                          <div class="cards-colunm-left"><p>Last Name</p></div>
+                          <div class="cards-colunm-right">
+                            <div class="align-vertical-layout">
+                              <select *ngIf="!useLastName" formControlName="mapLastName" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapLastName.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                              <label *ngIf="useLastName">Last Name will be automatically generated.</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapSalutation ">
+                          <div class="cards-colunm-left"><p>Salutation</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapSalutation" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapSalutation.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapTitle">
+                          <div class="cards-colunm-left"><p>Title</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapTitle" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapTitle.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCompany ">
+                          <div class="cards-colunm-left"><p>Company</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCompany" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCompany.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="full-row-width">
+                          <div class="full-row-text">
+                            <h5>Address</h5>
+                          </div>
+                        </div>
+
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapAdd1 ">
+                          <div class="cards-colunm-left"><p>Address 1</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapAdd1" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapAdd1.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapAdd2">
+                          <div class="cards-colunm-left"><p>Address 2</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapAdd2" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapAdd2.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapAdd3 ">
+                          <div class="cards-colunm-left"><p>Address 3</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapAdd3" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapAdd3.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCity ">
+                          <div class="cards-colunm-left"><p>City</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCity" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCity.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapState ">
+                          <div class="cards-colunm-left"><p>State</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapState" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapState.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapZip ">
+                          <div class="cards-colunm-left"><p>Zip</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapZip" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapZip.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCountry">
+                          <div class="cards-colunm-left"><p>Country</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCountry" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCountry.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="full-row-width">
+                          <div class="full-row-text">
+                            <h5>Additional Information</h5>
+                          </div>
+                        </div>
+
+                        <!-- Date of Birth -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom1 && contactUploadFieldMappings.mapcustom1.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom1.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom1" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom1.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Agm referral Src -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom2 && contactUploadFieldMappings.mapcustom2.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom2.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom2" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom2.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Membership Name -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom3 && contactUploadFieldMappings.mapcustom3.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom3.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom3" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom3.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Member Number -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom4 && contactUploadFieldMappings.mapcustom4.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom4.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom4" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom4.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Membership ID -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom5 && contactUploadFieldMappings.mapcustom5.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom5.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom5" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom5.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Engagement Action -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom6 && contactUploadFieldMappings.mapcustom6.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom6.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom6" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom6.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Referred/Sponsored By: -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom7 && contactUploadFieldMappings.mapcustom7.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom7.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom7" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom7.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--DL No. -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom8 && contactUploadFieldMappings.mapcustom8.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom8.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom8" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom8.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Emergency Contact -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom9 && contactUploadFieldMappings.mapcustom9.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom9.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom9" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom9.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Aggrement Changed -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom10 && contactUploadFieldMappings.mapcustom10.isShow <= 1 ">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom10.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom10" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom10.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Referral URL -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom11 && contactUploadFieldMappings.mapcustom11.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom11.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom11" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom11.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Host Address(IP) -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom12  && contactUploadFieldMappings.mapcustom12.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom12.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom12" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom12.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--FBC Plus -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom13  && contactUploadFieldMappings.mapcustom13.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom13.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom13" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom13.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Search Keyword -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom14  && contactUploadFieldMappings.mapcustom14.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom14.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom14" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom14.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Milestone Alert Email -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom15  && contactUploadFieldMappings.mapcustom15.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom15.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom15" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom15.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Mobile Keyword -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom16  && contactUploadFieldMappings.mapcustom16.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom16.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom16" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom16.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Source -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom17  && contactUploadFieldMappings.mapcustom17.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom17.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom17" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom17.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom18 && contactUploadFieldMappings.mapcustom18.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom18.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom18" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom18.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom19 && contactUploadFieldMappings.mapcustom19.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom19.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom19" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom19.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <!--Agm referral Comments-->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcustom20 && contactUploadFieldMappings.mapcustom20.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcustom20.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcustom20" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcustom20.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="full-row-width">
+                          <div class="full-row-text">
+                            <h5>Comments/other Fields</h5>
+                          </div>
+                        </div>
+
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapComments  ">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">Add To Comments</p>
+                              <label class="billing-label">2000 charracter max</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <kendo-multiselect [filterable]="true" [placeholder]="'-No Mapping-'" (valueChange)="onValueChangeMulti($event,'mapComments')" formControlName="mapComments" [data]="contactUploadFieldMappings.mapComments.items" textField="text" valueField="value" [valuePrimitive]="true"></kendo-multiselect>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapHistory  && contactUploadFieldMappings.mapHistory.isShow <= 1">
+                          <div class="cards-colunm-left"><p>Add History Entry</p></div>
+                          <div class="cards-colunm-right">
+                            <kendo-multiselect [filterable]="true" [placeholder]="'-No Mapping-'" (valueChange)="onValueChangeMulti($event,'historyEntry')" formControlName="mapHistory" [data]="contactUploadFieldMappings.mapHistory.items" textField="text" valueField="value" [valuePrimitive]="true"></kendo-multiselect>
+                          </div>
+                        </div>
+                        <!--Note Type -->
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapNotes ">
+                          <div class="cards-colunm-left"><p>Note Type	</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapNotes" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of lookUpNoteTypeCode" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="wraper-body-right left-side-border">
+                      <div class="excel-main-panel">
+                        <div class="full-row-width">
+                          <div class="full-row-text">
+                            <h5>Communication</h5>
+                          </div>
+                        </div>
+
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCustom8  && contactUploadFieldMappings.mapcompanyCustom8.isShow <= 1">
+                          <div class="cards-colunm-left"><p>Business Phone *</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapcompanyCustom8" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCustom8.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapHomePhone ">
+                          <div class="cards-colunm-left"><p> Home Phone</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapHomePhone" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapHomePhone.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapMobile">
+                          <div class="cards-colunm-left"><p>Mobile</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapMobile" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapMobile.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapAltPhone ">
+                          <div class="cards-colunm-left"><p>Other Phone</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapAltPhone" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapAltPhone.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapFax">
+                          <div class="cards-colunm-left"><p>Fax</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapFax" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapFax.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapOtherFax ">
+                          <div class="cards-colunm-left"><p>Other Fax</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapOtherFax" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapOtherFax.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapEmail  ">
+                          <div class="cards-colunm-left"><p>Primary Email</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapEmail" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapEmail.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapEmail2">
+                          <div class="cards-colunm-left"><p>Email 2</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapEmail2" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapEmail2.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapEmail3 ">
+                          <div class="cards-colunm-left"><p>Email 3</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapEmail3" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapEmail3.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapWebSite  ">
+
+                          <div class="cards-colunm-left"><p>WebSite</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapWebSite" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapWebSite.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="full-row-width">
+                          <div class="full-row-text">
+                            <h5>Classification</h5>
+                          </div>
+                        </div>
+
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapClass1Code  && contactUploadFieldMappings.mapClass1Code.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapClass1Code.fieldTitle}}</p>
+                              <label class="billing-label">use valid Class 1 codes *</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapClass1Code" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapClass1Code.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapClass2Code  && contactUploadFieldMappings.mapClass2Code.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapClass2Code.fieldTitle}}</p>
+                              <label class="billing-label">use valid Class 2 codes</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapClass2Code" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapClass2Code.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapClass3Code  && contactUploadFieldMappings.mapClass3Code.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapClass3Code.fieldTitle}}</p>
+                              <label class="billing-label">use valid Class 3 codes</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapClass3Code" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapClass3Code.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapClass4Code  && contactUploadFieldMappings.mapClass4Code.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapClass4Code.fieldTitle}}</p>
+                              <label class="billing-label">use valid Class 4 codes</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapClass4Code" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapClass4Code.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapClass5Code  && contactUploadFieldMappings.mapClass5Code.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapClass5Code.fieldTitle}}</p>
+                              <label class="billing-label">use valid Class 5 codes</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapClass5Code" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapClass5Code.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapClass6Code  && contactUploadFieldMappings.mapClass6Code.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapClass6Code.fieldTitle}}</p>
+                              <label class="billing-label">use valid Class 6 codes</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapClass6Code" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapClass6Code.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapClass7Code  && contactUploadFieldMappings.mapClass7Code.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapClass7Code.fieldTitle}}</p>
+                              <label class="billing-label">use valid Class 7 codes</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapClass7Code" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapClass7Code.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapClass8Code  && contactUploadFieldMappings.mapClass8Code.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapClass8Code.fieldTitle}}</p>
+                              <label class="billing-label">use valid Class 8 codes</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapClass8Code" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapClass8Code.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.check1  && contactUploadFieldMappings.check1.isShow <= 1 ">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.check1.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="check1" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.check1.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.check2  && contactUploadFieldMappings.check2.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.check2.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="check2" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.check2.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.check3  && contactUploadFieldMappings.check3.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.check3.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="check3" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.check3.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.check4  && contactUploadFieldMappings.check4.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.check4.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="check4" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option disabled value="-1">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.check4.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.check5  && contactUploadFieldMappings.check5.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.check5.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="check5" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.check5.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.check6  && contactUploadFieldMappings.check6.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.check6.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="check6" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.check6.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="full-row-width">
+                          <div class="full-row-text">
+                            <h5>System</h5>
+                          </div>
+                        </div>
+
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapUserCode ">
+                          <div class="cards-colunm-left"><p>User Code</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapUserCode" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapUserCode.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapdtLastModified  ">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">Date Last Modified</p>
+                              <label class="billing-label">m/d/yyyy</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapdtLastModified" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapdtLastModified.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapdtCreated  ">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">Date Created</p>
+                              <label class="billing-label">m/d/yyyy</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapdtCreated" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapdtCreated.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="full-row-width">
+                          <div class="full-row-text">
+                            <h5>More Fields</h5>
+                          </div>
+                        </div>
+
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCustomDate1Title  && contactUploadFieldMappings.mapCustomDate1Title.isShow <= 1">
+                          <div class="cards-colunm-left"><p> {{contactUploadFieldMappings.mapCustomDate1Title.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCustomDate1Title" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCustomDate1Title.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCustomDate1  && contactUploadFieldMappings.mapCustomDate1.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapCustomDate1.fieldTitle}}</p>
+                              <label class="billing-label">m/d/yyyy</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCustomDate1" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCustomDate1.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCustomDate2Title  && contactUploadFieldMappings.mapCustomDate2Title.isShow <= 1">
+                          <div class="cards-colunm-left"><p> {{contactUploadFieldMappings.mapCustomDate2Title.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCustomDate2Title" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCustomDate2Title.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCustomDate2  && contactUploadFieldMappings.mapCustomDate2.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapCustomDate2.fieldTitle}}</p>
+                              <label class="billing-label">m/d/yyyy</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCustomDate2" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCustomDate2.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCustomDate3Title  && contactUploadFieldMappings.mapCustomDate3Title.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapCustomDate3Title.fieldTitle}} </p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCustomDate3Title" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCustomDate3Title.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCustomDate3  && contactUploadFieldMappings.mapCustomDate3.isShow <= 1">
+                          <div class="cards-colunm-left">
+                            <div class="align-vertical-layout">
+                              <p class="billing-tag-bottom">{{contactUploadFieldMappings.mapCustomDate3.fieldTitle}}</p>
+                              <label class="billing-label">m/d/yyyy</label>
+                            </div>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCustomDate3" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCustomDate3.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCustomText1  && contactUploadFieldMappings.mapCustomText1.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapCustomText1.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCustomText1" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCustomText1.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCustomText2  && contactUploadFieldMappings.mapCustomText2.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapCustomText2.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCustomText2" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCustomText2.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapCustomText3  && contactUploadFieldMappings.mapCustomText3.isShow <= 1">
+                          <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapCustomText3.fieldTitle}}</p></div>
+                          <div class="cards-colunm-right">
+                            <select formControlName="mapCustomText3" class="form-control" type="submit">
+                              <option value="">-No Mapping-</option>
+                              <option *ngFor="let option of contactUploadFieldMappings.mapCustomText3.items" [ngValue]="option.value">{{ option.text }}</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div *ngIf="contactUploadFieldMappings.mapcompanyCheck1">
+                          <div class="full-row-width">
+                            <div class="full-row-text">
+                              <h5>Additional Information</h5>
+                            </div>
+                          </div>
+                          <!-- Date of Birth -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCheck1 && contactUploadFieldMappings.mapcompanyCheck1.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCheck1.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCheck1" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCheck1.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Agm referral Src -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCheck2 && contactUploadFieldMappings.mapcompanyCheck2.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCheck2.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCheck2" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCheck2.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Membership Name -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCheck3 && contactUploadFieldMappings.mapcompanyCheck3.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCheck3.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCheck3" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCheck3.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Member Number -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCheck4 && contactUploadFieldMappings.mapcompanyCheck4.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCheck4.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCheck4" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCheck4.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Membership ID -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyClass1 && contactUploadFieldMappings.mapcompanyClass1.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyClass1.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyClass1" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyClass1.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Engagement Action -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyClass2 && contactUploadFieldMappings.mapcompanyClass2.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyClass2.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyClass2" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyClass2.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Referred/Sponsored By: -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyClass3 && contactUploadFieldMappings.mapcompanyClass3.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyClass3.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyClass3" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyClass3.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--DL No. -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyClass4 && contactUploadFieldMappings.mapcompanyClass4.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyClass4.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyClass4" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyClass4.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Emergency Contact -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyClass5 && contactUploadFieldMappings.mapcompanyClass5.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyClass5.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyClass5" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyClass5.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Aggrement Changed -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyClass6 && contactUploadFieldMappings.mapcompanyClass6.isShow <= 1 ">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyClass6.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyClass6" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyClass6.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Referral URL -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyClass7 && contactUploadFieldMappings.mapcompanyClass7.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyClass7.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyClass7" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyClass7.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Host Address(IP) -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyClass8  && contactUploadFieldMappings.mapcompanyClass8.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyClass8.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyClass8" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyClass8.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--FBC Plus -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCustom2  && contactUploadFieldMappings.mapcompanyCustom2.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCustom2.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCustom2" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCustom2.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Search Keyword -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCustom3  && contactUploadFieldMappings.mapcompanyCustom3.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCustom3.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCustom3" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCustom3.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Milestone Alert Email -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCustom4  && contactUploadFieldMappings.mapCompanyCustom4.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCustom4.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCustom4" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCustom4.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Mobile Keyword -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCustom5  && contactUploadFieldMappings.mapcompanyCustom5.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCustom5.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCustom5" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCustom5.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Source -->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCustom6  && contactUploadFieldMappings.mapcompanyCustom6.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCustom6.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCustom6" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCustom6.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <!--Agm referral Comments-->
+                          <div class="cards-body-section" *ngIf="contactUploadFieldMappings.mapcompanyCustom7 && contactUploadFieldMappings.mapcompanyCustom7.isShow <= 1">
+                            <div class="cards-colunm-left"><p>{{contactUploadFieldMappings.mapcompanyCustom7.fieldTitle}}</p></div>
+                            <div class="cards-colunm-right">
+                              <select formControlName="mapcompanyCustom7" class="form-control" type="submit">
+                                <option value="">-No Mapping-</option>
+                                <option *ngFor="let option of contactUploadFieldMappings.mapcompanyCustom7.items" [ngValue]="option.value">{{ option.text }}</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="3">
+          <div class="">
+            <div *ngIf="!loadStep4" class="warning-alert"> <p [innerHTML]="uploadContactSummary.messageString"></p></div>
+          </div>
+          <div class="">
+            <div class="warning-alert"> <p>There are no items to upload. </p></div>
+          </div>
+          <div class="">
+            <div class="margin-all-area text-right">
+              <button class="btn btn-primary" type="button" [disabled]="showSpinner" (click)="excelStep4Load()"><i class="fa-solid fa-arrow-right"></i> Go To Next Step</button>
+            </div>
+          </div>
+          <div class="">
+            <div class="success-alert">
+              <div class="" *ngIf="!isFindDuplicate">
+                <span>During this step, you have the option of searching your existing list of contacts within SalesOptima to find duplicates. Simply click the Find Duplicates button to begin.</span>
+                <p class="text-danger">Note: Duplicate contacts are only detected within the system not within the upload file itself. Please make sure duplicate contacts have been removed from the upload file before using this wizard.</p>
+              </div>
+              <p *ngIf="isFindDuplicate">Use the control panel on the right to configure the Company rceords to be uplaoded.Then Go To Next Step to continue.</p>
+            </div>
+
+            <div class="duplicate-alignment-section">
+              <div class="duplicate-alignment-panel">
+                <div class="duplicate-alignment-div"><p class="generic-heading">Duplicate detection</p></div>
+                <div class="duplicate-alignment-div">
+                  <button class="btn btn-primary" type="button" (click)="dupCheckUploadSummary(); isFindDuplicate = true;">
+                    <i class="fas fa-trash mr-1"></i>Find Duplicates
+                  </button>
+                </div>
+                <div class="duplicate-alignment-div flex-pragph">
+                  <p class="generic-heading">Search Scope </p>
+                  <select class="form-control" type="submit" [(ngModel)]="searchScope">
+                    <option disabled value="-1">-No Mapping-</option>
+                    <option *ngFor="let option of searchScopeList" [ngValue]="option.value">{{ option.text }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="duplicate-alignment-section">
+              <div class="duplicate-alignment-panel">
+                <div class="duplicate-alignment-div"><img src="../../../../assets/bulkcontactstitle.svg" class="mr-1" /></div>
+                <div class="duplicate-alignment-div billing-left-section">
+                  <p>Total Contact Processed: </p>
+                  <p>Duplicate Contact Detected: </p>
+                </div>
+                <div class="duplicate-alignment-div">
+                  <p>{{uploadContactSummary.totContacts}}</p>
+                  <button class="btn btn-primary" (click)="configureContactList(false); processGridType=1;" type="button"><i class="fas fa-trash mr-1"></i>Configure</button>
+                  <p style="display:block;">{{uploadContactSummary.totDuplicateContacts}}</p>
+                  <div *ngIf="uploadContactSummary.totDuplicateContacts == null" class=""> <p>N/A</p></div>
+                </div>
+                <div class="duplicate-alignment-div">
+                  <div *ngIf="getDuplicatesOnly()">
+                    <button class="btn btn-primary float-right" (click)="configureContactList(true);" type="button"><i class="fas fa-trash mr-1"></i>Configure</button>
+                  </div>
+                  <p class="generic-heading text-success">Contacts to be uploaded: {{uploadContactSummary.totNewContacts}}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="billing-divider">
+              <mat-divider></mat-divider>
+            </div>
+
+            <div class="duplicate-alignment-section">
+              <div class="duplicate-alignment-panel">
+                <div class="duplicate-alignment-div">
+                  <img src="../../../../assets/bulkcontactstitle.svg" class="mr-1" />
+                </div>
+                <div class="duplicate-alignment-div billing-left-section">
+                  <p>Total Companies Processed: </p>
+                  <p>Existing Companies Detected:</p>
+                </div>
+                <div class="duplicate-alignment-div">
+                  <div>
+                    <p>{{uploadContactSummary.totCompanies}}</p>
+                    <button class="btn btn-primary" (click)="configureCompanyList(false); " type="button"><i class="fas fa-trash mr-1"></i>Configure</button>
+                  </div>
+                  <div><p *ngIf="uploadContactSummary.totDuplicateContacts == null" class="">N/A</p></div>
+                  <div class=""><p> {{uploadContactSummary.totDupCompanies}}</p></div>
+                </div>
+                <div class="duplicate-alignment-div billing-left-section" *ngIf="getDuplicatesOnly();">
+                  <div class="">
+                    <div class="">
+                      <button class="btn btn-primary" (click)="configureCompanyList(true); " type="button"><i class="fas fa-trash mr-1"></i>Configure</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="duplicate-alignment-div">
+                  <div><p class="generic-heading text-success">Companies to be created: {{uploadContactSummary.totNewCompanies}} </p></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="billing-divider">
+              <mat-divider></mat-divider>
+            </div>
+
+            <div *ngIf="isEditField">
+              <ng-container [ngSwitch]="isToTransferFieldContact">
+                <ng-container *ngSwitchCase="0">
+                  <div>
+                    <div *ngIf="!saveConfirmation" class=" row">
+                      <p class="bulk-action-msg">{{messageStep3}}</p>
+                    </div>
+                    <div *ngIf="saveConfirmation" class=" row">
+                      <p class="bulk-action-msg"> Please confirm the field and value you would like to edit for all checked contacts. </p>
+                    </div>
+
+                    <div class="alert-panel">
+                      <div class="display-row">
+                        <div>Total records Found  {{isDuplicateContact ? contactDuplicateList?.length : contactProcessedList?.length}} </div>
+                        <div>
+                          <div class="excel-btn-panel">
+                            <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                              <input type="image" (click)="editField(); isEditField = true; isToTransferFieldContact='0'  " name="editContactFields" title="Edit a field for all checked contacts." src="../../../../assets/btneditcontacts.svg">
+                            </div>
+                            <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                              <input type="image" (click)="isToTransferFieldContact='1'" name="editContactFields" title="Transfer ownership of checked contacts." src="../../../../assets/btntransfercontacts.svg">
+                            </div>
+                            <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                              <input type="image" (click)="uploadContactUpdateAction(1);" name="editContactFields" title="Overwrite checked contacts." src="../../../../assets/contact-check.svg">
+                            </div>
+                            <div class="excel-btn-icon">
+                              <input type="image" (click)="uploadContactUpdateAction(2);" name="editContactFields" title="Upload checked contacts." src="../../../../assets/btnuploadcontacts.svg">
+                            </div>
+                            <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                              <input type="image" (click)="uploadContactUpdateAction(0);" name="editContactFields" title="Do not upload checked contacts." src="../../../../assets/contact-delete.svg">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="bulk-action-body">
+                      <div class="wraper-body-panel">
+                        <div class="wraper-body-left">
+                          <form [formGroup]="uploadEditFieldForm" (ngSubmit)="updateContactUploadFormStep3Main()">
+                            <div class="cards-body-section">
+                              <div class="cards-colunm-left">
+                                <span>Select Field </span>
+                              </div>
+                              <div class="cards-colunm-right">
+                                <select class="form-control" formControlName="ddField" *ngIf="uploadEditFieldForm.controls.ddField.value == ''" (change)="changeDDFields()">
+                                  <option  value=""> -Select one- </option>
+                                  <option *ngFor="let option of lookUpFields" [ngValue]="option.value">{{ option.text }}</option>
+                                </select>
+                                <span *ngIf="uploadEditFieldForm.controls.ddField.value != ''">{{uploadEditFieldForm.controls.ddField.value}}</span>
+                              </div>
+                            </div>
+                            <div class="cards-body-section" *ngIf="uploadEditFieldForm.controls.ddField.value != '' &&  editMode">
+                              <div class="cards-colunm-left">
+                                <span>Edit Type </span>
+                              </div>
+                              <div class="cards-colunm-right">
+                                <select class="form-control" formControlName="editType" *ngIf="uploadEditFieldForm.controls.editType.value == -1" (change)="changeField()">
+                                  <option disabled value="-1">Select one</option>
+                                  <option [value]="key" *ngFor="let key of editTypeKeys" [label]="enumForEditType[key]"></option>
+                                </select>
+                                <span *ngIf="uploadEditFieldForm.controls.editType.value == 0">Replace</span>
+                                <span *ngIf="uploadEditFieldForm.controls.editType.value == 1">Add to</span>
+                                <span *ngIf="uploadEditFieldForm.controls.editType.value == 2">Clear</span>
+                                <span *ngIf="uploadEditFieldForm.controls.editType.value == 3">Remove</span>
+                              </div>
+                            </div>
+                            <div class="cards-body-section" *ngIf="uploadEditFieldForm.controls.editType.value >= 0  && editMode">
+                              <div class="cards-colunm-left">
+                                <span>Value </span>
+                              </div>
+                              <div class="cards-colunm-right">
+                                <ng-container [ngSwitch]="true">
+                                  <ng-container *ngSwitchCase="uploadEditFieldForm.controls.ddField.value == 'Shareable' ||uploadEditFieldForm.controls.ddField.value == 'Check1' ||uploadEditFieldForm.controls.ddField.value == 'Check2' ||uploadEditFieldForm.controls.ddField.value == 'Check3' ||uploadEditFieldForm.controls.ddField.value == 'Check4' ||uploadEditFieldForm.controls.ddField.value == 'Check5' ||uploadEditFieldForm.controls.ddField.value == 'Check6' ">
+                                    <div>
+                                      <input class="form-control" type="checkbox" formControlName="textValue" [ngClass]="{'has-error': uploadEditFieldForm.controls.textValue.errors && (uploadEditFieldForm.controls.textValue.touched || uploadEditFieldForm.controls.textValue.dirty)}" />
+                                      <div *ngIf="uploadEditFieldForm.controls.textValue.errors && (uploadEditFieldForm.controls.textValue.touched || uploadEditFieldForm.controls.textValue.dirty)">
+                                        <div class="login-error" *ngIf="uploadEditFieldForm.controls.textValue.errors.required">Value is required </div>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngSwitchCase="uploadEditFieldForm.controls.ddField.value == 'Notes' || uploadEditFieldForm.controls.ddField.value == 'Comments'">
+                                    <div>
+                                      <textarea id="note" class="form-control contact-text-auto-height" row="1" cols="1" formControlName="textValue" placeholder="note"></textarea>
+                                      <div *ngIf="uploadEditFieldForm.controls.textValue.errors && (uploadEditFieldForm.controls.textValue.touched || uploadEditFieldForm.controls.textValue.dirty)">
+                                        <div class="login-error" *ngIf="uploadEditFieldForm.controls.textValue.errors.required">Note is required </div>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngSwitchCase="uploadEditFieldForm.controls.ddField.value == 'CMCustomDate1' || uploadEditFieldForm.controls.ddField.value == 'CMCustomDate1 : Issue' || uploadEditFieldForm.controls.ddField.value == 'CMCustomDate2' ||uploadEditFieldForm.controls.ddField.value == 'CMCustomDate2 : Request Info' || uploadEditFieldForm.controls.ddField.value == 'CMCustomDate3' || uploadEditFieldForm.controls.ddField.value == 'CMCustomDate3 : Expiration'">
+                                    <div>
+                                      <kendo-datetimepicker class="form-control" id="textValue" formControlName="textValue" name="textValue"></kendo-datetimepicker>
+                                      <div *ngIf="uploadEditFieldForm.controls.textValue.errors && (uploadEditFieldForm.controls.textValue.touched || uploadEditFieldForm.controls.textValue.dirty)">
+                                        <div class="login-error" *ngIf="uploadEditFieldForm.controls.textValue.errors.required">Value is required </div>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+
+                                  <ng-container *ngSwitchCase=" uploadEditFieldForm.controls.ddField.value == 'Tag'">
+                                    <div>
+                                      <div class="example-wrapper">
+                                        <kendo-dropdownlist [defaultItem]="{ text: 'Select Tag value', value: null , lookupName: null }"
+                                            [data]="tagData"
+                                            [filterable]="true"
+                                            textField="text"
+                                            valueField="value"
+                                            formControlName="textValue"
+                                            [valuePrimitive]="true"
+                                            (filterChange)="handleTagFilter($event)"
+                                            required>
+                                        </kendo-dropdownlist>
+                                        <div *ngIf="uploadEditFieldForm.controls.textValue.errors && (uploadEditFieldForm.controls.textValue.touched || uploadEditFieldForm.controls.textValue.dirty)">
+                                          <div class="login-error" *ngIf="uploadEditFieldForm.controls.textValue.errors.required">Value is required </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngSwitchCase=" uploadEditFieldForm.controls.ddField.value == 'Class1Code' ||uploadEditFieldForm.controls.ddField.value == 'Class2Code' || uploadEditFieldForm.controls.ddField.value == 'Class3Code' ||uploadEditFieldForm.controls.ddField.value == 'Class4Code' ||uploadEditFieldForm.controls.ddField.value == 'Class5Code' ||uploadEditFieldForm.controls.ddField.value == 'Class6Code' ||uploadEditFieldForm.controls.ddField.value == 'Class7Code' ||uploadEditFieldForm.controls.ddField.value == 'Class8Code' || uploadEditFieldForm.controls.ddField.value == 'Class1Code : Status' || uploadEditFieldForm.controls.ddField.value == 'Class2Code : Marketing Channel' || uploadEditFieldForm.controls.ddField.value == 'Class3Code : Best time to call' || uploadEditFieldForm.controls.ddField.value == 'Class4Code : DQ/Dead Factors' || uploadEditFieldForm.controls.ddField.value == 'Class5Code : BEM ONLY (do not use)'|| uploadEditFieldForm.controls.ddField.value == 'Class6Code : Channel'|| uploadEditFieldForm.controls.ddField.value == 'Class7Code : Source'|| uploadEditFieldForm.controls.ddField.value == 'Class8Code : Campaign' ">
+                                    <div>
+                                      <select class="form-control" formControlName="textValue">
+                                        <option disabled value=""> -Select one- </option>
+                                        <option *ngFor="let key of classCode; let i = index" [value]="key.code">{{key.display }}</option>
+                                      </select>
+                                      <div *ngIf="uploadEditFieldForm.controls.textValue.errors && (uploadEditFieldForm.controls.textValue.touched || uploadEditFieldForm.controls.textValue.dirty)">
+                                        <div class="login-error" *ngIf="uploadEditFieldForm.controls.textValue.errors.required">Value is required </div>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngSwitchDefault>
+                                    <div>
+                                      <input type="text" formControlName="textValue" [ngClass]="{'has-error': uploadEditFieldForm.controls.textValue.errors && (uploadEditFieldForm.controls.textValue.touched || uploadEditFieldForm.controls.textValue.dirty)}" />
+                                      <div *ngIf="uploadEditFieldForm.controls.textValue.errors && (uploadEditFieldForm.controls.textValue.touched || uploadEditFieldForm.controls.textValue.dirty)">
+                                        <div class="login-error" *ngIf="uploadEditFieldForm.controls.textValue.errors.required">Value is required </div>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                </ng-container>
+                              </div>
+                            </div>
+
+                            <div class="cards-body-section">
+                              <div class="cards-colunm-left"></div>
+                              <div class="cards-colunm-right">
+                                <div class="bottom-button-bar" *ngIf="uploadEditFieldForm.controls.editType.value != -1">
+                                  <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" *ngIf="!saveConfirmation" type="button" (click)="preSaveContact();"> Save</button>
+                                  <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" *ngIf="saveConfirmation" [disabled]="showSpinner" type="submit"> Click to Confirm Save</button>
+                                  <button class="btn btn-cancel" type="button" (click)="cancelSaveContact()"> Cancel</button>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="1">
+                  <div>
+                    <div class="alert-panel">
+                      <!--<div *ngIf="processGridType===1" class="col-md-3">Total records Found  {{isDuplicateContact ? contactDuplicateList?.length : contactProcessedList?.length}}</div>-->
+                      <div *ngIf="processGridType === 1" class="excel-btn-panel">
+                        <div class="excel-btn-icon">
+                          <input type="image" (click)="editField(); isEditField = true;isToTransferFieldContact='0'  " name="editContactFields" title="Edit a field for all checked contacts." src="../../../../assets/btneditcontacts.svg">
+                        </div>
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="isToTransferFieldContact='1';newManagerId=0;" name="editContactFields" title="Transfer ownership of checked contacts." src="../../../../assets/btntransfercontacts.svg">
+                        </div>
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="uploadContactUpdateAction(1);" name="editContactFields" title="Overwrite checked contacts." src="../../../../assets/contact-check.svg">
+                        </div>
+                        <div class="excel-btn-icon">
+                          <input type="image" (click)="uploadContactUpdateAction(2);" name="editContactFields" title="Upload checked contacts." src="../../../../assets/btnuploadcontacts.svg">
+                        </div>
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="uploadContactUpdateAction(0);" name="editContactFields" title="Do not upload checked contacts." src="../../../../assets/contact-delete.svg">
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div *ngIf="!transferConfirmation" class="warning-alert"> <p>Please select the new owner of all  {{mySelection?.length}} selected contacts.</p></div>
+                      <div *ngIf="transferConfirmation" class="warning-alert"> <p>You are about to transfer ownership of all {{mySelection.length}} selected contacts to {{newManagerId}} Please confirm.</p></div>
+                    </div>
+                    <div class="">
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left">
+                          <span>New Owner</span>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <select class="form-control" name="newManagerId" [(ngModel)]="newManagerId">
+                            <option disabled value="0"> -Select one- </option>
+                            <option *ngFor="let option of filterManagerTransfer" [ngValue]="option.value">{{ option.text }}</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left"></div>
+                        <div class="cards-colunm-right">
+                          <div class="bottom-button-bar">
+                            <button *ngIf="!transferConfirmation" class="btn btn-primary" type="submit" (click)="preTransferContact()">Click To Transfer</button>
+                            <button *ngIf="transferConfirmation" [disabled]="showSpinner" class="btn btn-primary" type="submit" (click)="transferOwnerShip();">Click To Confirm Transfer</button>
+                            <button class="btn btn-cancel" type="button" (click)="cancelTransfer()">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                  <div>
+                    <p>Cannot Find data.</p>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </div>
+
+            <ng-container [ngSwitch]="processGridType">
+              <ng-container *ngSwitchCase="1">
+                <div class="alert-panel" *ngIf="!isEditField">
+                  <div class="display-row">
+                    <div>Total records Found  {{isDuplicateContact ? contactDuplicateList?.length : contactProcessedList?.length}}</div>
+                    <div>
+                      <div class="excel-btn-panel">
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="editField(); isEditField = true; isToTransferFieldContact='0'" name="editContactFields" title="Edit a field for all checked contacts." src="../../../../assets/btneditcontacts.svg">
+                        </div>
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="isEditField = true; isToTransferFieldContact='1'; " name="editContactFields" title="Transfer ownership of checked contacts." src="../../../../assets/btntransfercontacts.svg">
+                        </div>
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="uploadContactUpdateAction(1,1);" name="editContactFields" title="Overwrite checked contacts." src="../../../../assets/contact-check.svg">
+                        </div>
+                        <div class="excel-btn-icon">
+                          <input type="image" (click)="uploadContactUpdateAction(2,1);" name="editContactFields" title="Upload checked contacts." src="../../../../assets/btnuploadcontacts.svg">
+                        </div>
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="uploadContactUpdateAction(0,1);" name="editContactFields" title="Do not upload checked contacts." src="../../../../assets/contact-delete.svg">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="margin-all-area">
+                  <div class="global-card-section">
+                    <div class="global-header-section">
+                      <div class="header-button-panel">
+                        <div class="button-wrapper">
+                          <label>Contacts selected: {{mySelection.length}}</label>
+                          <!--   <label *ngIf="selectAllContacts">Contacts selected: {{contactsArchiveData.length}}</label>-->
+                          <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputContactSearch.value = ''"> Reset Grid Setting</button>
+                          <button class="btn btn-primary" type="button" (click)="selectAllContacts=true;onSelectAllChange('checked')">Select All</button>
+                          <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onContactProcessListFilter($event.target.value)" #inputContactSearch />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="global-body-section">
+                      <kendo-grid class="" #grid id="gridId"
+                        [kendoGridBinding]="isDuplicateContact ? contactDuplicateList : contactProcessedList"
+                        kendoGridSelectBy="uploadContactID"
+                        [selectable]="{enabled: true, checkboxOnly: true }"
+                        [(selectedKeys)]="mySelection"
+                        [pageSize]="_gridCnfgService.pageSize"
+                        [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                        [sortable]="{mode: 'multiple'}"
+                        [scrollable]="'scrollable'"
+                        [sort]="_gridCnfgService.sort"
+                        [columnMenu]="{ filter: true }"
+                        [resizable]="true"
+                        [reorderable]="true"
+                        [ngStyle]="gridHeight"
+                        (columnReorder)="_gridCnfgService.columnsOrderChanged('contact_excel_process_grid', $event)"
+                        (sortChange)="_gridCnfgService.sortChange('contact_excel_process_grid', $event)"
+                        (pageChange)="_gridCnfgService.pageChange('contact_excel_process_grid', $event)"
+                        (columnResize)="_gridCnfgService.columnResize(5,'contact_excel_process_grid', $event)"
+                        (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'contact_excel_process_grid',grid)">
+                        <div class="grid-scroll-bar">
+                          <kendo-grid-checkbox-column>
+                            <ng-template kendoGridHeaderTemplate>
+                              <input type="checkbox"
+                                kendoCheckBox
+                                id="selectAllCheckboxId"
+                                kendoGridSelectAllCheckbox
+                                [state]="selectAllState"
+                                (selectAllChange)="onSelectAllChange($event)" />
+                              <label class="k-checkbox-label" for="selectAllCheckboxId"></label>
+                            </ng-template>
+                          </kendo-grid-checkbox-column>
+                          <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                            [field]="column.field"
+                            [title]="column.title | titlecase"
+                            [width]="column.field == '$' ? '40' : column.width"
+                            [filterable]="true"
+                            [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                            [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                            [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                            [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                            [includeInChooser]="column.field=='$' ? false : true">
+                            <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                              <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                              <div class="customer-name" *ngIf="column.title == 'Name'">{{dataItem['firstName'] ? dataItem['firstName'] + " "   + dataItem['lastName']  : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.title == 'Address'">{{dataItem['companyName'] ? dataItem['companyName'] +   dataItem['mobile']  : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.title == 'Email'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.title == 'Classification'">{{dataItem[column.field] ? getClassificationData(dataItem[column.field]) : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.title == 'Owner'">{{dataItem['firstName'] ? dataItem['firstName'] : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.title == 'System Message'"><p class="text-success">--</p></div>
+                              <div class="customer-name" *ngIf="column.title == 'Action'">{{getActionToTakeData(dataItem['actionToTake'])? getActionToTakeData(dataItem['actionToTake']) : '--' }}</div>
+
+                            </ng-template>
+                          </kendo-grid-column>
+                        </div>
+                      </kendo-grid>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="2">
+                <div class="alert-panel" *ngIf="!isEditField">
+                  <div class="display-row">
+                    <div>Total records Found  {{isDuplicateCompany ? companyDuplicateList?.length : companyProcessedList?.length}}</div>
+                    <div>
+                      <div class="  excel-btn-panel">
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="editField(); isEditField = true; isToTransferFieldContact='0'" name="editContactFields" title="Edit a field for all checked contacts." src="../../../../assets/btneditcontacts.svg">
+                        </div>
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="isEditField = true; isToTransferFieldContact='1'; " name="editContactFields" title="Transfer ownership of checked contacts." src="../../../../assets/btntransfercontacts.svg">
+                        </div>
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="uploadContactUpdateAction(1);" name="editContactFields" title="Overwrite checked contacts." src="../../../../assets/contact-check.svg">
+                        </div>
+                        <div class="excel-btn-icon">
+                          <input type="image" (click)="uploadContactUpdateAction(2);" name="editContactFields" title="Upload checked contacts." src="../../../../assets/btnuploadcontacts.svg">
+                        </div>
+                        <div *ngIf="processGridType === 1" class="excel-btn-icon">
+                          <input type="image" (click)="uploadContactUpdateAction(0);" name="editContactFields" title="Do not upload checked contacts." src="../../../../assets/contact-delete.svg">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="margin-all-area">
+                  <div class="global-card-section">
+                    <div class="global-header-section">
+                      <div class="header-button-panel">
+                        <div class="button-wrapper">
+                          <div>
+                            <label *ngIf="!selectAllContacts">Company selected: {{companySelection.length}}</label>
+                          </div>
+                          <div>
+                            <button class="btn btn-primary" type="button" (click)="resetCmpGridSetting(); inputContactSearch2.value = ''"><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+                            <button class="btn btn-primary" type="button" (click)="onSelectAllChangeCompany('checked')">Select All</button>
+                            <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onCompanyProcessListFilter($event.target.value)" #inputContactSearch2 />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="global-body-section">
+                      <kendo-grid #grid2 id="gridId2"
+                                  [kendoGridBinding]="companyProcessedList"
+                                  kendoGridSelectBy="uploadCompanyID"
+                                  [selectable]="{enabled: true, checkboxOnly: true }"
+                                  [(selectedKeys)]="companySelection"
+                                  [pageSize]="_gridCnfgServiceCompany.pageSize"
+                                  [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                                  [sortable]="{mode: 'multiple'}"
+                                  [scrollable]="'scrollable'"
+                                  [sort]="_gridCnfgServiceCompany.sort"
+                                  [columnMenu]="{ filter: true }"
+                                  [resizable]="true"
+                                  [reorderable]="true"
+                                  [ngStyle]="gridHeight"
+                                  (columnReorder)="_gridCnfgServiceCompany.columnsOrderChanged('company_excel_process_grid', $event)"
+                                  (sortChange)="_gridCnfgServiceCompany.sortChange('company_excel_process_grid', $event)"
+                                  (pageChange)="_gridCnfgServiceCompany.pageChange('company_excel_process_grid', $event)"
+                                  (columnResize)="_gridCnfgServiceCompany.columnResize(5,'company_excel_process_grid', $event)"
+                                  (columnVisibilityChange)="_gridCnfgServiceCompany.onVisibilityChange($event,'company_excel_process_grid',grid)">
+                        <div class="grid-scroll-bar">
+                          <kendo-grid-checkbox-column>
+                            <ng-template kendoGridHeaderTemplate>
+                              <input type="checkbox"
+                                     kendoCheckBox
+                                     id="selectAllCompanyCheckboxId"
+                                     kendoGridSelectAllCheckbox
+                                     [state]="selectAllCompanyState"
+                                     (selectAllChange)="onSelectAllChangeCompany($event)" />
+                              <label class="k-checkbox-label" for="selectAllCompanyCheckboxId"></label>
+                            </ng-template>
+                          </kendo-grid-checkbox-column>
+                          <kendo-grid-column *ngFor="let column of _gridCnfgServiceCompany.columns"
+                                             [field]="column.field"
+                                             [title]="column.title | titlecase"
+                                             [width]="column.field == '$' ? '40' : column.width"
+                                             [filterable]="true"
+                                             [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                             [headerClass]="mobileCompanyColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                             [class]="mobileCompanyColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                             [hidden]="_gridCnfgServiceCompany.hiddenColumns.indexOf(column.field) > -1"
+                                             [includeInChooser]="column.field=='$' ? false : true">
+                            <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                              <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                              <div class="customer-name" *ngIf="column.title == 'Company'">{{dataItem[column.field] ?dataItem[column.field] : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.title == 'Address'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.title == 'Website'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.field == 'clpUserDisplay'">{{dataItem[column.field] ?dataItem[column.field] : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.field == 'systemNote'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                              <div class="customer-name" *ngIf="column.field == 'actionToTake'"><p class="text-success">{{dataItem[column.field] ? dataItem[column.field] : '--'}} </p></div>
+                            </ng-template>
+                          </kendo-grid-column>
+                        </div>
+                      </kendo-grid>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="4">
+          <div class="">
+            <div class="warning-alert"> <p [innerHTML]="uploadContactSummary.messageString"></p></div>
+            <div class="alert-panel" *ngIf="!step4Complete">
+              <h4>Review and confirm the upload results by clicking the Confirm and Finish button.</h4>
+            </div>
+            <div class="margin-all-area" *ngIf="!step4Complete">
+              <button class="btn btn-primary" type="button" [disabled]="showSpinner" (click)="step4Upload();">Confirm and finish</button>
+            </div>
+            <div class="success-alert" *ngIf="step4Complete">
+              <p>Congratulation!</p>
+            </div>
+            <div class="alert-panel">
+              <p>Contacts to be uploaded : {{contactsUploaded?.length}}</p>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>
+          <div class="next-btn-head">
+            <h3>default</h3>
+          </div>
+        </ng-container>
+
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

@@ -1,0 +1,110 @@
+<div class="wraper-main-section">
+  <div class="global-card-section">
+    <div class="inner-header-bg">
+      <div class="inner-cards-panel header-inner-hidden">
+        <span>Finalized</span>
+        <span>Franchiser</span>
+        <span>Location</span>
+        <span>Contact Owner</span>
+        <span>Referral Source</span>
+        <span>Marketing Channel</span>
+        <span>Agreement Type</span>
+        <span>Order By</span>
+      </div>
+    </div>
+    <form [formGroup]="agreementDashboardForm" (ngSubmit)="agreementDashboardSubmit()">
+      <div class="inner-cards-grid">
+
+        <div class="inner-card-mobile" *ngIf="!isCustomDate">
+          <label>Finalized</label>
+          <div class="">
+            <select class="form-control" formControlName="finalized" (change)="onFinilizerFilter($event.target.value)">
+              <option *ngFor="let item of finilized; let i= index;" [value]="item?.value">{{item?.name}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="inner-card-mobile row pr-5 pl-5" *ngIf="isCustomDate">
+          <div class="col">
+            <span class="mr-2 font-weight-bold">Start</span>
+            <kendo-datepicker formControlName="startDt"></kendo-datepicker>
+          </div>
+          <div class="col">
+            <span class="mr-2 font-weight-bold">End</span>
+            <kendo-datepicker formControlName="endDt"></kendo-datepicker>
+          </div>
+        </div>
+        <div class="inner-card-mobile">
+          <label>Franchiser</label>
+          <div class="">
+            <select class="form-control" formControlName="franchise">
+              <option [value]="0">-Any Franchiser-</option>
+            </select>
+          </div>
+        </div>
+        <div class="inner-card-mobile">
+          <label>Location</label>
+          <div class="">
+            <select class="form-control" formControlName="location">
+              <option [value]="0">-Any-</option>
+            </select>
+          </div>
+        </div>
+        <div class="inner-card-mobile">
+          <label>	Contact Owner</label>
+          <div class="">
+            <select class="form-control" formControlName="contactOwner">
+              <option [value]="0">-Any-</option>
+            </select>
+          </div>
+        </div>
+        <div class="inner-card-mobile">
+          <label>	Referral Source</label>
+          <div class="">
+            <select class="form-control" formControlName="referralSource">
+              <option [value]="0">-Any-</option>
+            </select>
+          </div>
+        </div>
+        <div class="inner-card-mobile">
+          <label>		Marketing Channel</label>
+          <div class="">
+            <select class="form-control" formControlName="marketingChannel">
+              <option [value]="0">-Any-</option>
+            </select>
+          </div>
+        </div>
+        <div class="inner-card-mobile">
+          <label>Agreement Type</label>
+          <div class="">
+            <select class="form-control" formControlName="agreementType">
+              <option [value]="0">-Any-</option>
+            </select>
+          </div>
+        </div>
+        <div class="inner-card-mobile">
+          <label>Order By</label>
+          <div class="">
+            <select class="form-control" formControlName="orderBy">
+              <option [value]="0">Contracts</option>
+            </select>
+          </div>
+        </div>
+        <div class="inner-card-mobile">
+          <label>Action</label>
+          <div class="">
+            <div class="text-right">
+              <button type="submit" class="common-colunm-btn">
+                <i class="fa fa-refresh" title="Refresh"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <p *ngIf="isAgreementGridData">No records were found matching your search criteria.</p>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

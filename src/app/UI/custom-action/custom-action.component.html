@@ -1,0 +1,1552 @@
+<div class="container-fluid mt-3 common-alignment">
+  <div class="custom-security-link">
+    <a (click)="cancelRep(); isShowCustom =false;" *ngIf="isShowCustom || isEnableEdit">Back To List</a>
+    <a (click)="addNew(0)">New Custom Action Screen</a>
+    <a>Automation Processes</a>
+  </div>
+
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel" *ngIf="!isShowCustom && !isEnableEdit">
+          <img src="../../../../assets/tagtitle.svg" class="mr-1" /> Custom Action Screens
+        </div>
+        <div class="svg-icon-panel" *ngIf="isShowCustom || isEnableEdit">
+          <img src="../../../../assets/tagtitle.svg" class="mr-1" /> Custom Action Screen:&nbsp;{{ customActionData?.formName}}
+        </div>
+        <div class="header-button-panel">
+          <div class="button-wrapper" *ngIf="!isShowCustom && !isEnableEdit">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputCustomSearch.value = ''">
+              <span>Reset Grid Setting</span>
+            </button>
+            <input class="ml-2" placeholder="Search in all columns..." (input)="onCustomActionFilter($event.target.value)" kendoTextBox #inputCustomSearch />
+            <select class="form-control select-option ml-2" style="display: initial;" [(ngModel)]="selectedUserId" (change)="getCustomActionByUser($event.target.value)" *ngIf="customActionResponse?.isUserDropdown">
+              <option value="0"> -All Users- </option>
+              <option *ngFor="let users of customActionUser; let i = index" [value]="users.cLPUserID">{{users.lastName}},&nbsp;{{users.firstName}}</option>
+            </select>
+            <button *ngIf="!isEnableEdit && (roleFeaturePermissions?.create == true || user?.userRole > 3)" type="button" matTooltip="New" class="icon-btn" (click)="addNew(0)">
+              <i class="fa fa-plus"></i>
+              <span class="btn-text">New</span>
+            </button>
+          </div>
+          <div class="button-wrapper">
+            <button *ngIf="isShowCustom && user?.userRole > 3 " [hidden]="roleFeaturePermissions?.edit == false" type="button" matTooltip="Edit" class="icon-btn" (click)="editCustomData()">
+              <i class="fa fa-pencil"></i>
+              <span class="btn-text">Edit</span>
+            </button>
+            <button [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="button" matTooltip="Save as" *ngIf="isShowCustom && user?.userRole > 3" (click)="addNew(1);" class="icon-btn">
+              <i class="fa fa-save"></i>
+              <span class="btn-text">Save as</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <!-- For Edit Field-->
+        <form [formGroup]="customActionForm" (ngSubmit)="customActionFormSubmit()" *ngIf="isEnableEdit && !isShowCustom">
+          <div class="wraper-body-panel">
+            <div class="wraper-body-left">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Name or Purpose</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="text" class="form-control" [ngClass]="{'has-error': customActionFrm.formName.errors && (customActionFrm.formName.touched || customActionFrm.formName.dirty)}" formControlName="formName" maxlength="100" required />
+                  <div *ngIf="customActionFrm.formName.errors && (customActionFrm.formName.touched || customActionFrm.formName.dirty)">
+                    <div class="login-error" *ngIf="customActionFrm.formName.errors.required">Name is required </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Display Edit Contact Button</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="flex-align-panel">
+                    <input type="checkbox" class="checkbox" formControlName="showEditContactLink" />
+                    <span class="d-block">The Edit Contact button will open the contact in a new window for editing.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Display Add To Comments Text Box</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="checkbox" class="checkbox" formControlName="showAddToComments" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Display Add To History Text Box</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="flex-align-panel">
+                    <input type="checkbox" class="checkbox" formControlName="showAddToHistory" />
+                    <span class="d-block">The Add To History text box will insert a note into the contact's history.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>User</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="cLPUserID">
+                    <option value="0" hidden>Does not Exist</option>
+                    <option *ngFor="let item of customActionUser" [value]="item.cLPUserID">{{item.lastName}},&nbsp;{{item.firstName}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"></div>
+                <div class="cards-colunm-right">
+                  <div class="bottom-button-bar">
+                    <button class="btn btn-primary"  [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"> Save</button>
+                    <button class="btn btn-cancel" type="button" (click)="cancelRep()"> Cancel</button>
+                    <button class="btn btn-danger" type="button" [hidden]="roleFeaturePermissions?.delete == false" data-toggle="modal" data-target="#deleteModal" *ngIf="isDeleteEnable"> Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModal" aria-hidden="true">
+          <div class="modal-dialog  modal-common-dialog" role="document">
+            <div class="modal-content modal-common-content">
+              <div class="modal-header modal-common-background">
+                <h4 class="modal-title modal-common-title">Confirmation</h4>
+              </div>
+              <div class="modal-body modal-common-body">
+                <h2>  Are you sure you want to Delete ? </h2>
+              </div>
+              <div class="modal-footer">
+                <button type="button" (click)="customActionDelete()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- For show data Field-->
+        <div class="wraper-body-panel" *ngIf="isShowCustom">
+          <div class="wraper-body-left">
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <span>Name or Purpose</span>
+              </div>
+              <div class="cards-colunm-right">
+                <span>{{ customActionData.formName}}</span>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <span>Display Edit Contact Button</span>
+              </div>
+              <div class="cards-colunm-right">
+                <div>
+                  <span *ngIf="customActionData.showEditContactLink" class="color-green">Edit Contact button will be displayed.</span>
+                  <span *ngIf="!customActionData.showEditContactLink" class="custom-red">Edit Contact button will Not be displayed.</span>
+                  <br />
+                  <span>The Edit Contact button will open the contact in a new window for editing.</span>
+                </div>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <span>Display Add To Comments Text Box</span>
+              </div>
+              <div class="cards-colunm-right">
+                <div>
+                  <span *ngIf="customActionData.showAddToComments" class="color-green">Add To Comments text box will be displayed.</span>
+                  <span *ngIf="!customActionData.showAddToComments" class="custom-red">Add To Comments text box will Not be displayed.</span>
+                </div>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <span>Display Add To History Text Box</span>
+              </div>
+              <div class="cards-colunm-right">
+                <div>
+                  <span *ngIf="customActionData.showAddToHistory" class="color-green">Add To History text box will be displayed.</span>
+                  <span *ngIf="!customActionData.showAddToHistory" class="custom-red">Add To History text box will Not be displayed.</span>
+                  <br />
+                  <span>The Add To History text box will insert a note into the contact's history.</span>
+                </div>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <span>User</span>
+              </div>
+              <div class="cards-colunm-right">
+                <span>{{customActionData.lastName}},&nbsp;{{customActionData.firstName}}</span>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left"></div>
+              <div class="cards-colunm-right">
+                <div class="bottom-button-bar">
+                  <button class="btn btn-primary" type="button" [hidden]="roleFeaturePermissions?.create == false" (click)="addCustomButton()"> Add Button</button>
+                  <button class="btn btn-primary" type="button" [hidden]="roleFeaturePermissions?.create == false" (click)="addCustomDropDown()"> Add Dropdown</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="wraper-body-inner" *ngIf="isShowCustom">
+              <div class="inner-container">
+                <!-- For Button & DropDown List-->
+                <div class="inner-container-left">
+                  <div class="message-info" *ngIf="customActionButtonList?.length == 0"><span>No buttons have been configured.</span></div>
+                  <div class="wraper-main-section mb-3 mt-1 ml-2" *ngIf="customActionButtonList?.length != 0">
+                    <div class="global-card-section">
+                      <div class="inner-header-bg">
+                        <div class="inner-cards-panel">
+                          <span>Order</span>
+                          <span>Click to edit</span>
+                        </div>
+                      </div>
+                      <div class="global-body-section">
+                        <div cdkDropList
+                             #frmList="cdkDropList"
+                             [cdkDropListData]="customActionButtonList"
+                             (cdkDropListDropped)="dropTeam($event)">
+                          <div class="" *ngFor="let name of customActionButtonList;trackBy:identifyTeam; let i = index">
+                            <div class="inner-cards-grid" cdkDrag>
+                              <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                {{i+1}}
+                              </div>
+                              <div class="">
+                                <button class="" [ngStyle]="{'width':customActionButtonList[i].width+'px',
+                                'backgroundColor':customActionButtonList[i].backColor,
+                                'font-weight':customActionButtonList[i].isFontBold ? 'bold':'400',
+                                'height':customActionButtonList[i].height+'px',
+                                'color':customActionButtonList[i].foreColor,
+                                'font-size':customActionButtonList[i].fontSize+'px'}" (click)="onCustomActionButton(customActionButtonList[i].customActionButtonId, customActionButtonList[i].buttonText);" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                  <span>{{customActionButtonList[i].buttonText}}</span>
+                                </button>
+                              </div>
+                            </div>
+                            <div class="team-example-box" *ngIf="customActionButtonList?.length === 0"><h6>No buttons have been configured.</h6></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- For Add Button Field-->
+                <div class="inner-container-right" *ngIf="isShowCustom && isShowButton">
+                  <div class="wraper-main-section">
+                    <div class="global-card-section">
+                      <div class="custom-action-body">
+                        <div class="global-header-section">
+                          <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Custom Action Button</div>
+                          <div class="header-button-panel" *ngIf="!isPreviewButton">
+                            <div class="button-wrapper">
+                              <button  [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="button" matTooltip="Save" [disabled]="customActionButtonForm.invalid" (click)="customActionButtonFormSubmit();" class="icon-btn">
+                                <i class="fa fa-save" aria-hidden="true"></i>
+                                <span class="btn-text">Save</span>
+                              </button>
+                              <button type="button" matTooltip="Cancel" (click)="cancleCustomButton()" class="icon-btn">
+                                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                                <span class="btn-text">Back</span>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="header-button-panel" *ngIf="isPreviewButton">
+                            <div class="button-wrapper">
+                              <button [hidden]="roleFeaturePermissions?.edit == false" type="button" matTooltip="Cancel" (click)="isPreviewButton = false;" class="icon-btn">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                <span class="btn-text">Edit</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="global-body-section">
+                          <div class="" *ngIf="!isPreviewButton">
+                            <div class="custom-action-title">
+                              <span>Button Appearance</span>
+                            </div>
+                            <form [formGroup]="customActionButtonForm" (ngSubmit)="customActionButtonFormSubmit()">
+                              <div class="">
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Button Text</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <input type="text" class="form-control" formControlName="buttonText" [ngClass]="{'has-error': customActionButtonForm.controls.buttonText.errors && (customActionButtonForm.controls.buttonText.touched || customActionButtonForm.controls.buttonText.dirty)}" />
+                                    <div *ngIf="customActionButtonForm.controls.buttonText.errors && (customActionButtonForm.controls.buttonText.touched || customActionButtonForm.controls.buttonText.dirty)">
+                                      <div class="login-error" *ngIf="customActionButtonForm.controls.buttonText.errors.required">Name is required </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Instructions</span>
+                                    <h6>(max 1000 chars)</h6>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <kendo-editor formControlName="instructions" class="for-editor">
+                                      <kendo-toolbar>
+                                        <kendo-toolbar-buttongroup>
+                                          <kendo-toolbar-button kendoEditorBoldButton></kendo-toolbar-button>
+                                          <kendo-toolbar-button kendoEditorItalicButton></kendo-toolbar-button>
+                                          <kendo-toolbar-button kendoEditorUnderlineButton></kendo-toolbar-button>
+                                        </kendo-toolbar-buttongroup>
+                                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                                        <kendo-toolbar-dropdownlist kendoEditorFontSize></kendo-toolbar-dropdownlist>
+                                        <kendo-toolbar-colorpicker kendoEditorForeColor></kendo-toolbar-colorpicker>
+                                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                                      </kendo-toolbar>
+                                    </kendo-editor>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Text Color</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <div class="flex-row-inner">
+                                      <kendo-colorpicker formControlName="foreColor">
+                                      </kendo-colorpicker>
+                                      <div [innerHTML]="customActionButtonForm.controls.instructions.value" *ngIf="customActionButtonForm.controls.instructions.value != ''"></div>
+                                      <div class="ml-2">
+                                        <button type="button" [ngStyle]="{'width':customActionButtonForm.controls.width.value+'px',
+                                    'backgroundColor':customActionButtonForm.controls.backColor.value,
+                                    'font-weight':customActionButtonForm.controls.isFontBold.value ? 'bold':'400',
+                                    'height':customActionButtonForm.controls.height.value+'px',
+                                    'color':customActionButtonForm.controls.foreColor.value,
+                                    'font-size':customActionButtonForm.controls.fontSize.value+'px'}">
+                                          <span *ngIf="customActionButtonForm.controls.buttonText.value != ''">{{customActionButtonForm.controls.buttonText.value}}</span>
+                                          <span *ngIf="customActionButtonForm.controls.buttonText.value == ''">Button Text</span>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Bold Text</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <input type="checkbox" class="checkbox" formControlName="isFontBold" />
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Font Size</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control" formControlName="fontSize">
+                                      <option value="10">10 pt</option>
+                                      <option value="12">12 pt</option>
+                                      <option value="14">14 pt</option>
+                                      <option value="16">16 pt</option>
+                                      <option value="18">18 pt</option>
+                                      <option value="20">20 pt</option>
+                                      <option value="22">22 pt</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Background Color</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <kendo-colorpicker formControlName="backColor">
+                                    </kendo-colorpicker>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Button Height</span>
+                                    <h6>in pixels	</h6>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <input type="text" class="form-control" formControlName="height" />
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Button Width</span>
+                                    <h6>in pixels	</h6>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <input type="text" class="form-control" formControlName="width" />
+                                  </div>
+                                </div>
+                                <div class="custom-action-title">
+                                  <span>Primary Automation Trigger Settings</span>
+                                  <button type="button" matTooltip="Display Lead Processes" (click)="getAutomationProcess(0)" class="grid-common-btn">
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                  </button>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Action to take</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <div class="flex-row-inner">
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('None');" [checked]="customActionButtonData.ctAction == 0">
+                                        <div class="for-check-txt"><span>No Action</span></div>
+                                      </div>
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('Start');" [checked]="customActionButtonData.ctAction == 1">
+                                        <div class="for-check-txt"> <span>Start</span> </div>
+                                      </div>
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('Stop');" [checked]="customActionButtonData.ctAction == 2">
+                                        <div class="for-check-txt"> <span>Stop</span> </div>
+                                      </div>
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('Pause');" [checked]="customActionButtonData.ctAction == 3">
+                                        <div class="for-check-txt"> <span>Pause</span> </div>
+                                      </div>
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('Remove');" [checked]="customActionButtonData.ctAction == 4">
+                                        <div class="for-check-txt"> <span>Remove</span> </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Automation Process</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control" formControlName="ctCampaignTemplateId">
+                                      <option value="0" hidden>-Select One-</option>
+                                      <option *ngFor="let item of AutomationProcessDDResponse[0].automationProcessDD" [value]="item.campaignTemplateID">{{item.campaignTemplateName}}</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>User</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control" formControlName="ctClpUserId">
+                                      <option value="0" hidden>-Contact Owner-</option>
+                                      <option *ngFor="let item of clickUser" [value]="item.key">{{item.value}}</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="custom-action-title">
+                                  <span>Secondary Automation Trigger Settings</span>
+                                  <button type="button" matTooltip="Display Lead Processes" (click)="getAutomationProcess(1)" class="grid-common-btn">
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                  </button>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Action to take</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <div class="flex-row-inner">
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio1" #actionRadio2 (change)="onChangeSecAction('None');" [checked]="customActionButtonData.secCtAction == 0">
+                                        <div class="for-check-txt"><span>No Action</span></div>
+                                      </div>
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio1" #actionRadio2 (change)="onChangeSecAction('Start');" [checked]="customActionButtonData.secCtAction == 1">
+                                        <div class="for-check-txt"> <span>Start</span> </div>
+                                      </div>
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio1" #actionRadio2 (change)="onChangeSecAction('Stop');" [checked]="customActionButtonData.secCtAction == 2">
+                                        <div class="for-check-txt"> <span>Stop</span> </div>
+                                      </div>
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio1" #actionRadio2 (change)="onChangeSecAction('Pause');" [checked]="customActionButtonData.secCtAction == 3">
+                                        <div class="for-check-txt"> <span>Pause</span> </div>
+                                      </div>
+                                      <div class="click-txt-left">
+                                        <input type="radio" class="forActionRadio" name="actionRadio1" #actionRadio2 (change)="onChangeSecAction('Remove');" [checked]="customActionButtonData.secCtAction == 4">
+                                        <div class="for-check-txt"> <span>Remove</span> </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Automation Process</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control" formControlName="secCtCampaignTemplateId">
+                                      <option value="0" hidden>-Select One-</option>
+                                      <option *ngFor="let item of AutomationProcessDDResponse[1].automationProcessDD" [value]="item.campaignTemplateID">{{item.campaignTemplateName}}</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>User</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control" formControlName="secCtClpUserId">
+                                      <option value="0" hidden>-Contact Owner-</option>
+                                      <option *ngFor="let item of clickUser" [value]="item.key">{{item.value}}</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="custom-action-title">
+                                  <span>Final Actions To Take</span>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Appointment Status</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control" formControlName="setApptStatus">
+                                      <option value="0">Leave As Pending</option>
+                                      <option value="1">Mark as Cancelled</option>
+                                      <option value="2">Mark as Completed</option>
+                                      <option value="3">Mark as Completed and Stop Campaign</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Next Window</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control" formControlName="nextCustomActionScreenId">
+                                      <option value="0">None: Just Close Window</option>
+                                      <option value="1">Go to: Contact Home Page</option>
+                                      <option value="2">Go to: Contact Appointment List</option>
+                                      <option value="3">Go to: My Calendar</option>
+                                      <option value="4">Go to: My Call List</option>
+                                      <option value="5">Go to: A custom URL</option>
+                                      <option value="6">Load: An Email Template</option>
+                                      <option value="7">Load: Another Call Action Screen</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section" *ngIf="customActionButtonForm.controls.nextCustomActionScreenId.value == '5'">
+                                  <div class="cards-colunm-left">
+                                    <span>Destination URL</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <input type="text" class="form-control" formControlName="destinationUrl" [ngClass]="{'has-error': customActionButtonForm.controls.destinationUrl.errors && (customActionButtonForm.controls.destinationUrl.touched || customActionButtonForm.controls.destinationUrl.dirty)}" />
+                                    <div *ngIf="customActionButtonForm.controls.destinationUrl.errors && (customActionButtonForm.controls.destinationUrl.touched || customActionButtonForm.controls.destinationUrl.dirty)">
+                                      <div class="login-error" *ngIf="customActionButtonForm.controls.destinationUrl.errors.required">Destination URL is required </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section" *ngIf="customActionButtonForm.controls.nextCustomActionScreenId.value == '6'">
+                                  <div class="cards-colunm-left">
+                                    <span>Email Template to Load</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control" formControlName="customActionScreenId">
+                                      <option *ngFor="let item of emailTemplate" [value]="item.emailTemplateId">{{item.templateName}}</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section" *ngIf="customActionButtonForm.controls.nextCustomActionScreenId.value == '7'">
+                                  <div class="cards-colunm-left">
+                                    <span>Custom Action Screen to Load</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control" formControlName="customActionScreenId">
+                                      <option *ngFor="let item of customActionScreenDd" [value]="item.customActionScreenId">{{item.formName}}</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left"></div>
+                                  <div class="cards-colunm-right">
+                                    <div class="bottom-button-bar">
+                                      <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit" [disabled]="customActionButtonForm.invalid"> Save</button>
+                                      <button class="btn btn-cancel" type="button" (click)="cancleCustomButton();"> Cancel</button>
+                                      <button class="btn btn-danger" [hidden]="roleFeaturePermissions?.delete == false" type="button" data-toggle="modal" data-target="#buttonDeleteModal" *ngIf="customActionButtonData.customActionButtonId != 0">Delete</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+
+                          <div class="global-body-section" *ngIf="isPreviewButton">
+                            <div class="custom-action-title">
+                              <span>Button Appearance</span>
+                            </div>
+                            <div class="admin-option-section">
+                              <div class="wraper-body-panel">
+                                <div class="wraper-body-left">
+                                  <div class="cards-body-section">
+                                    <div class="flex-width-panel">
+                                      <div class="cards-colunm-left">
+                                        <span>Button Text</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span>{{customActionButtonData.buttonText}}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="cards-body-section">
+                                    <div class="flex-width-panel">
+                                      <div class="cards-colunm-left">
+                                        <span>Instructions</span>
+                                        <h6>(max 1000 chars)</h6>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span class="text-danger">(refer to preview)</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="cards-body-section">
+                                    <div class="flex-width-panel">
+                                      <div class="cards-colunm-left">
+                                        <span>Text Color</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span>{{customActionButtonData.foreColor}}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="cards-body-section">
+                                    <div class="flex-width-panel">
+                                      <div class="cards-colunm-left">
+                                        <span>Bold Text</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span *ngIf="customActionButtonData.isFontBold">Yes</span>
+                                        <span *ngIf="!customActionButtonData.isFontBold">No</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="cards-body-section">
+                                    <div class="flex-width-panel">
+                                      <div class="cards-colunm-left">
+                                        <span>Font Size</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span>{{customActionButtonData.fontSize}}&nbsp;pt</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="cards-body-section">
+                                    <div class="flex-width-panel">
+                                      <div class="cards-colunm-left">
+                                        <span>Background Color</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span>{{customActionButtonData.backColor}}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="cards-body-section">
+                                    <div class="flex-width-panel">
+                                      <div class="cards-colunm-left">
+                                        <span>Button Height</span>
+                                        <h6>in pixels	</h6>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span>{{customActionButtonData.height}}&nbsp; pixels</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="cards-body-section">
+                                    <div class="flex-width-panel">
+                                      <div class="cards-colunm-left">
+                                        <span>Button Width</span>
+                                        <h6>in pixels	</h6>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span>{{customActionButtonData.width}}&nbsp; pixels</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="wraper-body-right">
+                                  <div [innerHTML]="customActionButtonForm.controls.instructions.value" *ngIf="customActionButtonForm.controls.instructions.value != ''"></div>
+                                  <div class="ml-2">
+                                    <button type="button" [ngStyle]="{'width':customActionButtonForm.controls.width.value+'px',
+                                    'backgroundColor':customActionButtonForm.controls.backColor.value,
+                                    'font-weight':customActionButtonForm.controls.isFontBold.value ? 'bold':'400',
+                                    'height':customActionButtonForm.controls.height.value+'px',
+                                    'color':customActionButtonForm.controls.foreColor.value,
+                                    'font-size':customActionButtonForm.controls.fontSize.value+'px'}">
+                                      <span *ngIf="customActionButtonForm.controls.buttonText.value != ''">{{customActionButtonForm.controls.buttonText.value}}</span>
+                                      <span *ngIf="customActionButtonForm.controls.buttonText.value == ''">Button Text</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="custom-action-title">
+                                <span>Primary Automation Trigger Settings</span>
+                                <button type="button" matTooltip="Display Lead Processes" class="grid-common-btn">
+                                  <i class="fa fa-search" aria-hidden="true"></i>
+                                </button>
+                              </div>
+                              <div class="cards-body-section">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>Action to take</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <span *ngIf="customActionButtonData.ctAction == 0">No Action</span>
+                                    <span *ngIf="customActionButtonData.ctAction == 1">Start</span>
+                                    <span *ngIf="customActionButtonData.ctAction == 2">Stop</span>
+                                    <span *ngIf="customActionButtonData.ctAction == 3">Pause</span>
+                                    <span *ngIf="customActionButtonData.ctAction == 4">Remove</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="cards-body-section">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>Automation Process</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <div *ngIf="customActionButtonData.ctCampaignTemplateId != 0 && customActionButtonData.ctAction != 0">
+                                      <div *ngFor="let item of AutomationProcessDDResponse[1].automationProcessDD;let i = index">
+                                        <span *ngIf="AutomationProcessDDResponse[1].automationProcessDD[i].campaignTemplateID == customActionButtonData.ctCampaignTemplateId">{{AutomationProcessDDResponse[1].automationProcessDD[i].campaignTemplateName}}</span>
+                                      </div>
+                                    </div>
+                                    <span class="text-danger" *ngIf="customActionButtonData.ctCampaignTemplateId == 0 || customActionButtonData.ctAction == 0">Automation process not set.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="cards-body-section">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>User</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <div *ngIf="customActionButtonData.ctClpUserId != 0 && customActionButtonData.ctAction != 0">
+                                      <div *ngFor="let item of clickUser;let i = index">
+                                        <span *ngIf="item.key == customActionButtonData.ctClpUserId">{{item.value}}</span>
+                                      </div>
+                                    </div>
+                                    <span *ngIf="customActionButtonData.ctClpUserId == 0 || customActionButtonData.ctAction == 0">Not Selected</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="custom-action-title">
+                                <span>Secondary Automation Trigger Settings</span>
+                                <button type="button" matTooltip="Display Lead Processes" class="grid-common-btn">
+                                  <i class="fa fa-search" aria-hidden="true"></i>
+                                </button>
+                              </div>
+                              <div class="cards-body-section">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>Action to take</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <span *ngIf="customActionButtonData.secCtAction == 0">No Action</span>
+                                    <span *ngIf="customActionButtonData.secCtAction == 1">Start</span>
+                                    <span *ngIf="customActionButtonData.secCtAction == 2">Stop</span>
+                                    <span *ngIf="customActionButtonData.secCtAction == 3">Pause</span>
+                                    <span *ngIf="customActionButtonData.secCtAction == 4">Remove</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="cards-body-section">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>Automation Process</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <div *ngIf="customActionButtonData.secCtCampaignTemplateId != 0 && customActionButtonData.secCtAction != 0">
+                                      <div *ngFor="let item of AutomationProcessDDResponse[1].automationProcessDD;let i = index">
+                                        <span *ngIf="AutomationProcessDDResponse[1].automationProcessDD[i].campaignTemplateID == customActionButtonData.secCtCampaignTemplateId">{{AutomationProcessDDResponse[1].automationProcessDD[i].campaignTemplateName}}</span>
+                                      </div>
+                                    </div>
+                                    <span class="text-danger" *ngIf="customActionButtonData.secCtCampaignTemplateId == 0 || customActionButtonData.secCtAction == 0">Automation process not set.</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="cards-body-section">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>User</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <div *ngIf="customActionButtonData.secCtClpUserId != 0 && customActionButtonData.secCtAction != 0">
+                                      <div *ngFor="let item of clickUser;let i = index">
+                                        <span *ngIf="clickUser[i].key == customActionButtonData.secCtClpUserId">{{clickUser[i].value}}</span>
+                                      </div>
+                                    </div>
+                                    <span *ngIf="customActionButtonData.secCtClpUserId == 0 || customActionButtonData.secCtAction == 0">Not Selected</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="custom-action-title">
+                                <span>Final Actions To Take</span>
+                              </div>
+                              <div class="cards-body-section">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>Appointment Status</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <span *ngIf="customActionButtonData.setApptStatus == 0">Leave As Pending</span>
+                                    <span *ngIf="customActionButtonData.setApptStatus == 1">Mark as Cancelled</span>
+                                    <span *ngIf="customActionButtonData.setApptStatus == 2">Mark as Completed</span>
+                                    <span *ngIf="customActionButtonData.setApptStatus == 3">Mark as Completed and Stop Campaign</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="cards-body-section">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>Next Window</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <span *ngIf="customActionButtonData.nextCustomActionScreenId == 0">None: Just Close Window</span>
+                                    <span *ngIf="customActionButtonData.nextCustomActionScreenId == 1">Go to: Contact Home Page</span>
+                                    <span *ngIf="customActionButtonData.nextCustomActionScreenId == 2">Go to: Contact Appointment List</span>
+                                    <span *ngIf="customActionButtonData.nextCustomActionScreenId == 3">Go to: My Calendar</span>
+                                    <span *ngIf="customActionButtonData.nextCustomActionScreenId == 4">Go to: My Call List</span>
+                                    <span *ngIf="customActionButtonData.nextCustomActionScreenId == 5">Go to: A custom URL</span>
+                                    <span *ngIf="customActionButtonData.nextCustomActionScreenId == 6">Load: An Email Template</span>
+                                    <span *ngIf="customActionButtonData.nextCustomActionScreenId == 7">Load: Another Call Action Screen</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="cards-body-section" *ngIf="customActionButtonData.nextCustomActionScreenId == 5">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>Destination URL</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <span>{{customActionButtonData.destinationUrl}}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="cards-body-section" *ngIf="customActionButtonData.nextCustomActionScreenId == 6">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>Email Template to Load</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <div *ngFor="let item of emailTemplate;let i = index">
+                                      <span *ngIf="emailTemplate[i].emailTemplateId == customActionButtonData.customActionScreenId">{{emailTemplate[i].templateName}}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="cards-body-section" *ngIf="customActionButtonData.nextCustomActionScreenId == 7">
+                                <div class="flex-width-panel">
+                                  <div class="cards-colunm-left">
+                                    <span>Custom Action Screen to Load</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <div *ngFor="let item of customActionScreenDd;let i = index">
+                                      <span *ngIf="item?.customActionScreenId == customActionButtonData?.customActionScreenId">{{item?.formName}}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- For Add DropDown Field-->
+                <div class="inner-container-right" *ngIf="isShowCustom && isEditDropdown">
+                  <div class="wraper-main-section">
+                    <div class="global-card-section">
+                      <div class="custom-action-body">
+                        <div class="top-txtmsg">
+                          <div class="global-header-section">
+                            <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Custom Action Dropdown</div>
+                            <div class="header-button-panel">
+                              <div class="button-wrapper">
+                                <button [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="button" matTooltip="Save" (click)="customActionDropdownFormSubmit();" class="icon-btn">
+                                  <i class="fa fa-save" aria-hidden="true"></i>
+                                  <span class="btn-text">Save</span>
+                                </button>
+                                <button  type="button" matTooltip="Cancel" (click)="cancelCustomDropDown()" class="icon-btn">
+                                  <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                                  <span class="btn-text">Back</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="wraper-body-panel">
+                            <div class="wraper-body-left">
+                              <div class="custom-action-title">
+                                <span>Dropdown Appearance</span>
+                              </div>
+                              <form [formGroup]="customActionDropdownForm" (ngSubmit)="customActionDropdownFormSubmit()">
+                                <div>
+                                  <div class="cards-body-section">
+                                    <div class="cards-colunm-left">
+                                      <span>Instructions</span>
+                                      <h6>(max 1000 chars)</h6>
+                                    </div>
+                                    <div class="cards-colunm-right">
+                                      <kendo-editor class="for-editor" formControlName="instructions">
+                                        <kendo-toolbar>
+                                          <kendo-toolbar-buttongroup>
+                                            <kendo-toolbar-button kendoEditorBoldButton></kendo-toolbar-button>
+                                            <kendo-toolbar-button kendoEditorItalicButton></kendo-toolbar-button>
+                                            <kendo-toolbar-button kendoEditorUnderlineButton></kendo-toolbar-button>
+                                          </kendo-toolbar-buttongroup>
+                                          <kendo-toolbar-buttongroup>
+                                            <kendo-toolbar-button kendoEditorAlignLeftButton></kendo-toolbar-button>
+                                            <kendo-toolbar-button kendoEditorAlignCenterButton></kendo-toolbar-button>
+                                            <kendo-toolbar-button kendoEditorAlignRightButton></kendo-toolbar-button>
+                                            <kendo-toolbar-button kendoEditorAlignJustifyButton></kendo-toolbar-button>
+                                          </kendo-toolbar-buttongroup>
+                                          <kendo-toolbar-dropdownlist kendoEditorFormat></kendo-toolbar-dropdownlist>
+                                          <kendo-toolbar-dropdownlist kendoEditorFontSize></kendo-toolbar-dropdownlist>
+                                          <kendo-toolbar-colorpicker kendoEditorForeColor></kendo-toolbar-colorpicker>
+                                          <kendo-toolbar-colorpicker kendoEditorBackColor view="gradient"></kendo-toolbar-colorpicker>
+                                          <kendo-toolbar-buttongroup>
+                                            <kendo-toolbar-button kendoEditorInsertUnorderedListButton></kendo-toolbar-button>
+                                            <kendo-toolbar-button kendoEditorInsertOrderedListButton></kendo-toolbar-button>
+                                          </kendo-toolbar-buttongroup>
+                                          <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                                        </kendo-toolbar>
+                                      </kendo-editor>
+                                    </div>
+                                  </div>
+                                  <div class="cards-body-section">
+                                    <div class="cards-colunm-left"></div>
+                                    <div class="cards-colunm-right">
+                                      <div class="bottom-button-bar">
+                                        <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"> Save</button>
+                                        <button class="btn btn-cancel" type="button" (click)="cancelCustomDropDown();"> Cancel</button>
+                                        <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#buttonDeleteModal" *ngIf="customActionButtonData.customActionButtonId != 0"> Delete</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- For Show DropDown Field-->
+                <div class="inner-container-right" *ngIf="isShowCustom && isShowDropdown">
+                  <div class="wraper-main-section">
+                    <div class="global-card-section">
+                      <div class="top-txtmsg">
+                        <div class="global-header-section">
+                          <div class="svg-icon-panel">
+                            <img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Custom Action Dropdown
+                          </div>
+                          <div class="header-button-panel">
+                            <div class="button-wrapper">
+                              <button *ngIf="isShowCustom " [hidden]="roleFeaturePermissions?.edit == false" type="button" matTooltip="Edit" class="icon-btn" (click)="editCustomDropdownData()">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                <span class="btn-text">Edit</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="wraper-body-panel">
+                          <div class="wraper-body-left">
+                            <div class="custom-action-title">
+                              <span>Dropdown Appearance</span>
+                            </div>
+                            <form>
+                              <div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Instructions</span>
+                                    <h6>(max 1000 chars)</h6>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <span>(refer to preview below)</span>
+                                    <div class="text-center" [innerHTML]="customActionButtonData.instructions"></div>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left">
+                                    <span>Preview</span>
+                                  </div>
+                                  <div class="cards-colunm-right">
+                                    <select class="form-control">
+                                      <option hidden> -Select One- </option>
+                                      <option *ngFor="let item of customActionDdItemList; let i=index">{{customActionDdItemList[i].itemText}}</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="cards-body-section">
+                                  <div class="cards-colunm-left"></div>
+                                  <div class="cards-colunm-right">
+                                    <div class="bottom-button-bar">
+                                      <button class="btn btn-primary" type="button" (click)="addItemDropDown()"> Add Item</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                        <!-- For Add Item To DropDown Field-->
+                        <div class="order-row-inner pl-0">
+                          <div class="txt-right ml-2 mt-2">
+                            <div class="message-info" *ngIf="customActionDdItemList?.length == 0"><span>No items have been configured.</span></div>
+                            <div class="wraper-main-section mb-3 mt-1" *ngIf="customActionDdItemList?.length != 0">
+                              <div class="global-card-section">
+                                <div class="inner-header-bg">
+                                  <div class="inner-cards-panel">
+                                    <span>Order</span>
+                                    <span>Click to edit</span>
+                                  </div>
+                                </div>
+                                <div class="global-body-section">
+                                  <div cdkDropList
+                                       #frmList="cdkDropList"
+                                       [cdkDropListData]="customActionDdItemList"
+                                       (cdkDropListDropped)="dropTeamItem($event)">
+                                    <div class="" *ngFor="let name of customActionDdItemList;trackBy:identifyTeam; let i = index">
+                                      <div class="inner-cards-grid" cdkDrag>
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          {{i+1}}
+                                        </div>
+                                        <div class="">
+                                          <button class="btn btn-primary margin-none" (click)="onCustomActionDdItem(customActionDdItemList[i].customActionDdItemId);" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                            <span>{{customActionDdItemList[i].itemText}}</span>
+                                          </button>
+                                        </div>
+                                      </div>
+                                      <div class="team-example-box" *ngIf="customActionDdItemList?.length === 0"><h6>No buttons have been configured.</h6></div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="click-txt-left" *ngIf="isShowCustom && isAddItemDropDown">
+                            <div class="wraper-main-section">
+                              <div class="global-card-section">
+                                <div class="global-header-section">
+                                  <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />	DropDown Item</div>
+                                  <div class="header-button-panel" *ngIf="!isPreviewDDItem">
+                                    <div class="button-wrapper">
+                                      <button [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="button" matTooltip="Save" [disabled]="customActionDdItemForm.invalid" (click)="customActionDdItemFormSubmit();" class="icon-btn">
+                                        <i class="fa fa-save" aria-hidden="true"></i>
+                                        <span class="btn-text">Save</span>
+                                      </button>
+                                      <button type="button" matTooltip="Cancel" (click)="cancelCustomDropDown()" class="icon-btn">
+                                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                                        <span class="btn-text">Back</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <div class="header-button-panel" *ngIf="isPreviewDDItem">
+                                    <div class="button-wrapper">
+                                      <button [hidden]="roleFeaturePermissions?.edit == false" type="button" matTooltip="Cancel" (click)="isPreviewDDItem = false;" class="icon-btn">
+                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                        <span class="btn-text">Edit</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="" *ngIf="!isPreviewDDItem">
+                                  <div class="custom-action-title"></div>
+                                  <form [formGroup]="customActionDdItemForm" (ngSubmit)="customActionDdItemFormSubmit()">
+                                    <div class="wraper-body-panel">
+                                      <div class="wraper-body-left">
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left">
+                                            <span>Item Text</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <input type="text" class="form-control" formControlName="itemText" [ngClass]="{'has-error': customActionDdItemForm.controls.itemText.errors && (customActionDdItemForm.controls.itemText.touched || customActionDdItemForm.controls.itemText.dirty)}" />
+                                            <div *ngIf="customActionDdItemForm.controls.itemText.errors && (customActionDdItemForm.controls.itemText.touched || customActionDdItemForm.controls.itemText.dirty)">
+                                              <div class="login-error" *ngIf="customActionDdItemForm.controls.itemText.errors.required">Name is required </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="custom-action-title">
+                                          <span>Primary Automation Trigger Settings</span>
+                                          <button type="button" matTooltip="Display Lead Processes" (click)="getAutomationProcess(2)" class="grid-common-btn">
+                                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                                          </button>
+                                        </div>
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left">
+                                            <span>Action to take</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <div class="flex-row-inner">
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio3" #actionRadio3 (change)="onChangeItemAction('None');" [checked]="customActionDdItemData.ctAction == 0">
+                                                <div class="for-check-txt"> <span>No Action</span> </div>
+                                              </div>
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio3" #actionRadio3 (change)="onChangeItemAction('Start');" [checked]="customActionDdItemData.ctAction == 1">
+                                                <div class="for-check-txt"> <span>Start</span> </div>
+                                              </div>
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio3" #actionRadio3 (change)="onChangeItemAction('Stop');" [checked]="customActionDdItemData.ctAction == 2">
+                                                <div class="for-check-txt"> <span>Stop</span> </div>
+                                              </div>
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio3" #actionRadio3 (change)="onChangeItemAction('Pause');" [checked]="customActionDdItemData.ctAction == 3">
+                                                <div class="for-check-txt"> <span>Pause</span> </div>
+                                              </div>
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio3" #actionRadio3 (change)="onChangeItemAction('Remove');" [checked]="customActionDdItemData.ctAction == 4">
+                                                <div class="for-check-txt"> <span>Remove</span> </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left">
+                                            <span>Automation Process</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <select class="form-control" formControlName="ctCampaignTemplateId">
+                                              <option value="0" hidden>-Select One-</option>
+                                              <option *ngFor="let item of AutomationProcessDDResponse[2].automationProcessDD" [value]="item.campaignTemplateID">{{item.campaignTemplateName}}</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left">
+                                            <span>User</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <select class="form-control" formControlName="clClpUserId">
+                                              <option value="0" hidden>-Contact Owner-</option>
+                                              <option *ngFor="let item of clickUser" [value]="item.key">{{item.value}}</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="custom-action-title">
+                                          <span>Secondary Automation Trigger Settings</span>
+                                          <button type="button" matTooltip="Display Lead Processes" (click)="getAutomationProcess(3)" class="grid-common-btn">
+                                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                                          </button>
+                                        </div>
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left">
+                                            <span>Action to take</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <div class="flex-row-inner">
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio4" #actionRadio4 (change)="onChangeSecItemAction('None');" [checked]="customActionDdItemData.secCtAction == 0">
+                                                <div class=" for-check-txt"> <span>No Action</span> </div>
+                                              </div>
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio4" #actionRadio4 (change)="onChangeSecItemAction('Start');" [checked]="customActionDdItemData.secCtAction == 1">
+                                                <div class=" for-check-txt"> <span>Start</span> </div>
+                                              </div>
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio4" #actionRadio4 (change)="onChangeSecItemAction('Stop');" [checked]="customActionDdItemData.secCtAction == 2">
+                                                <div class="for-check-txt"> <span>Stop</span> </div>
+                                              </div>
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio4" #actionRadio4 (change)="onChangeSecItemAction('Pause');" [checked]="customActionDdItemData.secCtAction == 3">
+                                                <div class="for-check-txt"> <span>Pause</span> </div>
+                                              </div>
+                                              <div class="click-txt-left">
+                                                <input type="radio" class="forActionRadio" name="actionRadio4" #actionRadio4 (change)="onChangeSecItemAction('Remove');" [checked]="customActionDdItemData.secCtAction == 4">
+                                                <div class="for-check-txt"> <span>Remove</span> </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left">
+                                            <span>Automation Process</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <select class="form-control" formControlName="secCtCampaignTemplateId">
+                                              <option value="0" hidden>-Select One-</option>
+                                              <option *ngFor="let item of AutomationProcessDDResponse[3].automationProcessDD" [value]="item.campaignTemplateID">{{item.campaignTemplateName}}</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left">
+                                            <span>User</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <select class="form-control" formControlName="secCtClpUserId">
+                                              <option value="0" hidden>-Contact Owner-</option>
+                                              <option *ngFor="let item of clickUser" [value]="item.key">{{item.value}}</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="custom-action-title">
+                                          <span>Final Actions To Take</span>
+                                        </div>
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left">
+                                            <span>Appointment Status</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <select class="form-control" formControlName="setApptStatus">
+                                              <option value="0">Leave As Pending</option>
+                                              <option value="1">Mark as Cancelled</option>
+                                              <option value="2">Does not Exist</option>
+                                              <option value="3">Does not Exist</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left">
+                                            <span>Next Window</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <select class="form-control" formControlName="nextCustomActionScreenId">
+                                              <option value="0">None: Just Close Window</option>
+                                              <option value="1">Go to: Contact Home Page</option>
+                                              <option value="2">Go to: Contact Appointment List</option>
+                                              <option value="3">Go to: My Calendar</option>
+                                              <option value="4">Go to: My Call List</option>
+                                              <option value="5">Go to: A custom URL</option>
+                                              <option value="6">Load: An Email Template</option>
+                                              <option value="7">Load: Another Call Action Screen</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="cards-body-section" *ngIf="customActionDdItemForm.controls.nextCustomActionScreenId.value == '5'">
+                                          <div class="cards-colunm-left">
+                                            <span>Destination URL</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <input type="text" class="form-control" formControlName="destinationUrl" [ngClass]="{'has-error': customActionDdItemForm.controls.destinationUrl.errors && (customActionDdItemForm.controls.destinationUrl.touched || customActionDdItemForm.controls.destinationUrl.dirty)}" />
+                                            <div *ngIf="customActionDdItemForm.controls.destinationUrl.errors && (customActionDdItemForm.controls.destinationUrl.touched || customActionDdItemForm.controls.destinationUrl.dirty)">
+                                              <div class="login-error" *ngIf="customActionDdItemForm.controls.destinationUrl.errors.required">Destination URL is required </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="cards-body-section" *ngIf="customActionDdItemForm.controls.nextCustomActionScreenId.value == '6'">
+                                          <div class="cards-colunm-left">
+                                            <span>Email Template to Load</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <select class="form-control" formControlName="customActionScreenId">
+                                              <option *ngFor="let item of emailTemplate" [value]="item.emailTemplateId">{{item.templateName}}</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="cards-body-section" *ngIf="customActionDdItemForm.controls.nextCustomActionScreenId.value == '7'">
+                                          <div class="cards-colunm-left">
+                                            <span>Custom Action Screen to Load</span>
+                                          </div>
+                                          <div class="cards-colunm-right">
+                                            <select class="form-control" formControlName="customActionScreenId">
+                                              <option *ngFor="let item of customActionScreenDd" [value]="item.customActionScreenId">{{item.formName}}</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="cards-body-section">
+                                          <div class="cards-colunm-left"></div>
+                                          <div class="cards-colunm-right">
+                                            <div class="bottom-button-bar">
+                                              <button [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" class="btn btn-primary" type="submit" [disabled]="customActionDdItemForm.invalid">Save</button>
+                                              <button class="btn btn-cancel" type="button" (click)="cancelItemDropDown();"> Cancel</button>
+                                              <button [hidden]="roleFeaturePermissions?.delete == false" class="btn btn-danger" type="button" data-toggle="modal" data-target="#itemDeleteModal" *ngIf="customActionDdItemData.customActionDdItemId != 0">Delete</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+
+                                <div class="wraper-body-panel" *ngIf="isPreviewDDItem">
+                                  <div class="wraper-body-left">
+                                    <div class="cards-body-section">
+                                      <div class="cards-colunm-left">
+                                        <span>Item Text</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span>{{customActionDdItemData.itemText}}</span>
+                                      </div>
+                                    </div>
+                                    <div class="custom-action-title">
+                                      <span>Primary Automation Trigger Settings</span>
+                                      <button type="button" matTooltip="Display Lead Processes" class="grid-common-btn">
+                                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                                      </button>
+                                    </div>
+                                    <div class="cards-body-section">
+                                      <div class="cards-colunm-left">
+                                        <span>Action to take</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span *ngIf="customActionDdItemData.ctAction == 0">No Action</span>
+                                        <span *ngIf="customActionDdItemData.ctAction == 1">Start</span>
+                                        <span *ngIf="customActionDdItemData.ctAction == 2">Stop</span>
+                                        <span *ngIf="customActionDdItemData.ctAction == 3">Pause</span>
+                                        <span *ngIf="customActionDdItemData.ctAction == 4">Remove</span>
+                                      </div>
+                                    </div>
+                                    <div class="cards-body-section">
+                                      <div class="cards-colunm-left">
+                                        <span>Automation Process</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <div *ngIf="customActionDdItemData.ctCampaignTemplateId != 0 && customActionDdItemData.ctAction != 0">
+                                          <div *ngFor="let item of AutomationProcessDDResponse[2].automationProcessDD;let i = index">
+                                            <span *ngIf="AutomationProcessDDResponse[2].automationProcessDD[i].campaignTemplateID == customActionDdItemData.ctCampaignTemplateId">{{AutomationProcessDDResponse[2].automationProcessDD[i].campaignTemplateName}}</span>
+                                          </div>
+                                        </div>
+                                        <span class="text-danger" *ngIf="customActionDdItemData.ctCampaignTemplateId == 0 || customActionDdItemData.ctAction == 0">Automation process not set.</span>
+                                      </div>
+                                    </div>
+                                    <div class="cards-body-section">
+                                      <div class="cards-colunm-left">
+                                        <span>User</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <div *ngIf="customActionDdItemData.clClpUserId != 0 && customActionDdItemData.ctAction != 0">
+                                          <div *ngFor="let item of clickUser;let i = index">
+                                            <span *ngIf="clickUser[i].key == customActionDdItemData.clClpUserId">{{clickUser[i].value}}</span>
+                                          </div>
+                                        </div>
+                                        <span *ngIf="customActionDdItemData.clClpUserId == 0 || customActionDdItemData.ctAction == 0">Not Selected</span>
+                                      </div>
+                                    </div>
+                                    <div class="custom-action-title">
+                                      <span>Secondary Automation Trigger Settings</span>
+                                      <button type="button" matTooltip="Display Lead Processes" class="grid-common-btn">
+                                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                                      </button>
+                                    </div>
+                                    <div class="cards-body-section">
+                                      <div class="cards-colunm-left">
+                                        <span>Action to take</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span *ngIf="customActionDdItemData.secCtAction == 0">No Action</span>
+                                        <span *ngIf="customActionDdItemData.secCtAction == 1">Start</span>
+                                        <span *ngIf="customActionDdItemData.secCtAction == 2">Stop</span>
+                                        <span *ngIf="customActionDdItemData.secCtAction == 3">Pause</span>
+                                        <span *ngIf="customActionDdItemData.secCtAction == 4">Remove</span>
+                                      </div>
+                                    </div>
+                                    <div class="cards-body-section">
+                                      <div class="cards-colunm-left">
+                                        <span>Automation Process</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <div *ngIf="customActionDdItemData.secCtCampaignTemplateId != 0 && customActionDdItemData.secCtAction != 0">
+                                          <div *ngFor="let item of AutomationProcessDDResponse[1].automationProcessDD;let i = index">
+                                            <span *ngIf="AutomationProcessDDResponse[1].automationProcessDD[i].campaignTemplateID == customActionDdItemData.secCtCampaignTemplateId">{{AutomationProcessDDResponse[1].automationProcessDD[i].campaignTemplateName}}</span>
+                                          </div>
+                                        </div>
+                                        <span class="text-danger" *ngIf="customActionDdItemData.secCtCampaignTemplateId == 0 || customActionDdItemData.secCtAction == 0">Automation process not set.</span>
+                                      </div>
+                                    </div>
+                                    <div class="cards-body-section">
+                                      <div class="cards-colunm-left">
+                                        <span>User</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <div *ngIf="customActionDdItemData.secCtClpUserId != 0 && customActionDdItemData.secCtAction != 0">
+                                          <div *ngFor="let item of clickUser;let i = index">
+                                            <span *ngIf="item?.key == customActionDdItemData.secCtClpUserId">{{item?.value}}</span>
+                                          </div>
+                                        </div>
+                                        <span *ngIf="customActionDdItemData.secCtClpUserId == 0 || customActionDdItemData.secCtAction == 0">Not Selected</span>
+                                      </div>
+                                    </div>
+                                    <div class="custom-action-title">
+                                      <span>Final Actions To Take</span>
+                                    </div>
+                                    <div class="cards-body-section">
+                                      <div class="cards-colunm-left">
+                                        <span>Appointment Status</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span *ngIf="customActionDdItemData.setApptStatus == 0">Leave As Pending</span>
+                                        <span *ngIf="customActionDdItemData.setApptStatus == 1">Mark as Cancelled</span>
+                                        <span *ngIf="customActionDdItemData.setApptStatus == 2">Mark as Completed</span>
+                                        <span *ngIf="customActionDdItemData.setApptStatus == 3">Mark as Completed and Stop Campaign</span>
+                                      </div>
+                                    </div>
+                                    <div class="cards-body-section">
+                                      <div class="cards-colunm-left">
+                                        <span>Next Window</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span *ngIf="customActionDdItemData.nextCustomActionScreenId == 0">None: Just Close Window</span>
+                                        <span *ngIf="customActionDdItemData.nextCustomActionScreenId == 1">Go to: Contact Home Page</span>
+                                        <span *ngIf="customActionDdItemData.nextCustomActionScreenId == 2">Go to: Contact Appointment List</span>
+                                        <span *ngIf="customActionDdItemData.nextCustomActionScreenId == 3">Go to: My Calendar</span>
+                                        <span *ngIf="customActionDdItemData.nextCustomActionScreenId == 4">Go to: My Call List</span>
+                                        <span *ngIf="customActionDdItemData.nextCustomActionScreenId == 5">Go to: A custom URL</span>
+                                        <span *ngIf="customActionDdItemData.nextCustomActionScreenId == 6">Load: An Email Template</span>
+                                        <span *ngIf="customActionDdItemData.nextCustomActionScreenId == 7">Load: Another Call Action Screen</span>
+                                      </div>
+                                    </div>
+                                    <div class="cards-body-section" *ngIf="customActionDdItemData.nextCustomActionScreenId == 5">
+                                      <div class="cards-colunm-left">
+                                        <span>Destination URL</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <span>{{customActionDdItemData.destinationUrl}}</span>
+                                      </div>
+                                    </div>
+                                    <div class="cards-body-section" *ngIf="customActionDdItemData.nextCustomActionScreenId == 6">
+                                      <div class="cards-colunm-left">
+                                        <span>Email Template to Load</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <div *ngFor="let item of emailTemplate;let i = index">
+                                          <span *ngIf="emailTemplate[i].emailTemplateId == customActionDdItemData.customActionScreenId">{{emailTemplate[i].templateName}}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="cards-body-section" *ngIf="customActionDdItemData.nextCustomActionScreenId == 7">
+                                      <div class="cards-colunm-left">
+                                        <span>Custom Action Screen to Load</span>
+                                      </div>
+                                      <div class="cards-colunm-right">
+                                        <div *ngFor="let item of customActionScreenDd;let i = index">
+                                          <span *ngIf="item?.customActionScreenId == customActionDdItemData.nextCustomActionScreenId">{{item?.formName}}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal fade" id="itemDeleteModal" tabindex="-1" role="dialog" aria-labelledby="itemDeleteModal" aria-hidden="true">
+                            <div class="modal-dialog  modal-common-dialog" role="document">
+                              <div class="modal-content modal-common-content">
+                                <div class="modal-header modal-common-background">
+                                  <h4 class="modal-title modal-common-title">Confirmation</h4>
+                                </div>
+                                <div class="modal-body modal-common-body">
+                                  <h2>  Are you sure you want to Delete ? </h2>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" [hidden]="roleFeaturePermissions?.delete == false" (click)="customActionDropdownItemDelete()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                                  <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade" id="buttonDeleteModal" tabindex="-1" role="dialog" aria-labelledby="buttonDeleteModal" aria-hidden="true">
+                  <div class="modal-dialog  modal-common-dialog" role="document">
+                    <div class="modal-content modal-common-content">
+                      <div class="modal-header modal-common-background">
+                        <h4 class="modal-title modal-common-title">Confirmation</h4>
+                      </div>
+                      <div class="modal-body modal-common-body">
+                        <h2>  Are you sure you want to Delete ? </h2>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" (click)="customActionButtonDelete()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                        <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- For Grid Field-->
+        <div>
+          <kendo-grid class="custom-action-grid" *ngIf="!isShowCustom && !isEnableEdit" #grid id="gridId"
+                [kendoGridBinding]="customActionDataList"
+                [sortable]="{mode: 'multiple'}"
+                [sort]="_gridCnfgService.sort"
+                [pageSize]="_gridCnfgService.pageSize"
+                [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                [scrollable]="'false'"
+                [reorderable]="true"
+                [resizable]="true"
+                [columnMenu]="{ filter: true }"
+                [ngStyle]="gridHeight"
+                (columnReorder)="_gridCnfgService.columnsOrderChanged('custom_action_grid', $event)"
+                (sortChange)="_gridCnfgService.sortChange('custom_action_grid', $event)"
+                (pageChange)="_gridCnfgService.pageChange('custom_action_grid', $event)"
+                (columnResize)="_gridCnfgService.columnResize(4,'custom_action_grid', $event)"
+                (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'custom_action_grid',grid)">
+            <div class="grid-scroll-bar">
+              <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                  [field]="column.field"
+                  [title]="column.title | titlecase"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [width]="column.width"
+                  [filterable]="true"
+                  [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1 || (column.field == 'bulkAppt' && roleFeaturePermissions?.isSuperAdmin == false)"
+                  [includeInChooser]="column.field=='$' ? false : (column.field == 'bulkAppt' && roleFeaturePermissions?.isSuperAdmin == false) ? false : true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="column.field == '$' && column.title == ''">{{ rowIndex+1 }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'formName'">
+                    <a (click)="showCustomData(dataItem)" class="text-primary">{{ dataItem[column.field] }}</a>
+                  </div>
+                  <div class="customer-name" *ngIf="column.field == 'showEditContactLink'">
+                    <span *ngIf="dataItem[column.field]">Yes</span>
+                    <span *ngIf="!dataItem[column.field]">No</span>
+                  </div>
+                  <div class="customer-name" *ngIf="column.field == 'showAddToComments'">
+                    <span *ngIf="dataItem[column.field]">Yes</span>
+                    <span *ngIf="!dataItem[column.field]">No</span>
+                  </div>
+                  <div class="customer-name" *ngIf="column.field == 'showAddToHistory'">{{ dataItem[column.field]}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'bulkAppt'">
+                    <span *ngIf="customActionResponse.isBulkAppt"><a>Start Wizard</a></span>
+                  </div>
+                  <div class="customer-name" *ngIf="column.field == 'user'">{{ customActionDataList[rowIndex].firstName}}&nbsp;{{ customActionDataList[rowIndex].lastName}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ dataItem[column.field] | date: 'MM/dd/yy'}}</div>
+                </ng-template>
+              </kendo-grid-column>
+            </div>
+          </kendo-grid>
+        </div>
+        </div>
+    </div>
+  </div>
+  <div class="important-msg-section" *ngIf="!isShowCustom && !isEnableEdit">
+    <div class="important-msg-panel">
+      <table>
+        <thead>
+          <tr>
+            <th>Important Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td> <a class="webkit-any-link" href="https://help.salesoptima.com/help/default.aspx?htid=184" target="_blank">1.	Overview of Sales Force Automation module</a>.</td>
+          </tr>
+          <tr>
+            <td> 2.	Quick Link: <a class="webkit-any-link" [routerLink]="['/webform']" router>manage Web Contact Forms </a></td>
+          </tr>
+          <tr>
+            <td> 3. If you are creating your own web forms, use the  <a class="webkit-any-link" href="https://www.salesoptima.com/support/web-form-post-api" target="_blank">Web Form API </a>to map your HTML elements into SalesOptima fields.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>
+
+</div>
+
+
+
+
+

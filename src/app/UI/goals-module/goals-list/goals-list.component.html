@@ -1,0 +1,170 @@
+<div class="row">
+  <div class="col-md-10">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../assets/goaltitle.svg" class="mr-1" />My Goals for August 2022</div>
+          <div class="header-button-panel">
+            <div class="button-wrapper">
+              <select class="form-control  select-option ml-2" [(ngModel)]="selectedUser">
+                <option *ngFor="let item of userList" [value]="item?.value">{{item?.text}}</option>
+              </select>
+
+              <select class="form-control  select-option ml-2" [(ngModel)]="selectedYear">
+                <option *ngFor="let item of yearList " [value]="item?.text">{{item?.text}}</option>
+              </select>
+
+              <select class="form-control  select-option ml-2" [(ngModel)]="selectedMonth">
+                <option *ngFor="let item of monthList" [value]="item?.key">{{item?.value}}</option>
+              </select>
+
+              <button type="submit" class="grid-common-btn" (click)="refreshGoalList();">
+                <i class="fa fa-refresh"></i>
+                <span class="grid-common-text">Refresh</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="user && listVisible">
+          <div class="margin-all-area" *ngIf="isShowSectionGeneral" >
+            <div class="global-card-section">
+              <div class="global-header-section">
+                <div class="svg-icon-panel">General Related Goals</div>
+              </div>
+              <div class="margin-all-area">
+                <div class="global-body-section mb-2 mt-2 ">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal  (showSectionContact)="genericSection($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="showSectionGeneral($event)" [tableHeading]="'General'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eGoalGeneral" [eDdField]="eDDFieldsGeneral"   [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section mb-2 mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal  (showSectionContact)="genericSection($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="showSectionGeneral($event)" [tableHeading]="'General Appointment Type'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eGoalApptGeneral" [eDdField]="eDDFieldsAppGeneral" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="margin-all-area" *ngIf="isShowSectionContact">
+            <div class="global-card-section">
+              <div class="global-header-section">
+                <div class="svg-icon-panel">Contact Related Goals</div>
+              </div>
+              <div class="margin-all-area">
+                <div class="global-body-section mb-2 mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user"  (showSectionContact)="showSectionContact($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="genericSection($event)"[tableHeading]="'Contact Appointment Type'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eContactApptType" [eDdField]="eDDFieldContactAppt" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section mb-2  mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user" (showSectionContact)="showSectionContact($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="genericSection($event)" [tableHeading]="'Contact:Sta'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eContactApptSta" [eDdField]="eDDFieldContactSta" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="global-body-section mb-2  mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user" (showSectionContact)="showSectionContact($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="genericSection($event)" [tableHeading]="'Contact:Prospect  Status'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eContactApptProsSta" [eDdField]="eDDFieldContactProsSta" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="global-body-section mb-2  mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user" (showSectionContact)="showSectionContact($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="genericSection($event)" [tableHeading]="'Contact: Agreement Type'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eContactAggr" [eDdField]="eDDFieldContactAggr" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="global-body-section mb-2  mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user"  (showSectionContact)="showSectionContact($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="genericSection($event)"[tableHeading]="'Contact:Referral Source Type'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eContactRef" [eDdField]="eDDFieldContactRef" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section mb-2  mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user" (showSectionContact)="showSectionContact($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="genericSection($event)" [tableHeading]="'Contact:Location of Interest'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eContactLOI" [eDdField]="eDDFieldContactLOI" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="global-body-section mb-2  mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user" (showSectionContact)="showSectionContact($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="genericSection($event)" [tableHeading]="'Contact:Objections'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eContactObject" [eDdField]="eDDFieldContactObject" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section mb-2  mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user" (showSectionContact)="showSectionContact($event)" (showSectionLead)="genericSection($event)" (showSectionGeneral)="genericSection($event)" [tableHeading]="'Contact:Ad/Marketing Channel'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eContactMarket" [eDdField]="eDDFieldContactMarket" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>          
+              </div>
+            </div>
+          </div>
+
+          <div class="margin-all-area" *ngIf="isShowSectionLead">
+            <div class="global-card-section">
+              <div class="global-header-section">
+                <div class="svg-icon-panel">Lead Related Goals</div>
+              </div>
+              <div class="margin-all-area">
+                <div class="global-body-section mb-2 mt-2 ">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user" (showSectionContact)="genericSection($event)" (showSectionLead)="showSectionLead($event)" (showSectionGeneral)="genericSection($event)" [tableHeading]="'Lead Appointment'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eLeadApptType" [eDdField]="eDDFieldLeadAppt" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section mb-2 mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal *ngIf="user" (showSectionContact)="genericSection($event)" (showSectionLead)="showSectionLead($event)" (showSectionGeneral)="genericSection($event)" [tableHeading]="'Lead Status'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eLeadStatus" [eDdField]="eDDFieldLeadSta" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section mb-2 mt-2">
+                  <div class="wraper-body-panel">
+                    <div class="wraper-body-left">
+                      <goal (showSectionContact)="genericSection($event)" (showSectionLead)="showSectionLead($event)" (showSectionGeneral)="genericSection($event)"  *ngIf="user" [tableHeading]="'Lead Rollout Phases 1'" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [eGoalType]="eLeadRollOut" [eDdField]="eDDFieldLeadRollOut" [selectedUser]="selectedUser" [selectedMonth]="selectedMonth" [selectedYear]="selectedYear"></goal>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><span>Quick Goals</span></div>
+        </div>
+        <div class="mt-1">
+          <div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

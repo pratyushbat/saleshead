@@ -1,0 +1,80 @@
+<div class="contact-container">
+  <div class="main-module">
+    <kendo-splitter orientation="horizontal">
+      <kendo-splitter-pane min="15%" max="30%" [(size)]="leftPanelSize" (sizeChange)="panelSizeChange('left', $event)">
+        <div class="left-section">
+          <fieldset>
+            <legend>
+              Lead Module
+              <a href="javascript:void(0)" class="create-contact-icon" (click)="_localService.showCommonComp ='lead-create'; showCommonComponent(); isLeadEdit = false" title="Create new contact"><i class="fas fa-user-plus"></i></a>
+            </legend>
+            <div class="contact-module-panel">
+              <div class="profile-module">
+                <span class="profile-main"><i class="fa fa-user"></i><input type="file" /></span>
+                <div class="profile-edit">
+                  <p>
+                    {{userName}}
+                    <span>{{companyName}}</span>
+                  </p>
+                  <span>
+                    <a><i class="fas fa-trash-alt"></i></a>
+                    <a href="javascript:void(0)" (click)="_localService.showCommonComp ='lead-create'; showCommonComponent(); isLeadEdit = true"><i class="fas fa-user-edit"></i></a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </kendo-splitter-pane>
+
+      <kendo-splitter-pane>
+        <div class="middle-section">
+          <fieldset #activeDashboardId>
+            <legend>Active Dashboard</legend>
+            <div class="middle-section-alignment">
+              <div class="common-section-module">
+                <lead-create *ngIf="showLeadCreateComponent == true" [isShowClosed]="true" [leadId]="isLeadEdit == true ? leadId : 0"></lead-create>
+                <app-contact-task *ngIf="showTaskComponent == true" [loggedUser]="user" [leadId]="leadId" [isLeadTask]="true"></app-contact-task>
+                <app-contact-note *ngIf="showNoteComponent == true" [loggedUser]="user" [ownerId]="leadId" [isLeadTask]="true"></app-contact-note>
+                <lead-appt *ngIf="showApptComponent == true" [loggedUser]="user" [ownerId]="leadId" [contactId]="contactId" [isLeadTask]="true"></lead-appt>
+                <quick-link *ngIf="showLinkComponent == true" [loggedUser]="user" [ownerId]="leadId"></quick-link>
+                <upload-document *ngIf="showUploadComponent == true" [loggedUser]="user" [ownerId]="leadId"></upload-document>
+                <lead-history leadIdReceive={{leadId}}></lead-history>
+              </div>
+            </div>
+            <div class="common"></div>
+          </fieldset>
+        </div>
+      </kendo-splitter-pane>
+
+      <kendo-splitter-pane min="13%" max="18%" [(size)]="rightPanelSize" (sizeChange)="panelSizeChange('right', $event)">
+        <div class="right-section">
+          <fieldset>
+            <legend>Action Module</legend>
+            <fieldset>
+              <legend>Engagement</legend>
+              <div class="lead-button-panel">
+                <button class="appointment-btn" (click)="_localService.showCommonComp ='appt'; showCommonComponent();_localService.scrollTop(activeDashboardId);">
+                  <img title="Edit Appointment" src="../../../../assets/activity/task/remindertasklead.svg" class="title-img" /> Quick Appointment
+                </button>
+                <button class="task-btn" (click)="_localService.showCommonComp ='task'; showCommonComponent();_localService.scrollTop(activeDashboardId);">
+                  <img title="Edit Task" src="../../../../assets/activity/task/tasktitle.svg" class="title-img" /> Quick Task
+                </button>
+                <button class="notes-btn" (click)="_localService.showCommonComp ='note'; showCommonComponent();_localService.scrollTop(activeDashboardId);">
+                  <img title="Edit Notes" src="../../../../assets/activity/note/notetitle.svg" class="title-img" /> Quick Notes
+                </button>
+                <button class="link-group-btn" (click)="_localService.showCommonComp ='link'; showCommonComponent();_localService.scrollTop(activeDashboardId);">
+                  <img title="Edit Add Link Groups" src="../../../../assets/activity/note/notetitle.svg" class="title-img" /> Add Link Groups
+                </button>
+                <button class="upload-doc-btn" (click)="_localService.showCommonComp ='upload'; showCommonComponent();_localService.scrollTop(activeDashboardId);">
+                  <img title="Edit Upload Documents" src="../../../../assets/activity/note/notetitle.svg" class="title-img" /> Upload Documents
+                </button>
+              </div>
+            </fieldset>
+          </fieldset>
+        </div>
+      </kendo-splitter-pane>
+
+    </kendo-splitter>
+  </div>
+</div>

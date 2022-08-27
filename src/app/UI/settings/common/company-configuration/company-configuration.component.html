@@ -1,0 +1,154 @@
+<div class="cards-height-section">
+  <div class="cards-height-panel">
+    <div class="multiple-cards-section" [sortablejs]="arrSortedBySection" [sortablejsOptions]="eventOptionsSection">
+      <div class="multiple-cards-panel draggable" *ngFor="let section of arrSortedBySection; let i = index;" [hidden]="section.items.length == 0">
+        <div class="config-panel">
+          <div class="panel">
+            <div class="panel-heading" [matTooltip]="_localService.matTooltipConfig.msg" [matTooltipPosition]="_localService.matTooltipConfig.position" [matTooltipShowDelay]="_localService.matTooltipConfig.delay">
+              <h5 *ngIf="section">{{ section.sectionName }}</h5>
+            </div>
+            <div class="panel-body">
+              <div class="common-form-section list-group" [sortablejs]="section.items" [sortablejsOptions]="eventOptions">
+                <div class="common-form-panel draggable" *ngFor="let sectionItem of section.items; let j = index" [matTooltip]="_localService.matTooltipConfig.msg" [matTooltipPosition]="_localService.matTooltipConfig.position" [matTooltipShowDelay]="_localService.matTooltipConfig.delay">
+                  <div class="left-div" *ngIf=" showSectionWise(section,sectionItem);">
+                    <label class="font-weight-bold">{{sectionItem.fieldTitle}}</label>
+                  </div>
+
+                  <div class="common-checkbox" *ngIf="section.sectionId==1 && sectionItem.fieldName != 'CompanyName'">
+                    <!--General-->
+                    <div class="left-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <input type="text" value="{{sectionItem.fieldTitle}}" id="tbGenTitle{{j}}" />
+                    </div>
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='check'">
+                      <span id="spanGen{{j}}"></span>
+                      <label class="switch">
+                        <input type="checkbox" id="cbGen{{j}}" (change)="checkValue($event,'spanGen'+j)">
+                        <span class="slider round"></span>
+                      </label>
+                    </div>
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioGen{{j}}" id="rbGenShow{{j}}" value="0"><span class="checkmark"></span> Show</label>
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioGen{{j}}" id="rbGenHide{{j}}" value="2"><span class="checkmark"></span> Hide</label>
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioGen{{j}}" id="rbGenMand{{j}}" value="1"><span class="checkmark"></span> Show Mandatory</label>
+                    </div>
+                  </div>
+                  <div *ngIf="sectionItem.fieldName == 'CompanyName'" class="text-success">(Show Mandatory)</div>
+
+                  <div class="common-checkbox" *ngIf="section.sectionId==2 && sectionItem.fieldName != 'CompanyName'">
+                    <!--AddtionalInformation-->
+                    <div class="left-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <input type="text" value="{{sectionItem.fieldTitle}}" id="tbCustomTextFldTitle{{j}}" />
+                    </div>
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='check'">
+                      <span id="spanCustomText{{j}}"></span>
+                      <label class="switch">
+                        <input type="checkbox" id="cbCustomText{{j}}" (change)="checkValue($event,'spanCustomText'+j)">
+                        <span class="slider round"></span>
+                      </label>
+                    </div>
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioCustomText{{j}}" value="0" id="rbCustomTextShow"><span class="checkmark"></span> Show</label>
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioCustomText{{j}}" value="2" id="rbCustomTextHide"><span class="checkmark"></span> Hide</label>
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioCustomText{{j}}" value="1" id="rbCustomTextMand"><span class="checkmark"></span> Show Mandatory</label>
+                    </div>
+                  </div>
+
+                  <div class="common-checkbox" *ngIf="section.sectionId==3 && sectionItem.fieldName != 'CompanyName'">
+                    <!--Communication-->
+                    <div class="left-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <input type="text" value="{{sectionItem.fieldTitle}}" id="tbCommTitle{{j}}" />
+                    </div>
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='check'">
+                      <span id="spanComm{{j}}"></span>
+                      <label class="switch">
+                        <input type="checkbox" id="cbComm{{j}}" (change)="checkValue($event,'spanComm'+j)">
+                        <span class="slider round"></span>
+                      </label>
+                    </div>
+
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioComm{{j}}" value="0" id="rbCommShow{{j}}"><span class="checkmark"></span> Show</label>
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioComm{{j}}" value="2" id="rbCommHide{{j}}"><span class="checkmark"></span> Hide</label>
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioComm{{j}}" value="1" id="rbCommMand{{j}}"><span class="checkmark"></span> Show Mandatory</label>
+                    </div>
+
+                  </div>
+                  <div class="common-checkbox" *ngIf="section.sectionId==4 && sectionItem.fieldName != 'CompanyName'">
+                    <!--ClassificationDropDown-->
+                    <div class="left-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <input type="text" value="{{sectionItem.fieldTitle}}" id="tbDDTitle{{j}}" />
+                    </div>
+
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='check'">
+                      <span id="spanDD{{j}}"></span>
+                      <label class="switch">
+                        <input type="checkbox" id="cbDD{{j}}" (change)="checkValue($event,'spanDD'+j)">
+                        <span class="slider round"></span>
+                      </label>
+                    </div>
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioDD{{j}}" id="rbDDShow{{j}}" value="0"><span class="checkmark"></span> Show</label>
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioDD{{j}}" id="rbDDHide{{j}}" value="2"><span class="checkmark"></span> Hide</label>
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioDD{{j}}" id="rbDDShowMand{{j}}" value="1"><span class="checkmark"></span> Show Mandatory</label>
+                    </div>
+                  </div>
+
+                  <div class="common-checkbox" *ngIf="section.sectionId==5 && sectionItem.fieldName != 'CompanyName'">
+                    <!--ClassificationCheckBox-->
+                    <div class="left-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <input type="text" value="{{sectionItem.fieldTitle}}" id="tbCBTitle{{j}}" />
+                    </div>
+
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='check'">
+                      <span id="spanCB{{j}}"></span>
+                      <label class="switch">
+                        <input type="checkbox" id="cbCB{{j}}" (change)="checkValue($event,'spanCB'+j)">
+                        <span class="slider round"></span>
+                      </label>
+                    </div>
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioCB{{j}}" id="rbCBShow{{j}}" value="0"><span class="checkmark"></span> Show</label>
+                      <label class="radio-button"><input type="radio" (change)="handleChange($event)" name="radioCB{{j}}" id="rbCBHide{{j}}" value="2"><span class="checkmark"></span> Hide</label>
+                    </div>
+                  </div>
+
+                  <div class="common-checkbox" *ngIf="section.sectionId==6 && sectionItem.fieldName != 'CompanyName'">
+                    <div class="left-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <input type="text" value="{{sectionItem.fieldTitle}}" id="tbCommentTitle{{j}}" />
+                    </div>
+                    <!--Comments-->
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='check'">
+                      <span id="spanComments{{j}}"></span>
+                      <label class="switch">
+                        <input type="checkbox" id="cbComments{{j}}" (change)="checkValue($event,'spanComments'+j)">
+                        <span class="slider round"></span>
+                      </label>
+                    </div>
+                    <div class="right-div" *ngIf="sectionItem.inputConfigFiled=='radio'">
+                      <p><input type="radio" (change)="handleChange($event)" name="radioComments{{j}}" value="0" id="rbCommentsShow{{j}}"><label>Show</label></p>
+                      <p><input type="radio" (change)="handleChange($event)" name="radioComments{{j}}" value="2" id="rbCommentsHide{{j}}"><label>Hide</label></p>
+                      <p><input type="radio" (change)="handleChange($event)" name="radioComments{{j}}" value="1" id="rbCommentsMand{{j}}"><label>Mandatory</label></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-fix-footer">
+    <div class="top-common-btn">
+      <button [disabled]="roleFeaturePermissions?.create == false?true:showSpinner?true:false" class="btn btn-primary" (click)="saveConfiguration()">Update</button>
+      <button class="btn btn-primary" (click)="onreset()" type="button"><i class="fas fa-sync-alt mr-2"></i>Reset</button>
+    </div>
+  </div>
+</div>
+<div class="loader-body loader-common-setting" *ngIf="showSpinner" >
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+
+
+

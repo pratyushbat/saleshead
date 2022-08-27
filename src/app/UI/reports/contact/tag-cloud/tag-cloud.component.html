@@ -1,0 +1,60 @@
+<div class="wraper-main-section mt-5">
+  <div class="global-card-section">
+    <div class="common-inner-header">
+      <div class="inner-header-bg">
+        <div class="svg-icon-panel"><img src="../../../../assets/tagtitle.svg" class="mr-1" />Tags Cloud Report</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:center">
+      <ul style="flex:1">
+        <li *ngFor="let item of tagSettingsResponse">
+          <a class="contact-cursor-pointer" (click)="onTagCloudName(item);">{{item.tag}}</a>({{item.contact}})
+        </li>
+      </ul>
+      <div style="flex:1;" *ngIf="isShowSelectedTags">
+        <div class="inner-header-bg">Selected Tags</div>
+        <div>
+          <div class="row" *ngFor="let item of selectedTags">
+            <span>{{item.tag}}</span><br />  &nbsp; &nbsp; &nbsp; &nbsp;
+            <button type="button" (click)="deleteSelectedUser(item)" title="Remove"><i class="fa-solid fa-trash"></i></button><br />
+          </div>
+        </div><br />
+        <div class="form-check">
+          <input class="form-check-input" type="radio" value="2" (change)="onViewResultTagCloud($event.target.value)" [(ngModel)]="tagSearchType" checked>
+          <label class="form-check-label">
+            Contains ANY selected tags
+          </label>
+        </div><br />
+        <div class="form-check">
+          <input class="form-check-input" type="radio" value="1" (change)="onViewResultTagCloud($event.target.value)" [(ngModel)]="tagSearchType">
+          <label class="form-check-label" >
+            Contains EVERY selected tags
+          </label>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="isShowSelectedTags" class="bg-warning inner-header-bg">
+      {{contactLength}} contact(s) included in report
+      <div class="bg-warning inner-header-bg" *ngIf="contactLength>0">
+        <button (click)="onViewResultTagCloud('showGrid')"> View Result</button>
+        <div class="form-group">
+          <select class="form-control" id="action">
+            <option>-Select Action-</option>
+            <option>Send to mailing wizard</option>
+            <option>Send to email blastwizard</option>
+            <option>Send to bulk appointment wizzard</option>
+            <option>Send to bulk action wizzard</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isShowContactList" class="margin-all-area">
+  <app-search-result-common [user]="user" [tagSearchType]="tagSearchType" (contactLength)="contactLengths($event)" [searchBy]="searchBy" [selectedTagIds]="selectedTags" [isShowSearchGrid]="isShowSearchGrid"></app-search-result-common>
+</div>
+
+
+
+

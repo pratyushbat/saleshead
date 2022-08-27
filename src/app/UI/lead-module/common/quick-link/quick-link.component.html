@@ -1,0 +1,103 @@
+<div class="create-email" #scrollIdTarget [@filterAnimation]="showAnimation">
+  <fieldset>
+    <legend>Create Link</legend>
+    <div class="email-module" *ngIf="!showEmailComponent">
+      <div class="text-right">
+        <button class="btn btn-primary task-btn-margin" [routerLink]="['/link-group',0]"><i class="fa fa-plus"></i> Add New</button>
+      </div>
+      <form [formGroup]="linkContactForm" (ngSubmit)="linkContactFormSubmit()">
+        <div class="lead-wraper-section">
+          <div class="wraper-main-section">
+            <div class="global-card-section">
+              <div class="create-link-group">
+                <div class="global-header-section">
+                  <div class="svg-icon-panel">Create Link</div>
+                  <div class="header-button-panel">
+                    <div class="button-wrapper">
+                      <button type="button" (click)="onCloseLink();" class="icon-btn">
+                        <i class="fas fa-times"></i>
+                        <span class="btn-text">Close</span>
+                      </button>
+                      <button type="button" (click)="goToLink(null);" class="icon-btn" title="Send Email to Link">
+                        <i class="fas fa-envelope"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="align-top-style">
+                <div class="global-body-section">
+                  <div class="margin-all-area">
+                    <div class="templates-alignment">
+                      <div class="full-width-container">
+                        <div class="form-group">
+                          <span class="control-label">My Link Groups</span>
+                          <div [ngClass]="{'has-error': linkContactFrm.linkId.errors && (linkContactFrm.linkId.touched ||  linkContactFrm.linkId.dirty)}">
+                            <select class="form-control" id="linkId" formControlName="linkId">
+                              <option value=null>-None Selected-</option>
+                              <option *ngFor="let item of filterLinks" [value]="item.value">{{ item.text }}</option>
+                            </select>
+                          </div>
+                          <div class="search-query-error" *ngIf="linkContactFrm.linkId.errors && ( linkContactFrm.linkId.touched ||  linkContactFrm.linkId.dirty)">
+                            <div *ngIf="linkContactFrm.linkId.errors.required">Please select Link.</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="full-width-container margin-left10">
+                        <div class="form-group">
+                          <span class="control-label">Relationship</span>
+                          <div [ngClass]="{'has-error': linkContactFrm.relationship.errors && (linkContactFrm.relationship.touched ||  linkContactFrm.relationship.dirty)}">
+                            <input type="text" class="form-control" id="relationship" formControlName="relationship" />
+                          </div>
+                          <div class="search-query-error" *ngIf="linkContactFrm.relationship.errors && ( linkContactFrm.relationship.touched ||  linkContactFrm.relationship.dirty)">
+                            <div *ngIf="linkContactFrm.relationship.errors.required">Please enter Relationship</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="templates-alignment">
+                      <div class="full-width-container">
+                        <div class="bottom-panel">
+                          <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" [disabled]="isLinkContactSubmit" type="submit">Save</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+
+    <lead-email *ngIf="showEmailComponent" [filterLinks]="filterLinks" (closeEmailComponent)="closeEmailBox($event)" [loggedUser]="loggedUser" [leadId]="ownerId" [linkId]="linkId" [linkName]="linkName"></lead-email>
+    <div class="grid-wrapper">
+      <kendo-grid #grid id="gridId"
+                  [kendoGridBinding]="linkContactList"
+                  (edit)="viewHandler($event)"
+                  [pageSize]="10" [pageable]="{buttonCount:10, pageSizes:[10,50,100,200]}">
+        <div class="grid-scroll-bar">
+          <kendo-grid-column *ngFor="let column of columns"
+                             [field]="column.field"
+                             [title]="column.title | titlecase"
+                             [width]="column.width">
+            <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+              <div class="customer-name" *ngIf="column.field == '$'">{{ rowIndex+1 }}</div>
+              <div class="customer-name" *ngIf="column.field == 'linkName'">   {{ dataItem[column.field] }}</div>
+              <div class="customer-name" *ngIf="column.field == 'numContacts'">{{ dataItem[column.field] }}</div>
+            </ng-template>
+          </kendo-grid-column>
+          <kendo-grid-command-column title="Action" width="40" min="40" [style]="{'text-align': 'center'}">
+            <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+              <button kendoGridEditCommand [primary]="true" icon="preview" title="View"></button>
+              <button kendoButton (click)="goToLink(dataItem);" [primary]="true" icon="envelop" title="Send Email to Link">
+              </button>
+            </ng-template>
+          </kendo-grid-command-column>
+        </div>
+      </kendo-grid>
+    </div>
+  </fieldset>
+</div>

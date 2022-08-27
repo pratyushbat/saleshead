@@ -1,0 +1,77 @@
+<contact-common-search [execMapDuplicate]="false" [isLead]="true"></contact-common-search>
+<div class="custom-security-link">
+  <a [routerLink]="['/calender']">Calender</a>
+</div>
+<div class="margin-all-area">
+  <div class="tag-management-panel">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../assets/leadstitle.svg" class="mr-1" />Lead Search Results</div>
+          <div class="header-button-panel">
+            <div class="button-wrapper">
+              <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputTagSearch.value = ''">Reset Grid Setting</button>
+              <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onLeadSearchFilter($event.target.value)" #inputTagSearch />
+              <button type="button" matTooltip="Add" class="icon-btn" [routerLink]="['/lead-create']">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <span class="btn-text">Add</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="global-body-section">
+          <kendo-grid class="lead-search-grid" #grid id="gridId"
+              [kendoGridBinding]="leadList"
+              [sortable]="{mode: 'multiple'}"
+              [scrollable]="'scrollable'"
+              [sort]="_gridCnfgService.sort"
+              [columnMenu]="{ filter: true }"
+              [resizable]="true"
+              [pageSize]="_gridCnfgService.pageSize"
+              [reorderable]="true"
+              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+              (columnReorder)="_gridCnfgService.columnsOrderChanged((currentUrl == '/active-leads') ? 'active_lead_grid' : 'lead_grid', $event)"
+              (sortChange)="_gridCnfgService.sortChange((currentUrl == '/active-leads') ? 'active_lead_grid' : 'lead_grid', $event)"
+              (pageChange)="_gridCnfgService.pageChange((currentUrl == '/active-leads') ? 'active_lead_grid' : 'lead_grid', $event)"
+              (columnResize)="_gridCnfgService.columnResize(12,(currentUrl == '/active-leads') ? 'active_lead_grid' : 'lead_grid', $event)"
+              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,(currentUrl == '/active-leads') ? 'active_lead_grid' : 'lead_grid',grid)">
+            <div class="grid-scroll-bar">
+              <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                  [field]="column.field"
+                  [title]="column.title | titlecase"
+                  [width]="column.width"
+                  [filterable]="true"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                  [includeInChooser]="column.field=='$' ? false : true"
+                  [editable]="column.field == '$'?false: true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'leadDesc'">  <a  class="contact-cursor-pointer" (click)="viewHandler(dataItem);"> {{ dataItem[column.field] ? dataItem[column.field] : '--' }}</a></div>
+                  <div class="customer-name" *ngIf="column.field == 'lastFirst'">{{ dataItem[column.field] ? dataItem[column.field] : '--' }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'companyName'">{{ dataItem[column.field] ? dataItem[column.field] : '--' }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'ufirstName'">{{ dataItem[column.field] ? dataItem[column.field] : '--' }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'dtStart'">{{dataItem[column.field] != '0001-01-01T00:00:00' ? (dataItem[column.field] | date:'MM/dd/yyyy') : '--'}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'dtEnd'">{{dataItem[column.field] != '0001-01-01T00:00:00' ? (dataItem[column.field] | date:'MM/dd/yyyy') : '--'}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'revenue'">{{dataItem[column.field] ? '$'+dataItem[column.field] : '$0'}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'winProbability'">{{dataItem[column.field]}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'leadStatusCode'">{{dataItem[column.field] != 0 ? dataItem[column.field] : 'Not Set'}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'dtModified'">{{dataItem[column.field] != '0001-01-01T00:00:00' ? (dataItem[column.field] | date:'MM/dd/yyyy') : '--'}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{dataItem[column.field] != '0001-01-01T00:00:00' ? (dataItem[column.field] | date:'MM/dd/yyyy') : '--'}}</div>
+                </ng-template>
+
+              </kendo-grid-column>
+            </div>
+          </kendo-grid>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+

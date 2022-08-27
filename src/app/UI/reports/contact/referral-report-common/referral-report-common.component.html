@@ -1,0 +1,35 @@
+<div class="global-body-section">
+  <kendo-grid #grid id="gridId"
+              [kendoGridBinding]="referralList"
+              scrollable="none"
+              kendoGridFocusable
+              [ngStyle]="gridHeight">
+    <div class="grid-scroll-bar">
+      <kendo-grid-column *ngFor="let column of columns"
+                         [field]="column.field"
+                         [title]="column.title | titlecase"
+                         [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                         [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                         [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                         [width]="column.width"
+                         [includeInChooser]="column.field=='$' ? false : true">
+        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+          <div class="customer-name" *ngIf="column.field == '$' && column.title == ''">
+            <a class="contact-cursor-pointer" (click)="gotoLink('address-card', dataItem);" title="View Contact"><i class="icon_contact"><img src="../../../assets/icon_contact.svg" /></i></a>
+          </div>
+          <div class="customer-name" *ngIf="column.field == 'firstName'">
+            <a (click)="gotoLink('name', dataItem);" class="text-primary">{{ dataItem.lastName }},{{ dataItem.firstName }}</a>
+          </div>
+          <div class="customer-name" *ngIf="column.field == 'email'"><a class="contact-cursor-pointer" (click)="gotoLink('email', dataItem);" title="send email to {{dataItem.email}}" *ngIf="dataItem.email"><i class="email_new"><img src="../../../assets/email_new.svg" /></i></a></div>
+          <div class="customer-name" *ngIf="column.field == 'companyName'">{{ dataItem[column.field] }} </div>
+          <div class="customer-name user-name-colunm" *ngIf="column.field == 'userName'">{{ dataItem[column.field]}}</div>
+          <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ dataItem[column.field] | date: 'MM/dd/yy'}}</div>
+        </ng-template>
+      </kendo-grid-column>
+    </div>
+  </kendo-grid>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

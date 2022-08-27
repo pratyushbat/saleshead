@@ -1,0 +1,235 @@
+<div class="container-fluid mt-3 common-alignment">
+  <div class="custom-security-link">
+    <a [routerLink]="['/email-template']">Email Templates</a>
+    <a [routerLink]="['/image-bank']">My Image Bank</a>
+    <a >Create New Email Blast</a>
+  </div>
+
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel" *ngIf="!isEnableEdit"><img src="../../../../assets/tagtitle.svg" class="mr-1" />Click Tracking</div>
+        <div class="svg-icon-panel" *ngIf="isEnableEdit"><img src="../../../../assets/tagtitle.svg" class="mr-1" />Click Track URL Settings</div>
+        <div class="header-button-panel" *ngIf="!isEnableEdit">
+          <div class="button-wrapper">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputClickSearch.value = ''">Reset Grid Setting</button>
+            <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onClickTrackingFilter($event.target.value)" #inputClickSearch />
+            <button type="button" [hidden]="roleFeaturePermissions?.create == false" matTooltip="Add" class="icon-btn" (click)="addNew()">
+              <i class="fa fa-plus"></i>
+              <span class="btn-text">Add New</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <form [formGroup]="clickTrackingForm" (ngSubmit)="clickTrackingFormSubmit()" *ngIf="isEnableEdit">
+          <div class="wraper-body-panel">
+            <div class="wraper-body-left">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>URL</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="text" class="form-control" formControlName="destinationURL" [ngClass]="{'has-error': clickTrackingFrm.destinationURL.errors && (clickTrackingFrm.destinationURL.touched || clickTrackingFrm.destinationURL.dirty)}" />
+                  <div *ngIf="clickTrackingFrm.destinationURL.errors && (clickTrackingFrm.destinationURL.touched || clickTrackingFrm.destinationURL.dirty)">
+                    <div class="login-error" *ngIf="clickTrackingFrm.destinationURL.errors.required">Enter a valid URL </div>
+                  </div>
+                </div>
+              </div>
+              <div class="admin-option-section">
+                <div class="custom-action-title">
+                  <span> Automation Trigger Settings</span>
+                </div>                
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span>Action to take</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <div class="flex-row-inner">
+                      <div class="click-txt-left">
+                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('None');" [checked]="actionRadio1">
+                        <div class="for-check-txt"> <span>None</span> </div>
+                      </div>
+                      <div class="click-txt-left">
+                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('Start');" [checked]="actionRadio2">
+                        <div class="for-check-txt"> <span>Start</span> </div>
+                      </div>
+                      <div class="click-txt-left">
+                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('Stop');" [checked]="actionRadio3">
+                        <div class="for-check-txt"> <span>Stop</span> </div>
+                      </div>
+                      <div class="click-txt-left">
+                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('Pause');" [checked]="actionRadio4">
+                        <div class="for-check-txt"> <span>Pause</span> </div>
+                      </div>
+                      <div class="click-txt-left">
+                        <input type="radio" class="forActionRadio" name="actionRadio" #actionRadio1 (change)="onChangeAction('Remove');" [checked]="actionRadio5">
+                        <div class="for-check-txt"> <span>Remove</span> </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span>Automation Process</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" formControlName="cTCampaignTemplateID">
+                      <option value="0" hidden>-Select One-</option>
+                      <option value="-1" [hidden]="clickTrackingData?.cTAction == 1">-All Processes-</option>
+                      <option *ngFor="let item of clickTemplate" [value]="item.campaignTemplateID">{{item.campaignTemplateName}}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span>Campaign Owner</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" formControlName="cTCLPUserID">
+                      <option value="0" hidden>-Contact Owner-</option>
+                      <option value="-1" [hidden]="clickTrackingData?.cTAction == 1">-All Users-</option>
+                      <option *ngFor="let item of clickUser" [value]="item.key">{{item.value}}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span>Add to Buzz Index</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="number" class="form-control" formControlName="score" [ngClass]="{'has-error': clickTrackingFrm.score.errors && (clickTrackingFrm.score.touched || clickTrackingFrm.score.dirty)}" />
+                    <div *ngIf="clickTrackingFrm.score.errors && (clickTrackingFrm.score.touched || clickTrackingFrm.score.dirty)">
+                      <div class="login-error" *ngIf="clickTrackingFrm.score.errors.required">Enter a number (-100 to 100) </div>
+                    </div>
+                    <div *ngIf="clickTrackingFrm.score.errors && (clickTrackingFrm.score.touched || clickTrackingFrm.score.dirty)">
+                      <div class="login-error" *ngIf="clickTrackingFrm.score.errors?.min || clickTrackingFrm.score.errors?.max">Invalid number. (-100 to 100)</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <div class="bottom-button-bar">
+                      <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"> Save</button>
+                      <button class="btn btn-cancel" type="button" (click)="cancelRep()"> Cancel</button>
+                      <button class="btn btn-danger" [hidden]="roleFeaturePermissions?.delete == false" type="button" data-toggle="modal" data-target="#deleteclickTrackingModal" *ngIf="isEdit"> Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div class="modal fade" id="deleteclickTrackingModal" tabindex="-1" role="dialog" aria-labelledby="deleteclickTrackingModal" aria-hidden="true">
+          <div class="modal-dialog  modal-common-dialog" role="document">
+            <div class="modal-content modal-common-content">
+              <div class="modal-header modal-common-background">
+                <h4 class="modal-title modal-common-title">Confirmation</h4>
+              </div>
+              <div class="modal-body modal-common-body">
+                <h2>Please confirm that you would like to delete this Click.</h2><br />
+                <h2>Note: All click history for all contacts who have ever clicked on this Click tracking link will be permanentally deleted.</h2>
+              </div>
+              <div class="modal-footer bg-white">
+                <button type="button" (click)="deleteclickTracking();" data-dismiss="modal" class="btn btn-danger">Confirm Delete</button>
+                <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <kendo-grid *ngIf="!isEnableEdit" class="click-tracking-grid" #grid id="gridId"
+          [kendoGridBinding]="clickTrackingDataList"
+            (edit)="editHandler($event)"
+            [sortable]="{mode: 'multiple'}"
+            [sort]="_gridCnfgService.sort"
+            [pageSize]="_gridCnfgService.pageSize"
+            [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+            [scrollable]="'false'"
+            [reorderable]="true"
+            [resizable]="true"
+            [columnMenu]="{ filter: true }"
+            [ngStyle]="gridHeight"
+            (columnReorder)="_gridCnfgService.columnsOrderChanged('click_tracking_grid', $event)"
+            (sortChange)="_gridCnfgService.sortChange('click_tracking_grid', $event)"
+            (pageChange)="_gridCnfgService.pageChange('click_tracking_grid', $event)"
+            (columnResize)="_gridCnfgService.columnResize(4,'click_tracking_grid', $event)"
+            (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'click_tracking_grid',grid)">
+            <div class="grid-scroll-bar">
+              <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                [field]="column.field"
+                [title]="column.title"
+                [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                [width]="column.width"
+                [filterable]="true"
+                [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                [includeInChooser]="column.field=='$' ? false : true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="column.field == '$' && column.title == ''">{{ rowIndex+1 }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'destinationURL'">
+                    URL:
+                    <a href="{{Url}}" (click)="geturl(dataItem.destinationURL)" target="_blank" class="text-primary">{{ dataItem[column.field] }}</a>
+                  </div>
+                  <div class="customer-name" *ngIf="column.field == 'clickURL'">
+                    {{ dataItem[column.field] }}
+                  </div>
+                  <div class="customer-name" *ngIf="column.field == 'sfaSettings'" >
+                    <div *ngIf="dataItem[column.field] == 'None'">
+                      <span class="font-weight-bold negativeProgress">Not Set</span>
+                    </div>
+                    <div *ngIf="dataItem[column.field] != 'None' && dataItem[column.field] != 'Stop'">
+                      <span>{{ dataItem[column.field] }} - {{ dataItem.cTCampaignTemplateID == "-1" ? 'All Processes':clickTrackingDataList[rowIndex].campaignTemplateName }}for&nbsp;{{ clickTrackingDataList[rowIndex].userName }}</span>
+                    </div>
+                    <div *ngIf="dataItem[column.field] == 'Stop'" >
+                      <span class="font-weight-bold negativeProgress">{{ dataItem[column.field] }}</span> - {{ dataItem.cTCampaignTemplateID == "-1" ? 'All Processes':clickTrackingDataList[rowIndex].campaignTemplateName }}for&nbsp;{{ clickTrackingDataList[rowIndex].userName }}
+                    </div>
+                  </div>
+                  <div class="customer-name" *ngIf="column.field == 'score'">{{ dataItem[column.field]}}</div>
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-grid-command-column title="Action" [hidden]="roleFeaturePermissions?.edit == false"  width="40" min="40" [style]="{'text-align': 'center'}" [includeInChooser]="false" [reorderable]="false" [columnMenu]="false">
+                <ng-template kendoGridCellTemplate>
+                  <button kendoGridEditCommand [hidden]="roleFeaturePermissions?.edit == false" [primary]="true" icon="edit" title="Edit"></button>
+                </ng-template>
+              </kendo-grid-command-column>
+            </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+
+  <div class="important-msg-section" *ngIf="isEdit">
+    <div class="important-msg-panel">
+      <table>
+        <thead>
+          <tr>
+            <th>Important Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="text-danger font-weight-bold">To implement this click-tracking link into your HTML template, simply replace the URL: </span>{{clickTrackingFrm.destinationURL.value}}</td>
+          </tr>
+          <tr>
+            <td><span class="text-danger font-weight-bold">with the following text:</span><span>{{clickTrackingData.clickURL}}</span> </td>
+          </tr>
+          <tr>
+            <td> <span class="text-danger font-weight-bold"> Note: This text is your entire URL. Do NOT include 'www.' or 'http:'.</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>
+</div>

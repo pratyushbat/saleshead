@@ -1,0 +1,222 @@
+<div class="container-fluid mt-3">
+  <div class="p-2">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="inner-header-bg">
+          <div class="inner-cards-panel header-inner-hidden">
+            <span>Date Filter</span>
+            <span></span>
+            <span>User Filter</span>
+            <span>Score Type</span>
+            <span>{{buzzScoreResponse?.class1CodeHead}}</span>
+            <span>{{buzzScoreResponse?.class4CodeHead}}</span>
+          </div>
+        </div>
+        <form [formGroup]="buzzScoreForm" (ngSubmit)="buzzFormSubmit()">
+          <div class="inner-cards-grid">
+            <div class="inner-card-mobile">
+              <div class="">
+                <span class="mr-2 font-weight-bold">Start</span>
+                <kendo-datepicker formControlName="startDt"></kendo-datepicker>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <div class="">
+                <span class="mr-2 font-weight-bold">End</span>
+                <kendo-datepicker formControlName="endDt"></kendo-datepicker>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <label>User Filter</label>
+              <div class="">
+                <select class="form-control" formControlName="userFilter" >
+                  <option [value]="0">-All-</option>
+                  <option *ngFor="let item of  buzzScoreResponse?.userDd; let i= index;" [value]="item?.key ">{{item?.value}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <label>Score Type</label>
+              <div class="">
+                <select class="form-control" formControlName="scoreType">
+                  <option [value]="0">-Select One-</option>
+                  <option *ngFor="let item of  buzzScoreResponse?.scoreTypeDd; let i= index;" [value]="item?.key ">{{item?.text}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <label>{{buzzScoreResponse?.class1CodeHead}}</label>
+              <div class="">
+                <select class="form-control" formControlName="class1Code">
+                  <option [value]="0">-Select One-</option>
+                  <option *ngFor="let item of  buzzScoreResponse?.class1CodeDd; let i= index;" [value]="item?.class1Code ">{{item?.display}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <label>{{buzzScoreResponse?.class4CodeHead}}</label>
+              <div class="">
+                <select class="form-control" formControlName="class4Code">
+                  <option [value]="0">-Select One-</option>
+                  <option *ngFor="let item of  buzzScoreResponse?.class4CodeDd; let i= index;" [value]="item?.class4Code ">{{item?.display}}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="inner-card-mobile">
+              <label>Action</label>
+              <div class="">
+                <div class="text-right">
+                  <button type="submit" class="common-colunm-btn">
+                    <i class="fa fa-refresh" title="Refresh"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <p *ngIf="!isShowGridData" class="text-align-center">Please select the criteria for your report and click the Refresh button.</p>
+    
+      <div class="wraper-main-section mt-5" *ngIf="isShowGridData">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel"><img src="../../../../../assets/leadstitle.svg" class="mr-1" />Buzz Score Result (From{{buzzScoreData?.startDt}}-To&nbsp;{{buzzScoreData?.endDt}})</div>
+            <div class="header-button-panel white-font">
+              <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputBuzzScore.value = '' ">Reset Grid Setting</button>
+              <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onBuzzScoreFilter($event.target.value)" #inputBuzzScore /> &nbsp;&nbsp;
+            </div>
+          </div>
+          <div class="global-body-section">
+            <kendo-grid #grid id="gridId" class="pro-rev-month-grid"
+                        [kendoGridBinding]="buzzScoreList"
+                        [sortable]="{mode: 'multiple'}"
+                        [sort]="_gridCnfgService.sort"
+                        [pageSize]="_gridCnfgService.pageSize"
+                        [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                        [scrollable]="false"
+                        [reorderable]="true"
+                        [resizable]="true"
+                        [columnMenu]="{ filter: true }"
+                        (columnReorder)="_gridCnfgService.columnsOrderChanged('buzz_score_grid', $event)"
+                        (sortChange)="_gridCnfgService.sortChange('buzz_score_grid', $event)"
+                        (pageChange)="_gridCnfgService.pageChange('buzz_score_grid', $event)"
+                        (columnResize)="_gridCnfgService.columnResize(4,'buzz_score_grid', $event)"
+                        (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'buzz_score_grid',grid)">
+              <ng-template kendoGridToolbarTemplate>
+                <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+                  <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                  <span>Download Excel</span>
+                </button>
+                <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+                  <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                  <span>Download PDF</span>
+                </button>
+              </ng-template>
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                                   [field]="column.field"
+                                   [title]="column.title"
+                                   [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                   [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                   [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                   [width]="column.width"
+                                   [filterable]="true">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                    <div class="customer-name" *ngIf="column.title == ' '"><a class="contact-cursor-pointer" (click)="gotoLink('address-card', dataItem);" title="View Contact"><i class="icon_contact"><img src="../../../assets/icon_contact.svg" /></i></a></div>
+                    <div class="customer-name" *ngIf="column.field == 'firstName'"><a class="contact-cursor-pointer" (click)="onUserNameClick(dataItem)">{{ dataItem[column.field] }}</a></div>
+                    <div class="customer-name" *ngIf="column.field == 'email'">{{ dataItem[column.field]?dataItem[column.field]:'--'}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'phone'">{{ dataItem[column.field]?dataItem[column.field]:'--'}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'mobile'">{{ dataItem[column.field]?dataItem[column.field]:'--'}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'homePhone'">{{  dataItem[column.field]?dataItem[column.field]:'--'}}</div>
+                    <a class="webkit-any-link" (click)="gotoLink('userName', dataItem);" [style.color]="column.field == 'userName'? '#1c0dbf':''" *ngIf="column.field == 'uFirstName'">{{buzzScoreList[rowIndex].uFirstName}}&nbsp;{{buzzScoreList[rowIndex].uLastName}}</a>
+                    <div class="customer-name" *ngIf="column.field == 'score'"><a class="contact-cursor-pointer" (click)="onBuzzScore(dataItem)">{{ dataItem[column.field]}}</a></div>
+                    <div class="customer-name" *ngIf="column.field == 'events'">{{ dataItem[column.field]}}</div>
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-excelexport #excelexport [data]="buzzScoreList" fileName='Buzz Score'>
+                  <kendo-excelexport-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name">{{ dataItem[col.field] }}</div>
+                    </ng-template>
+                  </kendo-excelexport-column>
+                </kendo-excelexport>
+                <kendo-grid-pdf fileName="Buzz Score.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                  <kendo-grid-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name">{{ dataItem[col.field] }}</div>
+                    </ng-template>
+                  </kendo-grid-column>
+                </kendo-grid-pdf>
+              </div>
+            </kendo-grid>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+<div class="modal fade" id="buzzScoreCalculation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-focus="false">
+  <div class="custom-modal-panel" role="document">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content user-body-section border-radius-contact">
+        <div class="modal-header user-body-header">
+          <h5 class="modal-title white-contact" id="exampleModalLabel"> Buzz Index Calculation</h5>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeModal();"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+          <h6>Contact: <b>{{buzzIndexCalcModal?.firstName}}</b></h6>  &nbsp;&nbsp; <h6>Buzz Index: <b>{{buzzIndexCalcModal?.score}}</b></h6>
+          <div class="global-body-section">
+            <kendo-grid #grid id="gridId" class="pro-rev-month-grid"
+                        [kendoGridBinding]="scoreHistoryResponse"
+                        [sortable]="{mode: 'multiple'}"
+                        [sort]="_gridCnfgServiceBSC.sort"
+                        [pageSize]="_gridCnfgServiceBSC.pageSize"
+                        [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                        [scrollable]="false"
+                        [reorderable]="true"
+                        [resizable]="true"
+                        [columnMenu]="{ filter: true }"
+                        (columnReorder)="_gridCnfgServiceBSC.columnsOrderChanged('buzz_score_calculation_grid', $event)"
+                        (sortChange)="_gridCnfgServiceBSC.sortChange('buzz_score_calculation_grid', $event)"
+                        (pageChange)="_gridCnfgServiceBSC.pageChange('buzz_score_calculation_grid', $event)"
+                        (columnResize)="_gridCnfgServiceBSC.columnResize(4,'buzz_score_grid', $event)"
+                        (columnVisibilityChange)="_gridCnfgServiceBSC.onVisibilityChange($event,'buzz_score_calculation_grid',grid)">
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgServiceBSC.columns"
+                                   [field]="column.field"
+                                   [title]="column.title"
+                                   [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                   [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                   [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                   [width]="column.width"
+                                   [filterable]="true">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'score'">{{ dataItem[column.field]}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'type'">{{ dataItem[column.field]}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ dataItem[column.field] | date: 'M/d/yy, h:mm:ss a'}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'delete'"><a class="" (click)="resetSingleScore(dataItem)"><i class="fa-solid fa-trash-can"></i></a></div>
+                  </ng-template>
+                </kendo-grid-column>
+              </div>
+            </kendo-grid>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="resetScoreHistory();">Reset Index</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal" (click)="closeModal();">Close this window</button>
+        </div>
+      </div>
+    </div>
+    <div class="loader-body" *ngIf="isShowSpinner">
+      <div class="lds-ripple"><div></div><div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

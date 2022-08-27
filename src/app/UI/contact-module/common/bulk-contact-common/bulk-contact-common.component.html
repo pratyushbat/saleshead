@@ -1,0 +1,211 @@
+<div class="container-fluid">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/bulkcontactstitle.svg" class="mr-1" /> Bulk Contact Actions</div>
+        <div class="header-button-panel" *ngIf="!isSelectAction">
+          <div class="button-wrapper">
+            <label class="info-text" *ngIf="!selectAllContacts">Contacts selected: {{mySelection.length}}</label>
+            <label class="info-text" *ngIf="selectAllContacts">Contacts selected: {{contactsArchiveData.length}}</label>
+            <button class="btn btn-primary" [disabled]="mySelection.length<=0 ||contactsArchiveData.length<=0" type="button" (click)="selectAction();">Select Checked</button>
+            <button class="btn btn-primary" [disabled]="contactsArchiveData.length<=0" type="button" (click)="selectAction();  selectAllContacts=true;">Select All</button>
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputContactSearch.value = ''">Reset Grid Setting</button>
+            <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onContactArchiveListFilter($event.target.value)" #inputContactSearch />
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section" *ngIf="!isSelectAction">
+        <div class="alert-panel">Please use the Quick Search panel on the right to search for contacts.</div>
+        <kendo-grid class="bulk-contact-grid" #grid id="gridId"
+          [kendoGridBinding]="contactsArchiveData"
+          kendoGridSelectBy="contactID"
+          [selectable]="{enabled: true, checkboxOnly: true }"
+          [(selectedKeys)]="mySelection"
+          [pageSize]="_gridCnfgService.pageSize"
+          [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+          [sortable]="{mode: 'multiple'}"
+          [scrollable]="'scrollable'"
+          [sort]="_gridCnfgService.sort"
+          [columnMenu]="{ filter: true }"
+          [resizable]="true"
+          [reorderable]="true"
+          [ngStyle]="gridHeight"
+          (columnReorder)="_gridCnfgService.columnsOrderChanged('contact_bulk_action_grid', $event)"
+          (sortChange)="_gridCnfgService.sortChange('contact_bulk_action_grid', $event)"
+          (pageChange)="_gridCnfgService.pageChange('contact_bulk_action_grid', $event)"
+          (columnResize)="_gridCnfgService.columnResize(5,'contact_bulk_action_grid', $event)"
+          (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'contact_bulk_action_grid',grid)">
+          <div class="grid-scroll-bar">
+            <kendo-grid-checkbox-column [width]="45"
+              [headerClass]="{ 'text-center': true }"
+              [class]="{ 'text-center': true }"
+              [resizable]="false"
+              [columnMenu]="false"
+              showSelectAll="true"></kendo-grid-checkbox-column>
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+              [field]="column.field"
+              [title]="column.title | titlecase"
+              [width]="column.field == '$' ? '40' : column.width"
+              [filterable]="true"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+              [includeInChooser]="column.field=='$' ? false : true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                <div class="customer-name" *ngIf="column.title == '  '"><a class="contact-cursor-pointer" (click)="gotoLink('address-card', dataItem);" title="View Contact"><i class="icon_contact"><img src="../../../assets/icon_contact.svg" /></i></a></div>
+                <div class="customer-name" *ngIf="column.field == 'email'"><a class="contact-cursor-pointer" (click)="gotoLink('email', dataItem);" title="send email to {{dataItem.email}}" *ngIf="dataItem.email"><i class="email_new"><img src="../../../assets/email_new.svg" /></i></a></div>
+                <div class="customer-name" *ngIf="column.field == 'phone'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--'"></span></div>
+                <div class="customer-name" [ngClass]="[column.field=='name' ? 'text-left' : '',  column.field=='companyName' ? 'text-left' : '']" *ngIf="showColumn(column.field)" [hidden]="column.field=='$'">
+                  <a class="webkit-any-link" (click)="gotoLink(column.field, dataItem);" [style.color]="column.field == 'userName'? '#1c0dbf':''" *ngIf="column.field == 'name' || column.field == 'userName'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</a>
+                  <span [hidden]="column.field == 'name' || column.field == 'userName' || column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</span>
+                  <span *ngIf="column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy' }}</span>
+                </div>
+              </ng-template>
+            </kendo-grid-column>
+          </div>
+        </kendo-grid>
+      </div>
+
+      <div class="wraper-main-section" *ngIf="isSelectAction">
+        <div class="global-card-section">
+          <div class="wraper-body-panel" *ngIf="isSelectActionButton">
+            <div class="wraper-body-left">
+              <div class="alert-panel">Please select the type of bulk action that you would like to perform on the selected contacts.</div>
+              <div class="bottom-button-bar">
+                <div class="button-bar-align">
+                  <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.edit == false" (click)="editField();">Edit A Field</button>
+                  <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.edit == false" (click)="transferOwnerField();">Transfer Ownership</button>
+                  <button class="btn btn-outline-danger" [hidden]="roleFeaturePermissions?.delete == false" (click)="isDeleteContact = true; isSelectActionButton = false">Permanently Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="wraper-body-panel" *ngIf="isEditField">
+            <div class="wraper-body-left">
+              <div class="alert-panel">Please select the field you would like to edit.</div>
+              <form [formGroup]="bulkEditFieldForm" (ngSubmit)="updateContacts()">
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span>Select Field</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" formControlName="ddField" *ngIf="bulkEditFieldForm.controls.ddField.value == ''" (change)="onChangeField(bulkEditFieldForm.controls.ddField.value);">
+                      <option *ngFor="let item of fieldDropdown;">{{item}}</option>
+                    </select>
+                    <span *ngIf="bulkEditFieldForm.controls.ddField.value != ''">{{bulkEditFieldForm.controls.ddField.value}}</span>
+                  </div>
+                </div>
+                <div class="cards-body-section" *ngIf="bulkEditFieldForm.controls.ddField.value != ''">
+                  <div class="cards-colunm-left">
+                    <span>Edit Type</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" formControlName="editType" *ngIf="bulkEditFieldForm.controls.editType.value == -1">
+                      <option value="-1">Select one</option>
+                      <option value="0" [hidden]="isTagSelected">Replace</option>
+                      <option value="1" [hidden]="isMoreFieldSelected">Add to</option>
+                      <option value="2" [hidden]="isTagSelected">Clear</option>
+                      <option value="3" [hidden]="!isTagSelected">Remove</option>
+                    </select>
+                    <span *ngIf="bulkEditFieldForm.controls.editType.value == 0">Replace</span>
+                    <span *ngIf="bulkEditFieldForm.controls.editType.value == 1">Add to</span>
+                    <span *ngIf="bulkEditFieldForm.controls.editType.value == 2">Clear</span>
+                    <span *ngIf="bulkEditFieldForm.controls.editType.value == 3">Remove</span>
+                  </div>
+                </div>
+                <div class="cards-body-section" *ngIf="bulkEditFieldForm.controls.editType.value == 0 || bulkEditFieldForm.controls.editType.value == 1">
+                  <div class="cards-colunm-left">
+                    <span>Value</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input class="form-control" type="text" formControlName="textValue" [ngClass]="{'has-error': bulkEditFieldForm.controls.textValue.errors && (bulkEditFieldForm.controls.textValue.touched || bulkEditFieldForm.controls.textValue.dirty)}" />
+                    <div *ngIf="bulkEditFieldForm.controls.textValue.errors && (bulkEditFieldForm.controls.textValue.touched || bulkEditFieldForm.controls.textValue.dirty)">
+                      <div class="login-error" *ngIf="bulkEditFieldForm.controls.textValue.errors.required">URL is required </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section" *ngIf="bulkEditFieldForm.controls.editType.value != -1">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <div class="bottom-button-bar">
+                      <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"><i class="fas fa-save mr-1"></i>Save</button>
+                      <button class="btn btn-cancel" type="button" (click)="cancelBulkAction();"><i class="fa fa-times"></i>Cancel</button>                      
+                    </div>
+                  </div>                  
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="wraper-body-panel" *ngIf="transferOwner">
+            <div class="wraper-body-left">
+              <div class="alert-panel">Please select the new owner of all checked contacts.</div>
+              <form [formGroup]="bulkTransferFieldForm" (ngSubmit)="transferContacts()">
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span>New Owner</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" formControlName="ddValue">
+                      <option value="0" hidden>Does not Exist</option>
+                      <option *ngFor="let item of clickUser" [value]="item.key">{{item.value}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span>Transfer all SFA related data</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" formControlName="trTransferSFA" />
+                    <p>Note: This will include all pending campaign appointments, emails, notes, tasks, triggers, and text messages.</p>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span>Transfer all contact related data</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" formControlName="cbTransferSFA" />
+                    <p>Note: This will include appointments, notes, tasks, leads, etc...that are related to these contacts.</p>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <div class="button-bar-align">
+                      <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"><i class="fas fa-save mr-1"></i>Save</button>
+                      <button class="btn btn-cancel" type="button" (click)="cancelBulkAction();"><i class="fa fa-times"></i>Cancel</button>                    
+                    </div>                    
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="wraper-body-panel" *ngIf="isDeleteContact">
+            <div class="wraper-body-left">
+              <div class="alert-panel">
+                <span>Caution: You are about to permanently delete all checked contacts along with all related items such as appointments, tasks, leads, etc... Please confirm.</span>
+              </div>
+              <div class="bottom-button-bar">
+                <div class="button-bar-align">
+                  <button class="btn btn-danger " [hidden]="roleFeaturePermissions?.delete == false" (click)="deleteContacts(); isDeleteContact = false;">Permanently Delete</button>
+                  <button class="btn btn-cancel" type="button" (click)="isDeleteContact = false; isSelectAction = false"><i class="fa fa-times"></i>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="alert-panel">
+            <span *ngIf="!selectAllContacts">Total records selected: {{mySelection.length}}</span>
+            <span *ngIf="selectAllContacts">Total records selected: {{contactsArchiveData.length}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>
+</div>

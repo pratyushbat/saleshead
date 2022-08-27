@@ -1,0 +1,72 @@
+{
+  "filter": [
+
+    {
+      "value": "0",
+      "name": "This Month",
+      "link": ""
+    },
+    {
+      "value": "1",
+      "name": "Last Month",
+      "link": ""
+    },
+    {
+      "value": "2",
+      "name": "Fiscal YTD",
+      "link": ""
+    },
+    {
+      "value": "8",
+      "name": "Fiscal 2020",
+      "link": ""
+    },
+    {
+      "value": "3",
+      "name": "Fiscal 2019",
+      "link": ""
+    },
+    {
+      "value": "4",
+      "name": "Fiscal 2018",
+      "link": ""
+    },
+    {
+      "value": "5",
+      "name": "Calendar YTD",
+      "link": ""
+    },
+    {
+      "value": "6",
+      "name": "Custom",
+      "link": ""
+    },
+    {
+      "value": "7",
+      "name": "-All-",
+      "link": ""
+    }
+
+  ],
+
+  "type": [
+    {
+      "id": "-1",
+      "text": "-All-"
+    },
+    {
+      "id": "New",
+      "text": "New Contracts"
+    },
+    {
+      "id": "Upgrade",
+      "text": "Upgrade"
+    },
+    {
+      "id": "Transfer",
+      "text": "Transfer"
+    }
+  ]
+
+
+}

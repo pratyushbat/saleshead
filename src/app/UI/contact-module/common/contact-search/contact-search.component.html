@@ -1,0 +1,182 @@
+<div class="contact-add-search-module" [@filterAnimation]="showAnimation">
+  <fieldset>
+    <legend>Contact Search</legend>
+    <div class="contact-add-search-Section">
+      <div class="modal-body">
+        <div class="">
+          <div class="grid-modal-content">
+            <div class="height-section">
+              <div [formGroup]="_contactSearchService.searchQueriesForm">
+                <div formArrayName="searchQueries">
+                  <div class="alignment-bottom">
+                    <div class="">
+                      <div class="">
+                        <table class="group-grid" border="0" id="tblSearch">
+                          <tr>
+                            <th class="column-one"></th>
+                            <th class="column-two" (click)="createGroups()"><img src="../../../assets/disable_group.png" [hidden]="isGroup" /><img src="../../../assets/active_group.png" [hidden]="!isGroup" /></th>
+                            <th id="thGroup"></th>
+                            <th class="column-three">And/Or	</th>
+                            <th class="column-four">Field</th>
+                            <th class="column-five">Operator</th>
+                            <th class="column-last">Value</th>
+                          </tr>
+                          <tr class="" *ngFor="let sr of _contactSearchService.searchQueriesCtls.controls; let i = index" [formGroupName]="i">
+                            <td class="column-one">
+                              <i class="fa fa-plus" aria-hidden="true" (click)="addSearchQuery()"></i>
+                              <i class="fa fa-times" aria-hidden="true" (click)="deleteSearchQuery(i,true)"></i>
+                            </td>
+                            <td class="column-two">
+                              <input id="chkIschecked{{i}}" [attr.disabled]="_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value==-1 ? 'true' : null" type="checkbox" formControlName="isSelected" class="form-control" (click)="selectGroupRow(i)" />
+                            </td>
+                            <td id="tdGroup{{minTwoDigits(i)}}" [hidden]="true"></td>
+                            <td class="column-three">
+                              <select id="drpMainOperator{{i}}" formControlName="mainOperator" class="form-control" [hidden]="i==0" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.mainOperator.invalid && isSearchSubmit && i!=0}">
+                                <option [selected]="true" [value]="null" disabled>--Select--</option>
+                                <option value='OR'>OR</option>
+                                <option value='AND'>AND</option>
+                              </select>
+                            </td>
+                            <td class="column-four">
+                              <select id="drpFields{{i}}" formControlName="searchItem" (change)="drpFields_onChange(i)" class="form-control" *ngIf="_contactSearchService.searchItems.length>0" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.searchItem.invalid && isSearchSubmit}">
+                                <option [selected]="true" [value]="null" disabled>--Please select--</option>
+                                <option *ngFor="let searchItem of _contactSearchService.searchItems; let i = index"
+                                        [value]="i">
+                                  {{searchItem.displayValue}}
+                                </option>
+                              </select>
+                            </td>
+                            <td class="column-five">
+                              <input type="text" disabled class="form-control search-input-height" *ngIf="_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value==-1" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.operator.invalid && isSearchSubmit}" />
+                              <select id="drpOperator{{i}}" (change)="drpOperator_onChange(i)" formControlName="operator" class="form-control" *ngIf="(_contactSearchService.searchItems && _contactSearchService.searchItems.length > 1) && (_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value>=0)" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.operator.invalid && isSearchSubmit}">
+                                <option *ngFor="let item of _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].searchOperators; let x = index" [value]='item.value'>{{item.operator}}</option>
+                              </select>
+                            </td>
+                            <td class="column-last">
+                              <input type="text" disabled class="form-control" *ngIf="_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value ==-1" />
+                              <input type="text" id="txtFieldData{{i}}" formControlName="searchItemValue" class="form-control" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.searchItemValue.invalid && isSearchSubmit}" *ngIf="_contactSearchService.searchItems.length > 1 && _contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value>=0 && _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].controlType == 't'" />
+                              <input type="hidden" id="txtTableName{{i}}" formControlName="tableName" />
+                              <input type="hidden" id="txtColumnName{{i}}" formControlName="columnName" />
+                              <input type="hidden" id="txtControlType{{i}}" />
+                              <select id="drpFieldData{{i}}" formControlName="searchItemValue" class="form-control" *ngIf="(_contactSearchService.searchItems && _contactSearchService.searchItems.length > 1) && (_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value>=0 && _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'd')" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.searchItemValue.invalid && isSearchSubmit}">
+                                <option *ngFor="let item of _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].itemData" [value]="item.value">{{item.display}}</option>
+                              </select>
+
+                              <mat-select id="drpFieldData{{i}}" (openedChange)="drpMultiFieldData_onChange($event,i)" formControlName="selectedValueForMultiSelect" class="form-control" multiple *ngIf="(_contactSearchService.searchItems && _contactSearchService.searchItems.length > 1) && (_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value>=0 && _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'md')" [ngClass]="{'has-error':  _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.selectedValueForMultiSelect.invalid && isSearchSubmit}">
+                                <mat-option *ngFor="let item of _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].itemData" [value]="item.value">{{item.display}}</mat-option>
+                              </mat-select>
+
+                              <span class="text-range" *ngIf="(_contactSearchService.searchItems && _contactSearchService.searchItems.length > 1) && (_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value>=0 && _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'r')">
+                                <input type="text" id="txtFieldData_rangeFrom{{i}}" formControlName="txtRangeFrom" class="form-control" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.txtRangeFrom.invalid && isSearchSubmit && (_contactSearchService.searchItems.length > 1 && _contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value>=0 && _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'r')}" />
+                                <span class="fa fa-minus contact-span-range" ></span>
+                                <input type="text" id="txtFieldData_rangeTo{{i}}" formControlName="txtRangeTo" class="form-control" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.txtRangeTo.invalid && isSearchSubmit && (_contactSearchService.searchItems.length > 1 && _contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value>=0 && _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'r')}" />
+                                <span class="clear"></span>
+                              </span>
+
+                              <span *ngIf="(_contactSearchService.searchItems && _contactSearchService.searchItems.length > 1) && (_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value>=0 && _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'dt')">
+                                <mat-form-field appearance="fill" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.dtStart.invalid && isSearchSubmit || _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.dtEnd.invalid && isSearchSubmit}">
+                                  <mat-date-range-input [rangePicker]="picker" class="date-picker-panel">
+                                    <input matStartDate placeholder="Start date" formControlName="dtStart">
+                                    <input matEndDate placeholder="End date" formControlName="dtEnd">
+                                  </mat-date-range-input>
+                                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                  <mat-date-range-picker #picker></mat-date-range-picker>
+                                </mat-form-field>
+                              </span>
+                              <span *ngIf="(_contactSearchService.searchItems && _contactSearchService.searchItems.length > 1) && (_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value>=0 && _contactSearchService.searchItems[_contactSearchService.searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'dtCustom')">
+                                <mat-form-field class="example-full-width" appearance="fill" [ngClass]="{'has-error': _contactSearchService.searchQueriesForm.controls['searchQueries'].controls[i].controls.searchItemValue.invalid && isSearchSubmit}">
+                                  <input matInput [matDatepicker]="picker" formControlName="searchItemValue">
+                                  <mat-datepicker-toggle matSuffix [for]="picker">
+                                  </mat-datepicker-toggle>
+                                  <mat-datepicker #picker></mat-datepicker>
+                                </mat-form-field>
+                              </span>
+                            </td>
+                          </tr>
+                        </table>
+                        <a  class="column-one contact-cursor-pointer" (click)="addSearchQuery()">&nbsp;Add new clause</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="contact-add-search-module">
+        <div class="">
+          <div class="search-sub-form-contact" >
+            <div class="">
+              <div *ngIf="IsSaveSearch">
+                <form class="form-horizontal required-section" [formGroup]="saveSearchForm">
+                  <div class="search-query-panel">
+                    <div class="" [ngClass]="{'has-error': saveSearchFrm.SearchQueryName.errors && (saveSearchFrm.SearchQueryName.touched ||  saveSearchFrm.SearchQueryName.dirty)}">
+                      <div class="search-query-alignment">
+                        <label class="control-label" for="SearchQueryName">Search Name <span class="red-contact-span">*</span></label>
+                        <div class="search-input-box">
+                          <input type="text" id="SearchQueryName" class="form-control" formControlName="SearchQueryName" />
+                          <div class="search-query-error" *ngIf="saveSearchFrm.SearchQueryName.errors && ( saveSearchFrm.SearchQueryName.touched ||  saveSearchFrm.SearchQueryName.dirty)">
+                            <div *ngIf="saveSearchFrm.SearchQueryName.errors.required">Search Name is a required</div>
+                          </div>
+                          <div class="search-query-error" *ngIf="savedQuery_response && savedQuery_response.messageBool">
+                            {{ savedQuery_response.errorMsg }}
+                          </div>
+                        </div>
+                        <button class="btn btn-save" (click)="SubmitSearch()" title="Submit Search" [hidden]="isEditSavedSearch"> Submit Search</button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="">
+        <div class="button-panel">
+          <div class="bottom-btn-panel">
+            <button class="btn btn-primary" (click)="runSearch()" title="Run Search"> Run Search</button>
+            <button class="btn btn-primary" (click)="saveSearch()" title="Save Search" *ngIf="!isEditSavedSearch"> Save Search</button>
+            <button class="btn btn-primary" (click)="updateSearch()" title="Update Search" *ngIf="isEditSavedSearch"> Update Search</button>
+            <button class="btn btn-danger" (click)="showDeleteSearch()" title="Delete Search" *ngIf="isEditSavedSearch"> Delete Search</button>
+            <button class="btn btn-cancel" (click)="hideSearch(true)" title="Cancel"> Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+<div class="contract-search-modal">
+  <div class="modal fade" id="modalDeleteSearch" tabindex="-1" role="dialog" aria-labelledby="modalCancelContract" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="Document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title text-left" id="modalCancelContractTitle">Delete Search</h4>
+          <button (click)="hideDeleteSearch()" title="Cancel"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="">
+            <div class="grid-modal-content">
+              <div class="">
+                <p>{{delete_string}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="deleteSavedQuery();">Yes</button>
+          <button type="button" class="btn btn-cancel" (click)="hideDeleteSearch()" title="Cancel">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="loader3">
+    <span></span>
+    <span></span>
+  </div>
+</div>

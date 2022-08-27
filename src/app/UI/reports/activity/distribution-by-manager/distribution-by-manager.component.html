@@ -1,0 +1,181 @@
+<div class="margin-all-area">
+  <div class="wraper-body-panel">
+    <div class="wraper-body-left">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="common-inner-header">
+            <div class="inner-header-bg">
+              <div class="inner-cards-panel header-inner-hidden">
+                <span>View</span>
+                <span>Created Date</span>
+                <span></span>
+              </div>
+              <div class="inner-detail-bg">
+                <span>Details</span>
+              </div>
+            </div>
+          </div>
+          <div class="common-inner-cards">
+            <form [formGroup]="distByManagerForm" (ngSubmit)="GetDistByManagerBindReport()">
+              <div class="inner-cards-grid">
+                <div class="inner-card-mobile">
+                  <label>View</label>
+                  <div class="mobile-view-design">
+                    <div class="display-row">
+                      <select class="form-control" formControlName="ddViews">
+                        <option *ngFor="let item of ddFieldsResponse?.ddView; let i= index;" [value]="item?.value">{{item?.text}}</option>
+                      </select>
+                      <p><input type="checkbox" class="checkbox" formControlName="includeZeroes" /></p>
+                    </div>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <label>Created Date</label>
+                  <div class="mobile-view-design">
+                    <div class="display-row">
+                      <kendo-datepicker formControlName="startDate"></kendo-datepicker>
+                      &nbsp;<kendo-datepicker formControlName="endDate"></kendo-datepicker>                      
+                    </div>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <label>Action</label>
+                  <div class="mobile-view-design">
+                    <button type="submit" class="grid-common-btn">
+                      <i class="fa fa-refresh"></i>
+                      <span class="grid-common-text">Refresh</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wraper-body-right"></div>
+</div>
+
+
+<div class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/contactstitle.svg" class="mr-1" />Contact Distribution By User </div>
+      </div>
+      <div class="align-top-style">
+        <div class="wraper-body-panel">
+          <div class="wraper-body-left">
+            <kendo-grid #grid id="gridId"
+              [kendoGridBinding]="ddFieldsResponse?.distributionByManagerList?.distributionList"
+              [scrollable]="'false'"
+              [reorderable]="true"
+              [resizable]="true"
+              [columnMenu]="{ filter: true }">
+              <ng-template kendoGridToolbarTemplate>
+                <button class="btn btn-primary" type="button" (click)="setGrid();">Reset Grid Setting</button>
+                <button type="button" class="k-button export-icon-YTD" title="Export list in excel" (click)="saveExcel(excelexport)">
+                  <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                  <span>Download Excel</span>
+                </button>
+                <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="k-button export-icon-YTD">
+                  <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                  <span>Download PDF</span>
+                </button>
+              </ng-template>
+
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of columns; let i=index"
+                  [field]="column.field"
+                  [title]="column.title"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [width]="column.width"
+                  [filterable]="true">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.title != 'Link' && column.title != 'Contacts'" [innerHtml]="dataItem[column.title]"></div>
+                    <div class="customer-name" *ngIf="column.title == 'Contacts'"><a (click)="loadContactList(ddFieldsResponse?.distributionByManagerList?.distributionList[rowIndex].Link);">{{dataItem[column.title]}}</a></div>
+                  </ng-template>
+                  <ng-template kendoGridFooterTemplate
+                               let-column="column" let-columnIndex="columnIndex">
+                    <div class="customer-name text-white" *ngIf="(column.field == 'field1')">Total</div>
+                    <div class="customer-name text-white" *ngIf="(column.title == 'Contacts')">{{totalContacts}} </div>
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-excelexport #excelexport [data]="ddFieldsResponse?.distributionByManagerList?.distributionList" fileName='DistributionByManager'>
+                  <kendo-excelexport-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name">{{ dataItem[col.title] }}</div>
+                    </ng-template>
+                  </kendo-excelexport-column>
+                </kendo-excelexport>
+                <kendo-grid-pdf fileName="DistributionByManager.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                  <kendo-grid-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name">{{ dataItem[col.title] }}</div>
+                    </ng-template>
+                  </kendo-grid-column>
+                </kendo-grid-pdf>
+              </div>
+            </kendo-grid>
+          </div>
+          <div class="wraper-body-right">
+            <kendo-chart [title]="ddFieldsResponse?.distributionByManagerList?.strCHTitle" #chart >
+              <kendo-chart-tooltip> </kendo-chart-tooltip>
+              <kendo-chart-legend position="bottom"></kendo-chart-legend>
+              <kendo-chart-series>
+                <kendo-chart-series-item type="pie"
+                  [data]="distManagerList"
+                  field="Contacts"
+                  categoryField="Split"
+                  [overlay]="{gradient: 'roundedBevel'}"
+                  [labels]="{ visible: true, content: labelContent }">
+                  <kendo-chart-series-item-tooltip>
+                    <ng-template kendoChartSeriesTooltipTemplate let-value="value">
+                      <div>{{(value/totalContacts)*100 | number:'1.0-0'}} %</div>
+                    </ng-template>
+                  </kendo-chart-series-item-tooltip>
+                </kendo-chart-series-item>
+              </kendo-chart-series>
+            </kendo-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="isShowContactList" class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel d-flex appt-2D-heading"><img src="../../../../../assets/contactstitle.svg" class="mr-1" />Contacts Search Results </div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <select class="form-control">
+              <option  hidden>Send Results To</option>
+              <option value="1">Direct Mail Campaign</option>
+              <option value="2">Email Marketing Campaign</option>
+              <option value="3">Bulk Appointments Wizard</option>
+              <option value="4">Bulk Actions Wizard</option>
+            </select>
+            <button type="button" class="btn btn-primary" (click)="addNewContact()">
+              <i class="fa fa-plus"></i> New Contact
+            </button>
+          </div>
+        </div>
+      </div>
+      <contact-exports [user]="user"></contact-exports>
+      <div class="margin-all-area">
+        <app-contact-map-common *ngIf="user" [contactsMapData]="contactListResponse?.contactList" [user]="user" [isDownload]=true></app-contact-map-common>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

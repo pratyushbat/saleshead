@@ -1,0 +1,75 @@
+<div class="container-fluid common-alignment">
+  <div class="account-setup-section">
+    <div class="account-setup-panel">
+      <div class="feature-table">
+        <fieldset>
+          <legend>Account Setup</legend>
+          <div class="role-tabs-section">
+            <div class="role-tabs-panel">
+              <kendo-tabstrip [keepTabContent]="true">
+                <kendo-tabstrip-tab [title]="'Billing Setup'" [selected]="true">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <p class="under-construction under-construction-common">
+                        <img src="../../../assets/under-construction.gif" />
+                      </p>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Account Information'">
+                  <ng-template kendoTabContent>
+                    <account-info *ngIf="user" [user]="user" [companyId]="0" [roleFeaturePermissions]="roleFeaturePermissions"></account-info>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Update Credit Card'">
+                  <ng-template kendoTabContent>                   
+                    <account-credit-card *ngIf="user" [user]=user [companyIdCredit]="0"  [roleFeaturePermissions]="roleFeaturePermissions"></account-credit-card>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Billing History'">
+                  <ng-template kendoTabContent>
+                    <account-billing-history *ngIf="user" [user]=user [companyIdBilling]="adminIdSelected" [roleFeaturePermissions]="roleFeaturePermissions"></account-billing-history>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Storage Summary'">
+                  <ng-template kendoTabContent>
+                    <account-storage-summary *ngIf="user" [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></account-storage-summary>  
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'HTML Email Usage'">
+                  <ng-template kendoTabContent>
+                    <account-html-email *ngIf="user" [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></account-html-email>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Text Message Usage'">
+                  <ng-template kendoTabContent>
+                    <div class="user-tabs-panel">
+                      <p class="under-construction under-construction-common">
+                        <img src="../../../assets/under-construction.gif" />
+                      </p>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+              </kendo-tabstrip>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+ 
+
+
+
+</div>
+  <div class="loader-body" *ngIf="showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>

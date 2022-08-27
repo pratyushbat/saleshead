@@ -1,0 +1,398 @@
+<div class="container-fluid mt-3 common-alignment">
+  <div class="custom-security-link">
+    <a (click)="backToRepSetting()">Back To List</a>
+  </div>
+</div>
+<div class="container-fluid mt-3">
+  <div class="wraper-main-section" *ngIf="!isShowEditPanel">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"></div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputContractSearch.value = ''"><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+            <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onContractSettingFilter($event.target.value)" #inputContractSearch />
+            <button type="button" [hidden]="roleFeaturePermissions?.create == false" matTooltip="Add" class="icon-btn" (click)="addNew()">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              <span class="btn-text">Add</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <kendo-grid #grid id="gridId"
+          [kendoGridBinding]="soscContractData"
+          (edit)="viewHandler($event)"
+          (remove)="removeHandler($event)"
+          [pageSize]="_gridCnfgService.pageSize"
+          [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+          [sortable]="{mode: 'multiple'}"
+          [scrollable]="'scrollable'"
+          [sort]="_gridCnfgService.sort"
+          [columnMenu]="{ filter: true }"
+          [resizable]="true"
+          [reorderable]="true"
+          (columnReorder)="_gridCnfgService.columnsOrderChanged('contract_grid', $event)"
+          (sortChange)="_gridCnfgService.sortChange('contract_grid', $event)"
+          (pageChange)="_gridCnfgService.pageChange('contract_grid', $event)"
+          (columnResize)="_gridCnfgService.columnResize(7,'contract_grid', $event)"
+          (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'contract_grid',grid)">
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+              [field]="column.field"
+              [title]="column.title | titlecase"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [width]="column.width"
+              [filterable]="true"
+              [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+              [includeInChooser]="column.field=='$' ? false : true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                <div class="customer-name" *ngIf="column.field == 'companyName'">{{ dataItem[column.field] }}<div>{{dataItem['team']}}</div></div>
+                <div class="customer-name" *ngIf="column.field == 'contractName'">{{ dataItem[column.field] }}</div>
+                <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ dataItem[column.field] | date:'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'dtExpires'">{{ dataItem[column.field] | date:'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'dtSigned'">{{dataItem[column.field] | date:'yyyy-MM-dd HH:mm:ss' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'pH_Spot1'" [innerHTML]="dataItem.pH_Spot1">{{ dataItem[column.field] }}</div>
+              </ng-template>
+
+            </kendo-grid-column>
+
+            <kendo-grid-command-column title="Action" width="40" min="40" [style]="{'text-align': 'center'}" [includeInChooser]="false" [reorderable]="false" [columnMenu]="false">
+              <ng-template kendoGridCellTemplate>
+                <button kendoGridEditCommand [primary]="true" icon="preview" title="View"></button>
+              </ng-template>
+            </kendo-grid-command-column>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="isShowEditPanel">
+    <form [formGroup]="contractSettingForm" (ngSubmit)="contractSettingFormSubmit()">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel" *ngIf="isShowOnEdit">
+              <img src="../../../../assets/txtmsgstitle.svg" class="mr-1" />{{soscContract.contractName}}{{' : ' + soscContract.companyName}}{{' ( ' + soscContract.team + ' ) '}}
+            </div>
+            <div class="svg-icon-panel" *ngIf="!isShowOnEdit">
+              <img src="../../../../assets/txtmsgstitle.svg" class="mr-1" />{{type}}
+            </div>
+            <div class="header-button-panel">
+              <div class="button-wrapper">
+                <button type="submit" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" *ngIf="!isPreview" [matTooltip]="isShowOnEdit == true ? 'Update Contract' : 'Save Contract'" [disabled]="contractSettingForm.invalid" class="icon-btn">
+                  <i class="fas fa-save" aria-hidden="true"></i>
+                  <span class="btn-text">Save</span>
+                </button>
+                <button *ngIf="isPreview" type="button" matTooltip="Edit" class="icon-btn" (click)="isPreview = false">
+                  <i class="fa fa-pencil"></i>
+                  <span class="btn-text">Edit</span>
+                </button>
+                <!--<button type="button" matTooltip="Cancel Contract" class="grid-common-btn" (click)="cancel()">
+                  <i class="fa fa-times" aria-hidden="true"></i>
+                </button>-->
+              </div>
+            </div>
+          </div>
+
+          <div class="align-top-style">
+            <div class="wraper-body-panel">
+              <div class="wraper-body-left">
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label">Type</span></div>
+                  <div class="cards-colunm-right">
+                    <span *ngIf="isShowOnEdit">{{soscContract.contractName}}</span>
+                    <span *ngIf="!isShowOnEdit">{{type}}</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label">Account</span></div>
+                  <div class="cards-colunm-right">
+                    <span *ngIf="isShowOnEdit">{{soscContract.companyName}}</span>
+                    <div class="input-group" *ngIf="!isShowOnEdit">
+                      <input class="form-control" type="text" (keypress)="_localService.onKeyDown($event)" formControlName="cLPCompanyID" id="example-search-input" minlength="1" maxlength="9">
+                      <span class="input-group-append">
+                        <button class="btn btn-outline-secondary border-start-0 border" (click)="searchUser()" type="button" [disabled]="contractSettingForm.invalid">
+                          <i class="fa fa-search"></i>
+                        </button>
+                      </span>
+                    </div>
+                    <div *ngIf="!contractSettingForm.controls.cLPCompanyID?.valid && (contractSettingForm.controls.cLPCompanyID?.dirty || contractSettingForm.controls.cLPCompanyID?.touched )">
+                      <div class="search-query-error acc-info-srch-error" *ngIf="contractSettingForm.controls.cLPCompanyID.errors?.required">Please enter Account.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label">Team</span></div>
+                  <div class="cards-colunm-right">
+                    <span *ngIf="isShowOnEdit">{{soscContract.team}}</span>
+                    <select *ngIf="!isShowOnEdit" (change)="onChangeTeam($event.target.value)" class="custom-select txtStandard" [disabled]="true" formControlName="teamCode">
+                      <option value="0"> -Select- </option>
+                      <option *ngFor="let item of teamCodes" [value]="item.teamCode">{{item.display}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label">User</span></div>
+                  <div class="cards-colunm-right">
+                    <div class="input-group">
+                      <select class="form-control" formControlName="cLPUserID" *ngIf="!isPreview">
+                        <option value="0"> -Select- </option>
+                        <option *ngFor="let item of clpUser" [value]="item.cLPUserID">{{item.fullName}} &nbsp;&nbsp;{{item.email}}</option>
+                      </select>
+                      <div *ngIf="isPreview">
+                        <div *ngFor="let item of clpUser">
+                          <div *ngIf="item.cLPUserID == soscContract.cLPUserID">
+                            <span>{{item.fullName}}</span><br />
+                            <span>Username:{{item.email}}</span>
+                          </div>
+                        </div>
+                        <div *ngIf="soscContract.cLPUserID == 0">
+                          <span>-Any-</span><br />
+                          <span> Username:</span>
+                        </div>
+                      </div>
+                      <span class="input-group-append">
+                        <button class="btn border" title="Email Contract Link" type="button">
+                          <i class="fa fa-envelope"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label">Status</span></div>
+                  <div class="cards-colunm-right">
+                    {{status}}
+                    <a *ngIf="isShowOnEdit" (click)="goToLink('https://devforms.salesoptima.com/signup/soservices.aspx?scid=' + soscContract.sOSCContractID)" class="text-primary">Open Link</a>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">Start Date</span></div>
+                  <div class="cards-colunm-right" *ngIf="isPreview">{{soscContract?.dtStart | date: 'MM/dd/yy'}} &nbsp; PH_dtStart</div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview"><kendo-datetimepicker formControlName="dtStart" [format]="format" class="w-100"></kendo-datetimepicker></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">Expiration Date</span></div>
+                  <div class="cards-colunm-right" *ngIf="isPreview">{{soscContract?.dtExpires | date: 'MM/dd/yy'}} &nbsp; PH_dtExpires</div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview"><kendo-datetimepicker formControlName="dtExpires" [format]="format" class="w-100"></kendo-datetimepicker></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">dtSigned</span></div>
+                  <div class="cards-colunm-right">
+                    <span *ngIf="isShowOnEdit">{{soscContract.dtSigned | date: 'MM/dd/yy'}} &nbsp; PH_dtSigned</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">Signature Details</span></div>
+                  <div class="cards-colunm-right">
+                    <span *ngIf="isShowOnEdit">Legal Name : {{soscContract.sigLegalName}}</span><br />
+                    <span *ngIf="isShowOnEdit">Name : {{soscContract.sigName}}</span><br />
+                    <span *ngIf="isShowOnEdit">Email : {{soscContract.sigEmail}}</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PDF</span></div>
+                  <div class="cards-colunm-right">
+                    <a *ngIf="isShowOnEdit" class="contract-td-a" (click)="downloadFile(soscContract.sOSCContractID,soscContract.companyName)">Download</a>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 1</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot1" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot1"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 2</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot2" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot1"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 3</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot3" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot3"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 4</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot4" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot4"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 5</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot5" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot5"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 6</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot6" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot6"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 7</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot7" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot7"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 8</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot8" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot8"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 9</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot9" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot9"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 10</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot10" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot10"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 11</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot11" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot11"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"><span class="control-label ">PH Spot 12</span></div>
+                  <div class="cards-colunm-right" *ngIf="!isPreview">
+                    <kendo-editor formControlName="pH_Spot12" class="contract-editor">
+                      <kendo-toolbar>
+                        <kendo-toolbar-dropdownlist kendoEditorFontSize class="contract-editor-drop"></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-dropdownlist kendoEditorFontFamily></kendo-toolbar-dropdownlist>
+                        <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                      </kendo-toolbar>
+                    </kendo-editor>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="isPreview" [innerHTML]="soscContract?.pH_Spot12"></div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <button type="submit" class="btn btn-primary" (ngSubmit)="contractSettingFormSubmit()" *ngIf="!isPreview">Save</button>
+                    <button type="button" class="btn btn-cancel" (click)="cancel()" *ngIf="!isPreview">Cancel</button>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#contractDeleteModal" *ngIf="isShowOnEdit && isPreview && (roleFeaturePermissions?.delete == false || user?.userRole > 3)">Delete</button>
+                  </div>
+                </div>
+                <!--Button under table-->
+              </div>
+              <div class="wraper-body-right">
+                <div [innerHTML]="htmlText"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>     
+  </div>
+</div>
+<div *ngIf="isShowOnEdit" class="modal fade" id="contractDeleteModal" tabindex="-1" role="dialog" aria-labelledby="teamDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h4 class="modal-title modal-common-title">Delete Confirmation</h4>
+      </div>
+      <div class="modal-body modal-common-body">
+        <h2>  Are you sure to delete <b>{{soscContract.contractName}} ?</b></h2>
+      </div>
+      <div class="modal-footer">
+        <button type="button" (click)="deleteContractList()" data-dismiss="modal" class="btn btn-danger">Delete</button>
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+

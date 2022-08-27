@@ -1,0 +1,199 @@
+<div [hidden]="!showApp">
+    <div class="Login-section">
+        <div class="container-fluid">
+            <div class="login-panel">
+                <div class="row justify-content-center">
+                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-10">
+                      <div class="login-container">
+                        <div class="login-logo">
+                          <img src="../assets/so_logo.png">
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-12">
+                            <div class="validation-error" [innerHTML]="errorMsg"></div>
+                            <div *ngIf="showRelogin">
+                              <div class="re-login-btn">
+                                <div class="submit-btn">
+                                  <button type="button" class="btn btn-primary" (click)="btnRelogin_click()">Click here to re-login</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="login-card" [hidden]="!showLogin">
+                          <div class="login-with">
+                            <div class="form-group center-piece" style="max-width: 800px; margin: auto;">
+                              <div class="float-left radio-label" style="margin: 0 10px 0 0;">Log in with:</div>
+                              <mat-radio-group>
+                                <mat-radio-button class="selection-radio" value="Email" color="primary" [checked]="pref == 'Email'" (change)="changeRadio($event)">Email</mat-radio-button>
+                                <mat-radio-button class="selection-radio" value="Mobile" color="primary" [checked]="pref == 'Mobile'" (change)="changeRadio($event)">Mobile</mat-radio-button>
+                              </mat-radio-group>
+                            </div>
+                          </div>
+                          <div class="">
+                            <div class="heading-text">
+                            </div>
+                            <div class="login-form-section">
+                              <form [formGroup]="loginForm">
+                                <div class="input-icon-panel">
+                                  <div class="form-group" [hidden]="usernameType == 'Mobile'">
+                                    <label>Email </label>
+                                    <input autocomplete="on" [ngClass]="{'has-error': (loginFrm.email.errors && (loginFrm.email.touched || loginFrm.email.dirty))}" placeholder="your@emailaddress.com" id="email" formControlName="email" type="email" class="form-control ng-dirty ng-valid ng-touched" #email>
+                                    <div class="login-error" *ngIf="(loginFrm.email.errors && (loginFrm.email.touched && loginFrm.email.invalid))">
+                                      <div *ngIf="(loginFrm.email.errors.required)">Your username is required</div>
+                                      <div *ngIf="(loginFrm.email.errors.pattern)">Please enter valid username</div>  
+                                    </div>
+                                  </div>
+                                  <div class="form-group" [hidden]="usernameType == 'Email'">
+                                    <label>Mobile Number</label>
+                                    <div >
+                                      <input autocomplete="on" [ngClass]="{'has-error': (loginFrm?.mobile?.errors && (loginFrm?.mobile?.touched && loginFrm?.mobile?.invalid && (loginFrm?.mobile?.errors?.required)))}"  id="mobile" formControlName="mobile" [placeholder]="placeHolder" [mask]="mobile_mask"  type="text" class="form-control " maxlength="15"   #imobile>
+                                    </div>
+                                    <div class="error-change-panel">
+                                      <div [hidden]="show_countries" class="change_country">
+                                        <span (click)="show_countries = true;">({{countryCode}}) change country</span>
+                                      </div>
+                                      <div class="login-error" *ngIf="(loginFrm?.mobile?.errors && (loginFrm?.mobile?.touched && loginFrm?.mobile?.invalid))">
+                                        <div *ngIf="(loginFrm?.mobile?.errors?.required)">Your mobile is required</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="" [hidden]="!show_countries || usernameType == 'Email'">
+                                  <div class="form-group center-piece">
+                                    <label class="control-label" for="country">Country</label>
+                                    <div>
+                                      <select class="custom-select" formControlName="countryId" (change)="changeCountry($event)">
+                                        <option *ngFor="let country of countryList" [value]="country.code2" [attr.data-code2]="country.code2">{{country.name}}</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="input-icon-panel">
+                                  <div class="form-group">
+                                    <label>Password</label>
+                                    <input autocomplete="on" [ngClass]="{'has-error': loginFrm.password.errors && (loginFrm.password.touched || loginFrm.password.dirty)}" type="password" class="form-control ng-dirty ng-valid ng-touched" placeholder="Enter password" id="pwd" formControlName="password">
+                                    <a><i class="fa fa-eye show-password" toggle="#pwd"></i></a>
+                                    <div class="login-error" *ngIf="loginFrm.password.errors && (loginFrm.password.touched || loginFrm.password.dirty)">
+                                      <div *ngIf="(loginFrm.password.errors.required)">Your password is required</div>
+                                    </div>
+
+                                  </div>
+                                </div>
+
+                                <div class="submit-btn">
+                                  <button type="submit" [disabled]="isLogin || logInEnabled()" class="btn btn-primary" id="submit-btn" (click)="login()">Submit</button>
+                                  <div class="forgot-panel">
+                                    <div class="row">
+                                      <div class="col-lg-12 col-md-12 col-sm-12">
+                                        <div class="forgot-link">
+                                          <button type="button" id="forgot-btn" (click)="forgetPassword()" [disabled]="btnForgotSpinner">Forgot your Password?</button>
+                                          <span *ngIf="btnForgotSpinner">&nbsp;<i class="fa fa-spinner fa-spin"></i></span>
+                                          <p>
+                                            <b>Don't have an account?</b> <button id="forgot-btn" type="button" [routerLink]="['/signup']">&nbsp;Sign up</button>
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </form>
+                              <div class="version">
+                                {{version}}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div [hidden]="!showReset">
+                          <div class="login-card1">
+                            <div class="">
+                              <div class="heading-text">
+                                <h3>Reset Password</h3>
+                              </div>
+                              <div class="">
+                                <form [formGroup]="resetForm">
+                                  <div class="input-icon-panel">
+                                    <div class="form-group" [ngClass]="{'has-error': resetfrm.CurrentPassword.errors && (resetfrm.CurrentPassword.touched || resetfrm.CurrentPassword.dirty)}">
+                                      <div *ngIf="!this.resetForm.get('CurrentPassword').disabled">
+                                        <!--<img src="../../../assets/padlock.png">-->
+                                        <input autocomplete="on" id="hello" type="password" class="form-control" placeholder="Current password" formControlName="CurrentPassword">
+                                      </div>
+                                      <a [hidden]="resetForm.get('CurrentPassword').disabled"><i class="fa fa-eye show-password" toggle="#hello"></i></a>
+                                      <div *ngIf="resetfrm.CurrentPassword.errors && (resetfrm.CurrentPassword.touched || resetfrm.CurrentPassword.dirty)">
+                                        Current Password is required.<br />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="input-icon-panel">
+                                    <div class="form-group" [ngClass]="{'has-error': resetfrm.NewPassword.errors && (resetfrm.NewPassword.touched || resetfrm.NewPassword.dirty)}">
+                                      <!--<img src="../../../assets/padlock.png">-->
+                                      <input autocomplete="on" type="password" class="form-control" id="NewPassword" placeholder="New password" formControlName="NewPassword">
+                                      <a><i class="fa fa-eye show-password" toggle="#NewPassword"></i></a>
+
+                                      <div *ngIf="resetfrm.NewPassword.errors && (resetfrm.NewPassword.touched || resetfrm.NewPassword.dirty)">
+                                        New Password is required.<br />
+                                      </div>
+
+                                    </div>
+                                  </div>
+                                  <div class="input-icon-panel">
+                                    <div class="form-group" [ngClass]="{'has-error': resetfrm.ConfirmPassword.errors && (resetfrm.ConfirmPassword.touched || resetfrm.ConfirmPassword.dirty)}">
+                                      <!--<img src="../../../assets/padlock.png">-->
+                                      <input autocomplete="on" type="password" class="form-control" id="ConfirmPassword" placeholder="Confirm password" formControlName="ConfirmPassword">
+                                      <a><i class="fa fa-eye show-password" toggle="#ConfirmPassword"></i></a>
+
+                                      <div *ngIf="resetfrm.ConfirmPassword.touched && resetfrm.ConfirmPassword.invalid">
+                                        <div *ngIf="resetfrm.ConfirmPassword.errors.required">Confirm Password is required.</div>
+                                        <div *ngIf="resetfrm.ConfirmPassword.errors.confirmedValidator">New and Confirm Password must match.</div>
+                                      </div>
+
+                                    </div>
+                                  </div>
+                                  <div class="submit-btn">
+                                    <button type="submit" class="btn btn-primary" (click)="resetPassword()" [disabled]="disabledSubmitPassword()">Submit Password</button>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="card" [hidden]="hide_security">
+                          <div class="card-body">
+                            <div class="container-fluid">
+                              <div class="row">
+                                <div class="btn-group btn-group-sm col-sm-12 text-center">
+                                  <form class="form-horizontal" [formGroup]="verifyForm">
+                                    <div class="row">
+                                      <div class="form-group col-sm-12 controls center-piece">
+                                        <h3>Just double-checking.</h3>
+                                        <p>Please enter the security code sent to your&nbsp;{{mfaMethod}}</p>
+                                      </div>
+                                      <div class="form-group col-sm-12 controls">
+                                        <input type="text" #securityCode placeholder="123456" mask="000000" formControlName="securityCode" class="form-control login-security" maxlength="6" />
+                                      </div>
+                                      <div class="form-group col-sm-12 controls">
+                                        <button type="button" class="btn btn-success" title="Confirm" (click)="confirm()" [disabled]="confirmEnabled()">Confirm</button>
+                                      </div>
+                                      <div class="form-group col-sm-12 controls">
+                                        <p><span class="resend-href" (click)="resendCode()">Resend Code</span></p>
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-section text-center">
+        Copyright ©2001 - 2021 SalesOptima. All rights reserved.
+    </div>
+</div>

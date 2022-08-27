@@ -1,0 +1,178 @@
+<div class="margin-all-area">
+  <div class="wraper-body-panel">
+    <div class="wraper-body-left">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="common-inner-header">
+            <div class="inner-header-bg">
+              <div class="inner-cards-panel header-inner-hidden">
+                <span>Classification</span>
+                <span>User</span>
+                <span>Time Period</span>
+                <span *ngIf="isSpecificDate===true">Date Range</span>
+              </div>
+              <div class="inner-detail-bg">
+                <span>Details</span>
+              </div>
+            </div>
+          </div>
+          <div class="common-inner-cards">
+            <div class="inner-cards-grid">
+              <div class="inner-card-mobile">
+                <label>Classification</label>
+                <div class="mobile-view-design">
+                  <select class="form-control" (change)="getUserDD('classification',$event.target.value)">
+                    <option *ngFor="let item of classificationDD; let i= index;" [value]="item?.value">{{item?.text}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="inner-card-mobile">
+                <label>User</label>
+                <div class="mobile-view-design">
+                  <div>
+                    <p>User</p>
+                    <select class="form-control" (change)="getUserDD('user',$event.target.value)" [(ngModel)]="selectedValueUser">
+                      <option [value]="0">-All-</option>
+                      <option *ngFor="let item of userFilterDD; let i= index;" [value]="item?.value ">{{item?.text}}</option>
+                    </select>
+                  </div>
+                  <div *ngIf="showRevenueFilterDropdown('team')">
+                    <p>Team</p>
+                    <select class="form-control" (change)="getUserDD('team',$event.target.value)" [(ngModel)]="selectedValueTeam">
+                      <option [value]="0">-All-</option>
+                      <option *ngFor="let item of teamFilterDD; let i= index;" [value]="item?.teamCode">{{item?.display}}</option>
+                    </select>
+                  </div>
+                  <div *ngIf="showRevenueFilterDropdown('office')">
+                    <p>Office</p>
+                    <select class="form-control" (change)="getUserDD('office',$event.target.value)" [(ngModel)]="selectedValueOffice">
+                      <option [value]="0">-All-</option>
+                      <option *ngFor="let item of officeFilterDD; let i= index;" [value]="item?.officeCode">{{item?.display}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="inner-card-mobile">
+                <label>Time Period</label>
+                <div class="mobile-view-design">
+                  <select class="form-control" (change)="getTimePeriod($event.target.value)">
+                    <option *ngFor="let item of isTimePeriod; let i= index;" [value]="item?.value">{{item?.name}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="inner-card-mobile" *ngIf="isSpecificDate===true">
+                <label>Date Range</label>
+                <div class="mobile-view-design">
+                  <div>
+                    <span>From</span>
+                    <kendo-datepicker (valueChange)="onStartDate($event)"> </kendo-datepicker>
+                  </div>
+                  <div>
+                    <span>To</span>
+                    <kendo-datepicker (valueChange)="onEndDate($event)"></kendo-datepicker>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>          
+        </div>
+      </div>
+    </div>
+    <div class="wraper-body-right"></div>
+  </div>
+</div>
+
+<div class="margin-all-area">
+  <p class="alert-panel" *ngIf="nameChangeOnTable===false">
+    <span>All leads managed by user:&nbsp;{{user?.firstName}}&nbsp;{{user?.lastName}}</span>
+  </p>
+  <p class="alert-panel" *ngIf="nameChangeOnTable===true">
+    <span>All leads managed &nbsp;{{nameOnTable}}</span>
+  </p>
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/leadstitle.svg" class="mr-1" /> Projected Revenue  by {{dateAfterName}} </div>
+        <div class="header-button-panel white-font">
+          <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputRevenueManagerClassification.value = '' ">Reset Grid Setting</button>
+          <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onProjectRevenueManagerFilter($event.target.value)" #inputRevenueManagerClassification /> &nbsp;&nbsp;
+          <span> <b>{{showStartDt}}-{{showEndDt}}</b></span>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <kendo-grid #grid id="gridId"
+          [kendoGridBinding]="projectRevenueClassificationResponse"
+          [sortable]="{mode: 'multiple'}"
+          [sort]="_gridCnfgService.sort"
+          [pageSize]="_gridCnfgService.pageSize"
+          [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+          [scrollable]="false"
+          [reorderable]="true"
+          [resizable]="true"
+          [columnMenu]="{ filter: true }"
+          (columnReorder)="_gridCnfgService.columnsOrderChanged('project_revenue_classification_grid', $event)"
+          (sortChange)="_gridCnfgService.sortChange('project_revenue_classification_grid', $event)"
+          (pageChange)="_gridCnfgService.pageChange('project_revenue_classification_grid', $event)"
+          (columnResize)="_gridCnfgService.columnResize(4,'project_revenue_classification_grid', $event)"
+          (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'project_revenue_classification_grid',grid)">
+          <ng-template kendoGridToolbarTemplate>
+            <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+              <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+              <span>Download Excel</span>
+            </button>
+            <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+              <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+              <span>Download PDF</span>
+            </button>
+          </ng-template>
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                               [field]="column.field"
+                               [title]="column.title"
+                               [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                               [width]="column.width"
+                               [filterable]="true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                <div class="customer-name" *ngIf="column.field == 'split'">{{ dataItem[column.field]}}</div>
+                <div class="customer-name" *ngIf="column.field == 'leads'">{{ dataItem[column.field]}}</div>
+                <div class="customer-name" *ngIf="column.field == 'revenue'">${{ dataItem[column.field]}}</div>
+                <div class="customer-name" *ngIf="column.field == 'probability'">{{ dataItem[column.field]?.toFixed(1)}}%</div>
+                <div class="customer-name" *ngIf="column.field == 'projected'">${{ dataItem[column.field]}}</div>
+              </ng-template>
+              <ng-template kendoGridFooterTemplate
+                           let-column="column" let-columnIndex="columnIndex">
+                <div class="customer-name text-white" *ngIf="column.field == '$'">Total</div>
+                <div class="customer-name text-white" *ngIf="column.field == 'leads' && column.field!== null"> {{total[3]}} </div>
+                <div class="customer-name text-white" *ngIf="column.field == 'revenue'  && column.field!== null"> ${{total[4]}} </div>
+                <div class="customer-name text-white" *ngIf="column.field == 'probability'  && column.field!== null"> {{total[5]?.toFixed(1)}}% </div>
+                <div class="customer-name text-white" *ngIf="column.field == 'projected' && column.field!== null">${{total[6]}} </div>
+              </ng-template>
+            </kendo-grid-column>
+            <kendo-excelexport #excelexport [data]="projectRevenueClassificationResponse" fileName='Project Revenue Classification'>
+              <kendo-excelexport-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name">{{ dataItem[col.title] }}</div>
+                </ng-template>
+              </kendo-excelexport-column>
+            </kendo-excelexport>
+            <kendo-grid-pdf fileName="Project Revenue Classification.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+              <kendo-grid-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name">{{ dataItem[col.field] }}</div>
+                </ng-template>
+              </kendo-grid-column>
+            </kendo-grid-pdf>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+  <p class="alert-panel mt-3">
+    <span>Note: This report is based on Receive Revenue Date</span>
+  </p>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

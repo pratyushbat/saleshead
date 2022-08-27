@@ -1,0 +1,393 @@
+<div class="custom-security-link">
+  <a>Inbound Calls By Time</a>
+</div>
+
+<div class="margin-all-area">
+  <div class="">
+    <div class="wraper-body-left">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="common-inner-header">
+            <div class="inner-header-bg">
+              <div class="inner-cards-panel header-inner-hidden">
+                <span>Call Date Filter</span>
+                <span></span>
+                <span>Team</span>
+                <span>Office</span>
+                <span>Group By</span>
+                <span></span>
+              </div>
+              <div class="inner-detail-bg">
+                <span>Details</span>
+              </div>
+            </div>
+          </div>
+          <div class="common-inner-cards">
+            <form [formGroup]="voiceCallForm" (ngSubmit)="getVoiceCallList()">
+              <div class="inner-cards-grid">
+                <div class="inner-card-mobile">
+                  <span class="font-weight-bold">Start</span>
+                  <div class="mobile-view-design">
+                    <kendo-datepicker formControlName="startDate" [ngClass]="{'has-error': voiceCallForm.controls.startDate.errors && (voiceCallForm.controls.startDate.touched || voiceCallForm.controls.startDate.dirty)}"></kendo-datepicker>
+                    <div class="login-error" *ngIf="voiceCallForm.controls.startDate.errors && (voiceCallForm.controls.startDate.touched || voiceCallForm.controls.startDate.dirty)">
+                      <span *ngIf="voiceCallForm.controls.startDate.errors.required">Start Date is required </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <span class="font-weight-bold">End</span>
+                  <div class="mobile-view-design">
+                    <kendo-datepicker formControlName="endDate" [ngClass]="{'has-error': voiceCallForm.controls.endDate.errors && (voiceCallForm.controls.endDate.touched || voiceCallForm.controls.endDate.dirty)}"></kendo-datepicker>
+                    <div class="login-error" *ngIf="voiceCallForm.controls.endDate.errors && (voiceCallForm.controls.endDate.touched || voiceCallForm.controls.endDate.dirty)">
+                      <span *ngIf="voiceCallForm.controls.endDate.errors.required">End Date is required </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <label>Team</label>
+                  <div class="mobile-view-design">
+                    <select class="form-control" formControlName="ddTeam">
+                      <option value="0">-All-</option>
+                      <option *ngFor="let item of teamFilterDD; let i= index;" [value]="item?.teamCode">{{item?.display}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <label>Office</label>
+                  <div class="mobile-view-design">
+                    <select class="form-control" formControlName="ddOffice">
+                      <option value="0">-All-</option>
+                      <option *ngFor="let item of officeFilterDD; let i= index;" [value]="item?.officeCode">{{item?.display}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <label>Group By</label>
+                  <div class="mobile-view-design">
+                    <select class="form-control" formControlName="groupBy">
+                      <option value="CLPUser">User</option>
+                      <option value="Team">Team</option>
+                      <option value="Office">Office</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <div class="mobile-view-design">
+                    <button type="submit" class="grid-common-btn" [disabled]="voiceCallForm.invalid">
+                      <i class="fa fa-refresh"></i>
+                      <span class="grid-common-text">Refresh</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wraper-body-right"></div>
+  </div>
+</div>
+
+
+
+<div class="wrapper-panel kendo-section margin-all-area">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="contact-list-section">
+        <div class="contact-list-panel">
+          <kendo-tabstrip [keepTabContent]="true" class="mt-0">
+            <kendo-tabstrip-tab [title]="'Total Calls'" [selected]="true">
+              <ng-template kendoTabContent>
+                <div class="global-body-section" >
+                  <kendo-grid #grid id="gridId"
+                    [kendoGridBinding]="totalVoiceRpt"
+                    [sortable]="{mode: 'multiple'}"
+                    [sort]="_gridCnfgService.sort"
+                    [pageSize]="_gridCnfgService.pageSize"
+                    [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                    [scrollable]="'false'"
+                    [reorderable]="true"
+                    [resizable]="true"
+                    [columnMenu]="{ filter: true }"
+                    [ngStyle]="gridHeight"
+                    (columnReorder)="_gridCnfgService.columnsOrderChanged('voice_call_grid', $event)"
+                    (sortChange)="_gridCnfgService.sortChange('voice_call_grid', $event)"
+                    (pageChange)="_gridCnfgService.pageChange('voice_call_grid', $event)"
+                    (columnResize)="_gridCnfgService.columnResize(16,'voice_call_grid', $event)"
+                    (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'voice_call_grid',grid)">
+                    <ng-template kendoGridToolbarTemplate>
+                      <button class="btn btn-primary" type="button" (click)="resetGridSetting();">Reset Grid Setting</button>
+                      <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+                        <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                        <span>Download Excel</span>
+                      </button>
+                      <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+                        <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                        <span>Download PDF</span>
+                      </button>
+                    </ng-template>
+                    <div class="grid-scroll-bar">
+                      <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                        [field]="column.field"
+                        [title]="column.title"
+                        [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                        [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                        [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                        [width]="column.width"
+                        [filterable]="true"
+                        [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1 || ( column.field == 'noRing' || column.field == 'pitchRate' || column.field == 'answerRate' )"
+                        [includeInChooser]="column.field=='$' ? false : (column.field == 'noRing' || column.field == 'pitchRate' || column.field == 'answerRate' ) ? false : true">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                          <div class="customer-name" >{{ dataItem[column.field] }}</div>
+                        </ng-template>
+                      </kendo-grid-column>
+                      <kendo-excelexport #excelexport [data]="appointmentTypeDataMonth" fileName='Voice-Call-Report'>
+                        <kendo-excelexport-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+                      </kendo-excelexport>
+                      <kendo-grid-pdf fileName="AppointmentType-Month.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                        <kendo-grid-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                        </kendo-grid-column>
+                      </kendo-grid-pdf>
+                    </div>
+                  </kendo-grid>
+                </div>
+              </ng-template>
+            </kendo-tabstrip-tab>
+            <kendo-tabstrip-tab [title]="'Inbound'">
+              <ng-template kendoTabContent>
+                <div class="global-body-section">
+                  <kendo-grid #grid id="gridId"
+                              [kendoGridBinding]="inboundRpt"
+                              [sortable]="{mode: 'multiple'}"
+                              [sort]="_gridCnfgService.sort"
+                              [pageSize]="_gridCnfgService.pageSize"
+                              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                              [scrollable]="'false'"
+                              [reorderable]="true"
+                              [resizable]="true"
+                              [columnMenu]="{ filter: true }"
+                              [ngStyle]="gridHeight"
+                              (columnReorder)="_gridCnfgService.columnsOrderChanged('voice_call_grid', $event)"
+                              (sortChange)="_gridCnfgService.sortChange('voice_call_grid', $event)"
+                              (pageChange)="_gridCnfgService.pageChange('voice_call_grid', $event)"
+                              (columnResize)="_gridCnfgService.columnResize(16,'voice_call_grid', $event)"
+                              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'voice_call_grid',grid)">
+                    <ng-template kendoGridToolbarTemplate>
+                      <button class="btn btn-primary" type="button" (click)="resetGridSetting();">Reset Grid Setting</button>
+                      <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+                        <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                        <span>Download Excel</span>
+                      </button>
+                      <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+                        <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                        <span>Download PDF</span>
+                      </button>
+                    </ng-template>
+                    <div class="grid-scroll-bar">
+                      <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                                         [field]="column.field"
+                                         [title]="column.title"
+                                         [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                         [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                         [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                         [width]="column.width"
+                                         [filterable]="true"
+                                         [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1 || ( column.field == 'user' || column.field == 'team' || column.field == 'office' )"
+                                         [includeInChooser]="column.field=='$' ? false : (column.field == 'user' || column.field == 'team' || column.field == 'office' ) ? false : true">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                          <div class="customer-name">{{ dataItem[column.field] }}</div>
+                        </ng-template>
+                      </kendo-grid-column>
+                      <kendo-excelexport #excelexport [data]="appointmentTypeDataMonth" fileName='Voice-Call-Report'>
+                        <kendo-excelexport-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+                      </kendo-excelexport>
+                      <kendo-grid-pdf fileName="AppointmentType-Month.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                        <kendo-grid-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                        </kendo-grid-column>
+                      </kendo-grid-pdf>
+                    </div>
+                  </kendo-grid>
+                </div>
+              </ng-template>
+            </kendo-tabstrip-tab>
+            <kendo-tabstrip-tab [title]="'Outbound - Click-To-Call'">
+              <ng-template kendoTabContent>
+                <div class="global-body-section">
+                  <kendo-grid #grid id="gridId"
+                              [kendoGridBinding]="outClickToCallRpt"
+                              [sortable]="{mode: 'multiple'}"
+                              [sort]="_gridCnfgService.sort"
+                              [pageSize]="_gridCnfgService.pageSize"
+                              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                              [scrollable]="'false'"
+                              [reorderable]="true"
+                              [resizable]="true"
+                              [columnMenu]="{ filter: true }"
+                              [ngStyle]="gridHeight"
+                              (columnReorder)="_gridCnfgService.columnsOrderChanged('voice_call_grid', $event)"
+                              (sortChange)="_gridCnfgService.sortChange('voice_call_grid', $event)"
+                              (pageChange)="_gridCnfgService.pageChange('voice_call_grid', $event)"
+                              (columnResize)="_gridCnfgService.columnResize(16,'voice_call_grid', $event)"
+                              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'voice_call_grid',grid)">
+                    <ng-template kendoGridToolbarTemplate>
+                      <button class="btn btn-primary" type="button" (click)="resetGridSetting();">Reset Grid Setting</button>
+                      <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+                        <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                        <span>Download Excel</span>
+                      </button>
+                      <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+                        <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                        <span>Download PDF</span>
+                      </button>
+                    </ng-template>
+                    <div class="grid-scroll-bar">
+                      <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                                         [field]="column.field"
+                                         [title]="column.title"
+                                         [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                         [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                         [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                         [width]="column.width"
+                                         [filterable]="true"
+                                         [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1 || ( column.field == 'noRing' || column.field == 'pitchRate' || column.field == 'answerRate' )"
+                                         [includeInChooser]="column.field=='$' ? false : (column.field == 'noRing' || column.field == 'pitchRate' || column.field == 'answerRate' ) ? false : true">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                          <div class="customer-name">{{ dataItem[column.field] }}</div>
+                        </ng-template>
+                      </kendo-grid-column>
+                      <kendo-excelexport #excelexport [data]="outClickToCallRpt" fileName='Voice-Call-Report'>
+                        <kendo-excelexport-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+                      </kendo-excelexport>
+                      <kendo-grid-pdf fileName="Voice-Call-Report.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                        <kendo-grid-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                        </kendo-grid-column>
+                      </kendo-grid-pdf>
+                    </div>
+                  </kendo-grid>
+                </div>
+              </ng-template>
+            </kendo-tabstrip-tab>
+            <kendo-tabstrip-tab [title]="'Outbound - Scheduled'">
+              <ng-template kendoTabContent>
+                <div class="global-body-section">
+                  <kendo-grid #grid id="gridId"
+                              [kendoGridBinding]="outScheduledRpt"
+                              [sortable]="{mode: 'multiple'}"
+                              [sort]="_gridCnfgService.sort"
+                              [pageSize]="_gridCnfgService.pageSize"
+                              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                              [scrollable]="'false'"
+                              [reorderable]="true"
+                              [resizable]="true"
+                              [columnMenu]="{ filter: true }"
+                              [ngStyle]="gridHeight"
+                              (columnReorder)="_gridCnfgService.columnsOrderChanged('voice_call_grid', $event)"
+                              (sortChange)="_gridCnfgService.sortChange('voice_call_grid', $event)"
+                              (pageChange)="_gridCnfgService.pageChange('voice_call_grid', $event)"
+                              (columnResize)="_gridCnfgService.columnResize(16,'voice_call_grid', $event)"
+                              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'voice_call_grid',grid)">
+                    <ng-template kendoGridToolbarTemplate>
+                      <button class="btn btn-primary" type="button" (click)="resetGridSetting();">Reset Grid Setting</button>
+                      <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+                        <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                        <span>Download Excel</span>
+                      </button>
+                      <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+                        <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                        <span>Download PDF</span>
+                      </button>
+                    </ng-template>
+                    <div class="grid-scroll-bar">
+                      <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                                         [field]="column.field"
+                                         [title]="column.title"
+                                         [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                         [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                         [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                         [width]="column.width"
+                                         [filterable]="true"
+                                         [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1 || ( column.field == 'noRing' || column.field == 'pitchRate' || column.field == 'answerRate' )"
+                                         [includeInChooser]="column.field=='$' ? false : (column.field == 'noRing' || column.field == 'pitchRate' || column.field == 'answerRate' ) ? false : true">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                          <div class="customer-name">{{ dataItem[column.field] }}</div>
+                        </ng-template>
+                      </kendo-grid-column>
+                      <kendo-excelexport #excelexport [data]="appointmentTypeDataMonth" fileName='Voice-Call-Report'>
+                        <kendo-excelexport-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+                      </kendo-excelexport>
+                      <kendo-grid-pdf fileName="AppointmentType-Month.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                        <kendo-grid-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                        </kendo-grid-column>
+                      </kendo-grid-pdf>
+                    </div>
+                  </kendo-grid>
+                </div>
+              </ng-template>
+            </kendo-tabstrip-tab>
+            <kendo-tabstrip-tab [title]="'SAM Cancelled'" >
+              <ng-template kendoTabContent>
+                <div class="global-body-section">
+                  <kendo-grid #grid id="gridId"
+                              [kendoGridBinding]="voiceCallCancelRpt"
+                              [sortable]="{mode: 'multiple'}"
+                              [sort]="_gridCnfgService.sort"
+                              [pageSize]="_gridCnfgService.pageSize"
+                              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                              [scrollable]="'false'"
+                              [reorderable]="true"
+                              [resizable]="true"
+                              [columnMenu]="{ filter: true }"
+                              [ngStyle]="gridHeight"
+                              (columnReorder)="_gridCnfgService.columnsOrderChanged('voice_call_grid', $event)"
+                              (sortChange)="_gridCnfgService.sortChange('voice_call_grid', $event)"
+                              (pageChange)="_gridCnfgService.pageChange('voice_call_grid', $event)"
+                              (columnResize)="_gridCnfgService.columnResize(16,'voice_call_grid', $event)"
+                              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'voice_call_grid',grid)">
+                    <ng-template kendoGridToolbarTemplate>
+                      <button class="btn btn-primary" type="button" (click)="resetGridSetting();">Reset Grid Setting</button>
+                      <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+                        <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                        <span>Download Excel</span>
+                      </button>
+                      <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+                        <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                        <span>Download PDF</span>
+                      </button>
+                    </ng-template>
+                    <div class="grid-scroll-bar">
+                      <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                                         [field]="column.field"
+                                         [title]="column.title"
+                                         [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                         [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                         [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                         [width]="column.width"
+                                         [filterable]="true"
+                                         [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1 || ( column.field == 'noRing' || column.field == 'pitchRate' || column.field == 'answerRate' )"
+                                         [includeInChooser]="column.field=='$' ? false : (column.field == 'noRing' || column.field == 'pitchRate' || column.field == 'answerRate' ) ? false : true">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                          <div class="customer-name">{{ dataItem[column.field] }}</div>
+                        </ng-template>
+                      </kendo-grid-column>
+                      <kendo-excelexport #excelexport [data]="appointmentTypeDataMonth" fileName='Voice-Call-Report'>
+                        <kendo-excelexport-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+                      </kendo-excelexport>
+                      <kendo-grid-pdf fileName="AppointmentType-Month.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                        <kendo-grid-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                        </kendo-grid-column>
+                      </kendo-grid-pdf>
+                    </div>
+                  </kendo-grid>
+                </div>
+              </ng-template>
+            </kendo-tabstrip-tab>
+          </kendo-tabstrip>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

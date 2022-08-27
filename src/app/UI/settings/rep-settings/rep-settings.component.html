@@ -1,0 +1,127 @@
+<div class="container-fluid common-alignment mt-3">
+  <div class="custom-security-link">
+    <a [routerLink]="['/mail-merge-template']">Mail Merge Templates</a>
+  </div>
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="top-txtmsg">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../assets/tagtitle.svg" class="mr-1" />SalesOptima Services Contracts</div>
+          <div class="header-button-panel">
+            <div class="button-wrapper">
+              <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputRepSearch.value = ''">Reset Grid Setting</button>
+              <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onRepSettingFilter($event.target.value)" #inputRepSearch />
+              <button type="button" [hidden]="roleFeaturePermissions?.create == false" matTooltip="Add" class="icon-btn" (click)="addNew()">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <span class="btn-text">Add</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="global-body-section">
+          <form [formGroup]="repSettingForm" (ngSubmit)="repSettingFormSubmit()" *ngIf="isEnableEdit">
+            <div class="wraper-body-panel">
+              <div class="wraper-body-left">
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span class="control-label"> SO Services Contract Title</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input [ngClass]="{'has-error': repSettingFrm.contractName.errors && (repSettingFrm.contractName.touched || repSettingFrm.contractName.dirty)}" type="text" class="txtStandard" formControlName="contractName" />
+                    <div *ngIf="repSettingFrm.contractName.errors && (repSettingFrm.contractName.touched || repSettingFrm.contractName.dirty)">
+                      <div class="login-error" *ngIf="repSettingFrm.contractName.errors.required">Contract name is required </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span class="control-label spantext">Mail Merge Template</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" formControlName="mailMergeTemplateID" [ngStyle]="{'margin-bottom': (repSettingFrm.contractName.errors && (repSettingFrm.contractName.touched || repSettingFrm.contractName.dirty)) ? '0px' : '0'}">
+                      <option value="0"> -Select- </option>
+                      <option *ngFor="let item of mailMergeTemplateDropDown" [value]="item.mailMergeTemplateID">{{item.templateName}}</option>
+                    </select>
+                    <div *ngIf="(repSettingFrm.mailMergeTemplateID.touched) && (repSettingFrm.mailMergeTemplateID.value == 0)">
+                      <div class="login-error">Mail Merge Template is required </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                    <button class="btn btn-primary" [disabled]="showSpinner" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"> Save</button>
+                    <button class="btn btn-cancel" type="button" (click)="cancelRep()"> Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <kendo-grid class="res-setting-grid" #grid id="gridId"
+            [kendoGridBinding]="repSettingsData"
+            (edit)="editHandler($event)"
+            (cancel)="cancelHandler($event)"
+            (save)="saveHandler($event)"
+            [sortable]="{mode: 'multiple'}"
+            [sort]="_gridCnfgService.sort"
+            [pageSize]="_gridCnfgService.pageSize"
+            [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+            [scrollable]="'false'"
+            [reorderable]="true"
+            [resizable]="true"
+            [columnMenu]="{ filter: true }"
+            [ngStyle]="gridHeight"
+            (columnReorder)="_gridCnfgService.columnsOrderChanged('rep_setting_grid', $event)"
+            (sortChange)="_gridCnfgService.sortChange('rep_setting_grid', $event)"
+            (pageChange)="_gridCnfgService.pageChange('rep_setting_grid', $event)"
+            (columnResize)="_gridCnfgService.columnResize(4,'rep_setting_grid', $event)"
+            (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'rep_setting_grid',grid)">
+            <div class="grid-scroll-bar">
+              <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                [field]="column.field"
+                [title]="column.title | titlecase"
+                [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                [width]="column.width"
+                [filterable]="true"
+                [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                [includeInChooser]="column.field=='$' ? false : true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'contractName'">
+                    <a [routerLink]="['/contract', dataItem.sOSCID, 0, dataItem.mailMergeTemplateID, 0, 0]" (click)="_localService.sendContractName(dataItem.contractName)" class="text-primary">{{ dataItem[column.field] }}</a>
+                  </div>
+
+                  <div class="customer-name" *ngIf="column.field == 'mailMergeTemplateID'">{{ convertEmailTemplate(dataItem[column.field]) }}</div>
+                </ng-template>
+                <ng-template kendoGridEditTemplate let-dataItem="dataItem" let-formGroup="formGroup" let-column="column">
+                  <div class="customer-name" *ngIf="column.field=='contractName'">
+                    <input placeholder="Contract Name" [(ngModel)]="dataItem[column.field]" name="column.title" />
+                  </div>
+                  <div class="customer-name" *ngIf="column.field=='mailMergeTemplateID'">
+                    <select [(ngModel)]="dataItem[column.field]" class="form-control">
+                      <option value="0"> -None Selected- </option>
+                      <option *ngFor="let item of mailMergeTemplateDropDown; let i = index" [ngValue]="item.mailMergeTemplateID">{{item.templateName }}</option>
+                    </select>
+                  </div>
+                </ng-template>
+              </kendo-grid-column>
+
+              <kendo-grid-command-column title="Action" [hidden]="roleFeaturePermissions?.edit == false" width="40" min="40" [includeInChooser]="false" [reorderable]="false" [columnMenu]="false">
+                <ng-template kendoGridCellTemplate>
+                  <button kendoGridEditCommand [hidden]="roleFeaturePermissions?.edit == false" [primary]="true" icon="edit" title="Edit"></button>
+                  <button kendoGridSaveCommand [primary]="true" icon="check" title="Update"></button>
+                  <button kendoGridCancelCommand icon="times" [primary]="true" title="Cancel"></button>
+                </ng-template>
+              </kendo-grid-command-column>
+            </div>
+          </kendo-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

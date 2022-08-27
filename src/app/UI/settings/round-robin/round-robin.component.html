@@ -1,0 +1,223 @@
+<div class="container-fluid mt-3 common-alignment" *ngIf="isPreview===true">
+  <div class="custom-security-link">
+    <a (click)="refreshRoundRobinList()">Back To List</a>
+  </div>
+</div>
+
+  <div class="card1 feature-table1">
+    <div class="card-body1">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel" *ngIf="!roundRobinState"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Round Robin Lead Assignment</div>
+            <div class="svg-icon-panel" *ngIf="roundRobinState"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Round Robin Lead Distribution Configuration</div>
+
+            <div class="header-button-panel" *ngIf="roundRobinState==0">
+              <div class="button-wrapper">
+                <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputRobinSearch.value =''">Reset Grid Setting</button>
+                <input class="webform-input-home" placeholder="Search in all columns..." kendoTextBox (input)="roundRobinFilter($event.target.value)" #inputRobinSearch />
+                <button type="button" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" matTooltip="Add Round Robin" class="icon-btn" [disabled]="!isSuccessRobin" (click)="addRoundRobin()">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                  <span class="btn-text">New</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="header-button-panel" *ngIf="roundRobinState === 1 && !initRoundRobinSave">
+              <div class="button-wrapper">
+                <button [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="button" matTooltip="Move To Next" class="icon-btn" (click)="roundRobinFormSubmit()">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                  <span class="btn-text">Save</span>
+                </button>
+                <button type="button" matTooltip="Cancel Round Robin" class="icon-btn" (click)="roundRobinState = 0">
+                  <i class="fa fa-times" aria-hidden="true"></i>
+                  <span class="btn-text">Cancel</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="header-button-panel" *ngIf="roundRobinState === 1 && initRoundRobinSave">
+              <div class="button-wrapper">
+                <button [hidden]="roleFeaturePermissions?.edit == false" type="button" class="icon-btn" (click)="initRoundRobinSave=false; ">
+                  <span class="btn-text">Edit</span>
+                  <i class="fa fa-pencil" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="global-body-section" *ngIf="roundRobinState == 0">
+            <kendo-grid #roundRobinGrid id="gridId" class="round-robin-grid"
+              [kendoGridBinding]="roundRobinList"
+              [pageSize]="_gridCnfgService.pageSize"
+              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+              [sortable]="{mode: 'multiple'}"
+              [scrollable]="'scrollable'"
+              [sort]="_gridCnfgService.sort"
+              [columnMenu]="{ filter: true }"
+              [resizable]="true"
+              [reorderable]="true"
+              (remove)="removeHandler($event)"
+              [ngStyle]="gridHeight"
+              (columnReorder)="_gridCnfgService.columnsOrderChanged('round_robin_grid', $event)"
+              (sortChange)="_gridCnfgService.sortChange('round_robin_grid', $event)"
+              (pageChange)="_gridCnfgService.pageChange('round_robin_grid', $event)"
+              (columnResize)="_gridCnfgService.columnResize(14,'round_robin_grid', $event)"
+              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'round_robin_grid',grid)">
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                  [field]="column.field"
+                  [title]="column.title | titlecase"
+                  [width]="column.width"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [filterable]="true"
+                  [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                  [includeInChooser]="column.field=='$' ? false : true">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.title == ''">{{ rowIndex+1 }}</div>
+                    <div class="customer-name" *ngIf="column.title == 'Round Robin Name'"><a (click)="editRoundRobin(dataItem);" class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</a></div>
+                    <div class="customer-name" *ngIf="column.title == 'Current Position'">{{ getCurrentPositionName(dataItem) }}</div>
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-messages [pagerItemsPerPage]="'Per page'" [pagerItems]="'Round Robins'"> </kendo-grid-messages>
+              </div>
+            </kendo-grid>
+          </div>
+
+          <div class="global-body-section" *ngIf="roundRobinState == 1">
+            <form [formGroup]="roundRobinForm" (ngSubmit)="roundRobinFormSubmit()">
+              <div class="wraper-body-panel">
+                <div class="wraper-body-left">
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Round Robin Name </span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div *ngIf="!initRoundRobinSave">
+                        <input type="text" class="form-control" [ngClass]="{'has-error': roundRobinFrm?.roundRobinName?.errors && (roundRobinFrm?.roundRobinName.touched || roundRobinFrm?.roundRobinName.dirty)}" id="roundRobinName" name="roundRobinName" formControlName="roundRobinName" placeholder=" Round Robin Name" />
+                        <div *ngIf="roundRobinFrm?.roundRobinName?.errors && (roundRobinFrm?.roundRobinName?.touched || roundRobinFrm?.roundRobinName?.dirty)">
+                          <div class="required-error" *ngIf="roundRobinFrm?.roundRobinName?.errors.required">Please enter a name for this form. </div>
+                        </div>
+                      </div>
+                      <div *ngIf="initRoundRobinSave">
+                        <p>{{roundRobinFrm?.roundRobinName.value}}</p>
+                      </div>
+                    </div>
+                </div>
+                  <div class="cards-body-section" *ngIf="initRoundRobinSave">
+                    <div class="cards-colunm-left">
+                      <span>Last Assigned</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div>
+                        {{this.assignedItemPosition>-1? this.assignedItemPosition+1+':' : ''}}{{clpUserDisplay ? clpUserDisplay : 'Not Set'}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section" *ngIf="initRoundRobinSave">
+                    <div class="cards-colunm-left">
+                    </div>
+                    <div class="cards-colunm-right">
+                      <select class="form-control" (change)="updateDropDownFormValue($event.target.value)">
+                        <option value=""> -Select User To Add- </option>
+                        <option *ngFor="let dtList of clpUserList; let i = index" [value]="dtList.key">{{dtList.value }}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="cards-body-section" *ngIf="initRoundRobinSave">
+                    <div class="cards-colunm-left">
+                      <div>
+                        <span>User List</span>
+                      </div>
+                    </div>
+                    <div class="cards-colunm-right" *ngIf="initRoundRobinSave">
+                      <div class="wraper-main-section" *ngIf="roundRobinData.roundRobinItems?.length > 0">
+                        <div class="global-card-section">
+                          <div class="inner-header-bg">
+                            <div class="inner-cards-panel header-inner-hidden">
+                              <span>Position</span>
+                              <span>Display</span>
+                              <span class="text-right">Action</span>
+                            </div>
+                            <div class="inner-detail-bg">
+                              <span>Details</span>
+                            </div>
+                          </div>
+                          <div class="common-inner-cards">
+                            <div cdkDropList
+                                  #frmList="cdkDropList"
+                                  [cdkDropListData]="roundRobinData.roundRobinItems"
+                                  (cdkDropListDropped)="dropRoundRobin($event)">
+                              <div class="inner-cards-grid" *ngFor="let item of roundRobinData.roundRobinItems; let i = index" cdkDrag>
+                                <div class="inner-card-mobile">
+                                  <label>Position</label>
+                                  <div class="mobile-view-design">
+                                    {{showPostion(i)}}
+                                  </div>
+                                </div>
+                                <div class="inner-card-mobile">
+                                  <label>Display</label>
+                                  <div class="mobile-view-design">
+                                    {{item.cLPUserDisplay}}
+                                  </div>
+                                </div>
+                                <div class="inner-card-mobile">
+                                  <label>Action</label>
+                                  <div class="mobile-view-design">
+                                    <div class="text-right">
+                                      <button type="submit" class="grid-common-btn" (click)="deleteRoundRobinItem(item, i)">
+                                        <i class="fa fa-trash round-trash"></i>
+                                        <span class="grid-common-text">Delete</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                      <div class="cards-colunm-left"></div>
+                      <div class="cards-colunm-right">
+                        <div class="bottom-button-bar">
+                          <button *ngIf="roundRobinState === 1 && initRoundRobinSave" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" [disabled]="!roundRobinForm.valid" class="btn btn-primary" type="button" (click)="moveNext()"> Move Next </button>
+                          <button *ngIf="roundRobinState === 1 && !initRoundRobinSave" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" [disabled]="!roundRobinForm.valid" class="btn btn-primary" type="submit" > Save </button>
+                          <button *ngIf="roundRobinState === 1 && !initRoundRobinSave" (click)="cancelRoundRobin();" class="btn btn-cancel" type="button"> Cancel</button>
+                          <button *ngIf="roundRobinState === 1 && !initRoundRobinSave && roundRobinData?.roundRobinID != 0" [hidden]="roleFeaturePermissions?.delete == false" class="btn btn-danger" type="button" data-toggle="modal" data-target="#roundRobinDeleteModal"> Delete </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="roundRobinDeleteModal" tabindex="-1" role="dialog" aria-labelledby="roundRobinDeleteModal" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>Caution: This Web Form will be permanently deleted.</h2><br />
+          <h5> Are you sure you want to delete this Web Form?</h5>
+        </div>
+        <div class="modal-footer">
+          <button type="button" [hidden]="roleFeaturePermissions?.delete == false" (click)="deleteRoundRobinConfirm()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>

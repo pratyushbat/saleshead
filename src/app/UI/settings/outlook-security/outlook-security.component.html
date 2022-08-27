@@ -1,0 +1,74 @@
+<div class="container-fuild mt-3">
+  <div class="margin-all-area">
+    <div class="custom-security-link">
+      <a [routerLink]="['/security-setting']">Security Settings</a>
+    </div>
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel">
+            <img src="../../../../assets/activity/config/securitytitle.svg" class="mr-1" />Outlook Contact Security Settings
+          </div>
+          <div class="header-button-panel">
+            <div class="button-wrapper">
+              <button type="button" matTooltip="Edit" class="icon-btn" *ngIf="!isEditMode && user?.userRole > 3" [hidden]="roleFeaturePermissions?.edit == false" (click)="editMode()">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+                <span class="btn-text">Edit</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isEditMode" class="alert-panel">Please choose which contacts your users can download to outlook and click Save.</div>
+        <div *ngIf="!isEditMode && status == 'Cancel'" class="alert-panel">No changes have been made.</div>
+        <div *ngIf="!isEditMode && status == 'Save'" class="alert-panel">Changes have been saved.</div>
+        <div class="global-body-section">
+          <div class="security-setting-header">
+            <div class="inner-cards-panel">
+              <span class="border-colunm outlook-align-top"><span>&nbsp;</span></span>
+              <span class="border-colunm text-center"><img src="../../../../assets/activity/config/hdradministrators.svg" /></span>
+              <span class="border-colunm text-center"><img src="../../../../assets/activity/config/hdrmanagers.svg" /></span>
+              <span class="text-center"><img src="../../../../assets/activity/config/hdrgeneralusers.svg" /></span>
+            </div>
+          </div>
+          <div class="outlook-row-bg">
+            <div class="inner-cards-panel outlook-align-top">
+              <span class="border-colunm">Company</span>
+              <span class="border-colunm text-center" *ngFor="let id of outlookRights; let i = index">
+                <span *ngIf="!isEditMode"><img  [src]="outlookRights[i].companyDownloadable? checkedImagePath : uncheckedImagePath" /></span>
+                <input *ngIf="isEditMode" type="checkbox" class="checkbox" [checked]="outlookRights[i].companyDownloadable" (change)="changeSettings(outlookRights[i].companyDownloadable,i,'companyDownloadable')" />
+              </span>
+            </div>
+          </div>
+          <div class="security-setting-background" *ngIf="companyResponse?.showOfficeDD == true">
+            <div class="inner-cards-panel outlook-align-top">
+              <span class="border-colunm">Office</span>
+              <span class="border-colunm text-center" *ngFor="let id of outlookRights; let i = index">
+                <span *ngIf="!isEditMode"><img [src]="outlookRights[i].officeDownloadable? checkedImagePath : uncheckedImagePath" /></span>
+                <input *ngIf="isEditMode" type="checkbox" class="checkbox" [checked]="outlookRights[i].officeDownloadable" (change)="changeSettings(outlookRights[i].officeDownloadable,i,'officeDownloadable')" />
+              </span>
+            </div>
+          </div>
+          <div class="outlook-row-bg" *ngIf="companyResponse?.showTeamDD == true">
+            <div class="inner-cards-panel outlook-align-top">
+              <span class="border-colunm">Team</span>
+              <span class="border-colunm text-center" *ngFor="let id of outlookRights; let i = index">
+                <span *ngIf="!isEditMode"><img [src]="outlookRights[i].teamDownloadable? checkedImagePath : uncheckedImagePath" /></span>
+                <input *ngIf="isEditMode" type="checkbox" class="checkbox" [checked]="outlookRights[i].teamDownloadable" (change)="changeSettings(outlookRights[i].teamDownloadable,i,'teamDownloadable')" />
+              </span>
+            </div>
+          </div>
+          <div class="security-setting-background global-padding10">
+            <div class="bottom-button-bar">
+              <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" *ngIf="isEditMode" type="button" (click)="saveSecuritySetting();"> Save</button>
+              <button class="btn btn-cancel" *ngIf="isEditMode" type="button" (click)="cancelSecuritySetting();"> Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fuild mt-3">
+    <app-outlook-addin *ngIf="user" [user]=user [roleFeaturePermissions]="roleFeaturePermissions" [isUserCode]="false"></app-outlook-addin>
+</div>
+

@@ -1,0 +1,147 @@
+<div class="container-fluid mt-3">
+  <div class="wraper-main-section">
+    <div class="">
+      <ul class="step">
+        <li class="active vertical-center"> <img src="../../../../assets/trans1x1.gif" class="steps1_4" border="0"><p class="transform-heading-map"> Search Contacts</p></li>
+        <li class="vertical-center" [ngClass]="{'active': step >= 2}"><img src="../../../../assets/trans1x1.gif" class="steps2_4" border="0"><p class="transform-heading-map"> Select Contacts</p></li>
+        <li class="vertical-center" [ngClass]="{'active': step >= 3}"><img src="../../../../assets/trans1x1.gif" class="steps3_4" border="0"><p class="transform-heading-map"> Select Action</p></li>
+        <li class="vertical-center" [ngClass]="{'active': step >= 4}"><img src="../../../../assets/trans1x1.gif" class="steps4_4" border="0"><p class="transform-heading-map"> Confirm Action</p></li>
+      </ul>
+    </div>
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/bulkcontactstitle.svg" class="mr-1" />Manage Duplicates</div>
+      </div>
+      <ng-container [ngSwitch]="step">
+        <ng-container *ngSwitchCase="1">
+          <div *ngIf="!isRecordDuplicates" class="alert-panel"><span>Select the population you want to search to check for duplicates using the Quick Search panel on the right.</span></div>
+          <div *ngIf="isRecordDuplicates" class="alert-panel"><span>No duplicates were found by email and mobile number. Select your population you want to search to check for duplicates using the Quick Search panel on the right.</span></div>
+          <div class="next-btn-head">
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="2">
+          <div class="alert-panel"><span>Duplicates by email and mobile number are listed below. Use the arrows on the left to expand each duplicate set to show associated contacts. Please select one set of duplicates to manage, using the checkboxes on the right.</span></div>
+          <div *ngIf="!isShowConfigure" class="alert-panel"><span>Please select one set of duplicates to configure by selecting one of the checkboxes below.</span></div>
+          <div class="margin-all-area"> <button (click)="configureMerge()" class="btn btn-primary">Configure Merge</button> </div>
+          <div class="global-body-section">
+            <kendo-grid class="contact-duplicate-grid" #grid id="griddupl" [kendoGridBinding]="duplicateContacts" [height]="550">
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of columns"
+                  [field]="column.field"
+                  [title]="column.title | titlecase"
+                  [width]="column.width"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'emailORMobile'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'count'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                    <div class="customer-name" *ngIf="column.field == 'select'">
+                      <input type="checkbox" class="k-checkbox" id="companyId{{rowIndex}}" (click)="setSelectedContacts($event,dataItem,rowIndex)" />
+                    </div>
+                  </ng-template>
+                </kendo-grid-column>
+              </div>
+              <div *kendoGridDetailTemplate="let dataItem">
+                <kendo-grid class="contact-duplicate-grid1" #grid2 id="gridchild" [kendoGridBinding]="dataItem.subItems" [navigable]="true">
+                  <div class="grid-scroll-bar">
+                    <kendo-grid-column *ngFor="let column of columnChild"
+                      [field]="column.field"
+                      [title]="column.title | titlecase"
+                      [width]="column.width"
+                      [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                      [headerClass]="mobileColumnChildNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                      [class]="mobileColumnChildNames?.includes(column.field) ? 'mobile-grid-colunm' : ''">
+                      <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                        <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                        <div class="customer-name" *ngIf="column.field == 'lastFirst'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                        <div class="customer-name" *ngIf="column.field == 'mobile'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                        <div class="customer-name" *ngIf="column.field == 'email'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                        <div class="customer-name" *ngIf="column.field == 'companyName'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                        <div class="customer-name" *ngIf="column.field == 'contactID'">{{user.firstName }}{{user.lastName}}</div>
+                        <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                      </ng-template>
+                    </kendo-grid-column>
+                  </div>
+                </kendo-grid>
+              </div>
+            </kendo-grid>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="3">
+          <div>
+            <div *ngIf="showDefaultMergeWarning" class="warning-alert"> <span>Please select at one action for each contact.</span></div>
+            <div class="alert-panel"><span>Select the action you would like to take for each contact using the options below.</span></div>
+            <div class="instruction-box-panel">
+              <div class="instruction-box-left">
+                <h4>Instructions</h4>
+              </div>
+              <div class="instruction-box-right">
+                <ul>
+                  <li>Each contact MUST have an action selected (Keep, Merge, Ignore).</li>
+                  <li><b>Keep:</b> This is the contact TO which you are merging any of these duplicates. You may only select one contact to Keep.</li>
+                  <li><b>Merge:</b> These are the contacts you would like to combine with the contact you've selected to Keep. This will merge all selected contacts and their history to the Keep contact, thereby removing them from your database.</li>
+                  <li><b>Ignore:</b> These contacts will remain unchanged. (InventHelp Only: All contacts with agreements assigned will remain unchanged.)</li>
+                </ul>
+              </div>
+            </div>
+            <div class="global-body-section">
+              <kendo-grid #grid3 id="gridchild2" class="nested-contact-duplicate-grid" [kendoGridBinding]="selectedContactsToMerge">
+                <div class="grid-scroll-bar">
+                  <kendo-grid-column *ngFor="let column of columnChildStep2"
+                    [field]="column.field"
+                    [title]="column.title | titlecase"
+                    [width]="column.width"
+                    [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                    [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                    [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                      <div class="customer-name" *ngIf="column.field == 'lastFirst'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                      <div class="customer-name" *ngIf="column.field == 'mobile'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                      <div class="customer-name" *ngIf="column.field == 'email'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                      <div class="customer-name" *ngIf="column.field == 'companyName'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                      <div class="customer-name" *ngIf="column.field == 'contactID'">{{user.firstName }}{{user.lastName}}</div>
+                      <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]}}</div>
+                      <div class="customer-name" *ngIf="column.field == 'keep'">
+                        <input type="checkbox" class="k-checkbox" id="keepId{{rowIndex}}" (change)="cbClick($event,'keep',rowIndex)" />
+                      </div>
+                      <div class="customer-name" *ngIf="column.field == 'merge'">
+                        <input type="checkbox" class="k-checkbox" id="mergeId{{rowIndex}}" (change)="cbClick($event,'merge',rowIndex)" />
+                      </div>
+                      <div class="customer-name" *ngIf="column.field == 'ignore'">
+                        <input type="checkbox" class="k-checkbox" id="ignoreId{{rowIndex}}" (change)="cbClick($event,'ignore',rowIndex)" />
+                      </div>
+                    </ng-template>
+                  </kendo-grid-column>
+                </div>
+              </kendo-grid>
+            </div>
+            <div class="margin-all-area">
+                <button [disabled]="showSpinner?true:false" [hidden]="roleFeaturePermissions?.edit == false" class="btn btn-primary" (click)="executeMerge()">Execute Merge Action</button>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="4">
+          <div>
+            <div class="warning-alert"> <span>Please select Confirm to execute the merge request. Remember, these are permanent changes that you are about to make to the selected contacts.</span></div>
+            <div class="margin-all-area">
+              <button [disabled]="showSpinner?true:false" [hidden]="roleFeaturePermissions?.edit == false" class="btn btn-primary" (click)="confirmExecuteMerge()">Confirm</button>
+              <button [disabled]="showSpinner?true:false" [hidden]="roleFeaturePermissions?.edit == false" class="btn btn-primary" (click)="step=1;">Cancel</button>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+
+
+

@@ -1,0 +1,3 @@
+
+<contact-common-search [sendMailInfo]="sendMailInfo"></contact-common-search>
+<bulk-contact-common *ngIf="user" (sendMailInfo)="sendMailInfo = $event;" [user]=user [roleFeaturePermissions]="roleFeaturePermissions" [contactsArchiveData] ="contactsArchiveData" [queryDataLoaded]="queryDataLoaded" [initContactsArchiveData]="contactsArchiveData"></bulk-contact-common>

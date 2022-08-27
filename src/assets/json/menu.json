@@ -1,0 +1,90 @@
+{
+  "homeMenu": [
+    {
+      "icon": "home",
+      "items": [
+        {
+          "text": "Home",
+          "items": [
+          ]
+        },
+        {
+          "text": "My Calendar",
+          "items": [
+            {
+              "text": "New Appointment",
+              "items": [
+              ]
+            },
+            {
+              "text": "Appointment List",
+              "items": [
+              ]
+            },
+            {
+              "text": "Bulk Appointment Wizard",
+              "items": [
+              ]
+            },
+            {
+              "text": "Dynamic Schedulers",
+              "items": [
+              ]
+            },
+            {
+              "text": "New Recurring Appointment",
+              "items": [
+              ]
+            },
+            {
+              "text": "My Schedule",
+              "items": [
+              ]
+            }
+          ]
+        },
+        {
+          "text": "My Call List",
+          "items": [
+          ]
+        },
+        {
+          "text": "My Tasks",
+          "items": [
+          ]
+        },
+        {
+          "text": "My Documents",
+          "items": [
+          ]
+        },
+        {
+          "text": "My Mailings",
+          "items": [
+          ]
+        },
+        {
+          "text": "My Goals",
+          "items": [
+            {
+              "text": "View My Goals",
+              "items": [
+              ]
+            },
+            {
+              "text": "Setup My Goals",
+              "items": [
+              ]
+            }
+          ]
+        },
+        {
+          "text": "My Profile",
+          "items": [
+          ]
+        }
+      ]
+    }
+
+  ]
+}

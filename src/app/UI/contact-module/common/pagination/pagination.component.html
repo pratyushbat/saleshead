@@ -1,0 +1,13 @@
+ <kendo-datapager [style.width.%]="100"
+                                         [pageSize]="teamOffice=='team' ? pageSize : teamOffice=='office' ?  pageSizeOffice : pageSize"
+                                         [skip]="teamOffice=='team' ? skip : teamOffice=='office' ?  skipOffice : skip"
+                                         [total]="teamOffice=='team' ? total : teamOffice=='office' ?  totalOffice : total"
+                                         (pageChange)="onPageChange($event)">
+                          <ng-template kendoDataPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                            <kendo-datapager-prev-buttons></kendo-datapager-prev-buttons>
+                            <kendo-datapager-numeric-buttons [buttonCount]="10"></kendo-datapager-numeric-buttons>
+                            <kendo-datapager-next-buttons></kendo-datapager-next-buttons>
+                            <kendo-datapager-info></kendo-datapager-info>
+                            <kendo-datapager-page-sizes [pageSizes]="teamOffice=='team' ? pageSizes : teamOffice=='office' ?  pageSizesOffice : pageSizes"></kendo-datapager-page-sizes>
+                          </ng-template>
+                        </kendo-datapager>

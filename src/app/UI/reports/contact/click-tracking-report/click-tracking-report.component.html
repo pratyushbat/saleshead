@@ -1,0 +1,120 @@
+<div class="wraper-main-section">
+  <div class="global-card-section">
+    <div class="common-inner-header">
+      <div class="inner-header-bg">
+        <div class="inner-cards-panel header-inner-hidden">
+          <span>Date Filter</span>
+        </div>
+      </div>
+      <form [formGroup]="clickTrackingForm" (ngSubmit)="clickTrackingFormSubmit()">
+        <div class="inner-cards-grid">
+          <div class="inner-card-mobile">
+            <div class="">
+              <span class="mr-2 font-weight-bold">Start</span>
+              <kendo-datepicker formControlName="startDt" placeholder=""></kendo-datepicker>
+            </div>
+          </div>
+          <div class="inner-card-mobile">
+            <div class="">
+              <span class="mr-2 font-weight-bold">End</span>
+              <kendo-datepicker formControlName="endDt" placeholder=""></kendo-datepicker>
+            </div>
+          </div>
+          <div class="inner-card-mobile">
+            <label>Action</label>
+            <div class="">
+              <div class="text-right">
+                <button type="submit" class="common-colunm-btn">
+                  <i class="fa fa-refresh" title="Refresh"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div *ngIf="isShowGridData==2"><p>Please select both a Start and End Date.</p></div>
+    <div *ngIf="isShowGridData==3"><p>End Date must be later than Start Date.</p></div>
+    <div class="wraper-main-section mt-5" *ngIf="isShowGridData==1">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../../assets/leadstitle.svg" class="mr-1" />Clicks</div>
+          <button (click)="getClickTrackingResponse()" class="common-colunm-btn">
+            <i class="fa fa-refresh" title="Refresh"></i>
+          </button>
+          <div class="header-button-panel white-font">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputClickTracking.value = '' ">Reset Grid Setting</button>
+            <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onClickTrackingFilter($event.target.value)" #inputClickTracking /> &nbsp;&nbsp;
+          </div>
+        </div>
+        <div class="global-body-section">
+          <kendo-grid #grid id="gridId" class=""
+                      [kendoGridBinding]="clickCountResponse"
+                      [sortable]="{mode: 'multiple'}"
+                      [sort]="_gridCnfgService.sort"
+                      [pageSize]="_gridCnfgService.pageSize"
+                      [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                      [scrollable]="false"
+                      [reorderable]="true"
+                      [resizable]="true"
+                      [columnMenu]="{ filter: true }"
+                      (columnReorder)="_gridCnfgService.columnsOrderChanged('click_tracking_report_grid', $event)"
+                      (sortChange)="_gridCnfgService.sortChange('click_tracking_report_grid', $event)"
+                      (pageChange)="_gridCnfgService.pageChange('click_tracking_report_grid', $event)"
+                      (columnResize)="_gridCnfgService.columnResize(4,'click_tracking_report_grid', $event)"
+                      (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'click_tracking_report_grid',grid)">
+            <ng-template kendoGridToolbarTemplate>
+              <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)">
+                <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                <span>Download Excel</span>
+              </button>
+              <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+                <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                <span>Download PDF</span>
+              </button>
+            </ng-template>
+            <div class="grid-scroll-bar">
+              <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                                 [field]="column.field"
+                                 [title]="column.title"
+                                 [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                 [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                 [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                 [width]="column.width"
+                                 [filterable]="true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'destinationUrl'">{{ dataItem[column.field]}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'count'">{{ dataItem[column.field]}}</div>
+                  <div class="customer-name" *ngIf="column.field == 'search'" (click)="onClickSearch(dataItem);" title="View"><a class=""><i class="fas fa-search"></i></a></div>
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-excelexport #excelexport [data]="clickCountResponse" fileName='Click Tracking'>
+                <kendo-excelexport-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name">{{ dataItem[col.field] }}</div>
+                  </ng-template>
+                </kendo-excelexport-column>
+              </kendo-excelexport>
+              <kendo-grid-pdf fileName="Click Tracking.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                <kendo-grid-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name">{{ dataItem[col.field] }}</div>
+                  </ng-template>
+                </kendo-grid-column>
+              </kendo-grid-pdf>
+            </div>
+          </kendo-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isShowContactList" class="margin-all-area">
+  <app-search-result-common [user]="user" [clickId]="clickId" [searchBy]="searchBy" [startDate]="clickTrackingData?.startDt" [endDate]="clickTrackingData?.endDt"></app-search-result-common>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

@@ -1,0 +1,171 @@
+<div class="wraper-main-section">
+  <div class="global-card-section">
+    <div class="global-header-section">
+      <div class="svg-icon-panel"><img src="../../../../assets/salesoptimatitle.svg" class="mr-1" />{{_mthNmeEml}}&nbsp;{{selYear}}</div>
+      <div class="header-button-panel">
+        <div class="button-wrapper">
+          <select class="ddStandard" (change)="setMonth($event.target.value)">
+            <option value="0">-Select-</option>
+            <option *ngFor="let getMonths of htmlEmailLogGetMonths" [ngValue]="getMonths.Mth">{{getMonths.Mth}}&nbsp;{{getMonths.yr}}</option>
+          </select>
+          <div class="svg-icon-panel">&nbsp;{{mthNmeEml}}&nbsp;{{selYear}}</div>
+        </div>
+      </div>
+    </div>
+    <div class="global-body-section">
+      <div class="margin-all-area">
+        <div class="txtmsg-image">
+          <table class="table-bordered" style="border-collapse: collapse;" [hidden]="hideUserCnt">
+            <tbody class="table table-striped">
+              <tr class="gvHeader">
+                <th>User</th>
+                <th class="gvtdalignheader">Emails sent</th>
+              </tr>
+              <tr class="gvRow" *ngFor="let item of htmlEmailLogUsageByMonth">
+                <td>{{item.name}}</td>
+                <td class="gvtdalign">{{item.cnt}}</td>
+              </tr>
+              <tr class="gvHeader">
+                <th>Total</th>
+                <th class="gvtdalign">{{ getTotal(htmlEmailLogUsageByMonth) }}</th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="global-header-section">
+      <div class="svg-icon-panel"><img src="../../../../assets/salesoptimatitle.svg" class="mr-1" />HTML Email Pricing Summary</div>
+      <div class="header-button-panel">
+        <div class="button-wrapper">
+          <button type="button" matTooltip="Edit Pricing Summary" class="icon-btn" (click)="onEdit()" [hidden]="roleFeaturePermissions?.edit == false || !showNewPricing">
+            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+            <span class="btn-text">Edit</span>
+          </button>
+          <button matTooltip="Save Pricing Summary" class="icon-btn" type="submit" (click)="saveNewEmailPricing()" [hidden]="showNewPricing">
+            <i class="fas fa-save" aria-hidden="true"></i>
+            <span class="btn-text">Save</span>
+          </button>
+          <button matTooltip="Cancel Pricing Summary" type="button" class="icon-btn" (click)="onCancel()" [hidden]="showNewPricing">
+            <i class="fas fa-times" aria-hidden="true"></i>
+            <span class="btn-text">Cancel</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="global-body-section">
+      <div class="wraper-body-left">
+        <div class="cards-body-section">
+          <div class="cards-colunm-left">
+            <span>Pricing Type</span>
+          </div>
+          <div class="cards-colunm-right">
+            <span class="control-label">Monthly Usage Per Email Pricing</span>
+          </div>
+        </div>
+        <div class="cards-body-section">
+          <div class="cards-colunm-left">
+            <span class="control-label ml-3 pricing-leftheading">Your Pricing Matrix</span>
+          </div>
+          <div class="cards-colunm-right">
+            <table class="table-bordered order-row-inner" style="border-collapse: collapse;">
+              <tbody>
+                <tr class="emlTableHeading">
+                  <th># Emails Sent</th>
+                  <th>Pricing</th>
+                </tr>
+                <tr class="gvRow">
+                  <td>0 - 100	</td>
+                  <td>${{htmlEmailPricing?.tierUpTo100}}</td>
+                </tr>
+                <tr class="gvRow">
+                  <td>101 - 1,000		</td>
+                  <td>${{htmlEmailPricing?.tierUpTo1000}}</td>
+                </tr>
+                <tr class="gvRow">
+                  <td>1,001 - 2,500	</td>
+                  <td>${{htmlEmailPricing?.tierUpTo2500}}</td>
+                </tr>
+                <tr class="gvRow">
+                  <td>2,501 - 5,000</td>
+                  <td>${{htmlEmailPricing?.tierUpTo5000}}</td>
+                </tr>
+                <tr class="gvRow">
+                  <td>5,001 - 10,000</td>
+                  <td>${{htmlEmailPricing?.tierUpTo10000}}</td>
+                </tr>
+                <tr class="gvRow">
+                  <td>10,001 - 25,000</td>
+                  <td>${{htmlEmailPricing?.tierUpTo25000}}</td>
+                </tr>
+                <tr class="gvRow">
+                  <td>25,000 +</td>
+                  <td>${{htmlEmailPricing?.tierOver25000}}&nbsp; per email sent</td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <form [formGroup]="htmlEmailPricingForm" (ngSubmit)="saveNewEmailPricing()" [hidden]="showNewPricing">
+          <div class="cards-body-section">
+            <div class="cards-colunm-left">
+              <div class="">
+                <span class="">New Matrix</span>
+              </div>
+            </div>
+            <div class="cards-colunm-right">
+              <table class="table-bordered order-row-inner" style="border-collapse: collapse;">
+                <tbody>
+                  <tr class="gvRow">
+                    <td>Type</td>
+                    <td>
+                      <div class="email-pricing-panel" *ngFor="let item of arrEmailChoice">
+                        <label class="child"><input [value]='item.value' type="radio" formControlName="emailChoice"> <span>{{item.name}}</span></label>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="">
+                    <th width="44%"># range</th>
+                    <th>Pricing</th>
+                  </tr>
+                  <tr class="gvRow">
+                    <td>0 - 100	</td>
+                    <td> <input class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" type="text" formControlName="tierUpTo100" /></td>
+                  </tr>
+                  <tr class="gvRow">
+                    <td>101 - 1,000		</td>
+                    <td> <input class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" type="text" formControlName="tierUpTo1000" /></td>
+                  </tr>
+                  <tr class="gvRow">
+                    <td>1,001 - 2,500	</td>
+                    <td> <input class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" type="text" formControlName="tierUpTo2500" /></td>
+                  </tr>
+                  <tr class="gvRow">
+                    <td>2,501 - 5,000</td>
+                    <td> <input class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" type="text" formControlName="tierUpTo5000" /></td>
+                  </tr>
+                  <tr class="gvRow">
+                    <td>5,001 - 10,000</td>
+                    <td> <input class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" type="text" formControlName="tierUpTo10000" /></td>
+                  </tr>
+                  <tr class="gvRow">
+                    <td>10,001 - 25,000</td>
+                    <td> <input class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" type="text" formControlName="tierUpTo25000" /></td>
+                  </tr>
+                  <tr class="gvRow">
+                    <td>25,000 +</td>
+                    <td> <input class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" type="text" formControlName="tierOver25000" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+        <div class="margin-all-area">
+          <span class="smallgreen">Note: Please submit a support ticket if you would like to change your <a href="http://www.salesoptima.com/email-marketing" target="_blank" class="font-weight-bold">HTML Email Pricing Type</a>.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

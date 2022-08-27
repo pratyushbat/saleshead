@@ -1,0 +1,88 @@
+<div class="col-md-5 p-4">
+  <div class="teamoffice-body-section">
+    <div class="team-example-list-heading">
+      <div class="team-example-box-heading">
+        <div class="col-md-4"><h6>User</h6></div>
+        <div class="col-md-3"><h6>Start Date</h6></div>
+        <div class="col-md-3"><h6>End Date</h6></div>
+        <div class="col-md-2"></div>
+      </div>
+    </div>
+    <div class="contact-settings-body-panel image-bank-body-panel">
+      <div class="example-container">
+        <form [formGroup]="emailOpenForm" >
+          <div class="team-example-list">
+            <div>
+              <div class=" team-example-box image-bank-cursor">
+                <div class="col-md-4">
+                  <select class="form-control" formControlName="ddUser">
+                    <!--<option *ngFor="let item of userList" [value]="item.cLPUserID">{{item.lastName}},{{item.firstName}}</option>-->
+                    <option>fsd</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <kendo-datepicker formControlName="startDate"></kendo-datepicker>
+                </div>
+                <div class="col-md-3">
+                  <kendo-datepicker formControlName="endDate"></kendo-datepicker>
+                </div>
+                <div class="col-md-2">
+                  <button type="submit" class="grid-common-btn"><i class="fa fa-refresh" title="Refresh"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-md-12">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/contactstitle.svg" class="mr-1" />Activity Report for Testing Account</div>
+        <div class="header-button-panel">
+        </div>
+      </div>
+      <div class="global-body-section">
+        <div class="admin-option-section">
+          <div class="flex-row-display">
+            <div class="txt-right">
+              <span>Appointments</span>
+            </div>
+            <div class="click-txt-left">
+              <span>0 appointment(s) found.</span>
+            </div>
+          </div>
+          <div class="flex-row-display">
+            <div class="txt-right">
+              <span>All Tasks</span>
+            </div>
+            <div class="click-txt-left">
+              <span>0 pending task(s) found.</span>
+            </div>
+          </div>
+          <div class="flex-row-display">
+            <div class="txt-right">
+              <span>History Notes</span>
+            </div>
+            <div class="click-txt-left">
+              <span>0 note(s) found.</span>
+            </div>
+          </div>
+          <div class="flex-row-display">
+            <div class="txt-right">
+              <span>Leads</span>
+            </div>
+            <div class="click-txt-left">
+              <span>0 lead(s) found.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+
+.dummy-margin {
+  margin: 50px;
+}
+input.ng-invalid.ng-touched {
+  border: 1px solid red;
+}
+input.redv-border-class.ng-dirty.ng-valid {
+  border: 1px solid red;
+}
+input.greenv-border-class.ng-dirty.ng-valid {
+  border: 1px solid green;
+}

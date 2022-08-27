@@ -1,0 +1,250 @@
+<div class="create-email" #scrollIdTarget [@filterAnimation]="showAnimation">
+  <div class="global-padding10">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel">
+            <span>Contact Information</span>
+            <span *ngIf="currentUrl == 'contact-create' && contactForm.get('firstName')?.value">&nbsp;-&nbsp;{{ contactForm.get('firstName').value  | titlecase}} {{contactForm.get('lastName').value | titlecase}} </span>
+          </div>
+        </div>
+        <div class="global-body-section">
+          <form [formGroup]="contactForm" (ngSubmit)="contactFormSubmit()" *ngIf="!showSpinner">
+            <div class="cards-height-section">
+              <div class="cards-height-panel">
+                <div *ngIf="contactFields">
+                  <div class="cards-height-flex">
+                    <div>
+                      <div class="form-group" [hidden]="contactFields.firstName.isShow == 2" [ngClass]="{'has-asterisk': contactFields.firstName.isShow == 1}">
+                        <label>{{contactFields.firstName.fieldTitle}}</label>
+                        <span *ngIf="isEditMode">:&nbsp;{{contactFields.firstName.fieldValue}}</span>
+                        <input type="text" tabindex="1" class="form-control" *ngIf="!isEditMode" formControlName="firstName" [ngClass]="{'has-error': (contactFrm.firstName.errors && (contactFrm.firstName.touched || contactFrm.firstName.dirty))}" required />
+                        <div *ngIf="contactFrm.firstName.errors &&(contactFrm.firstName.touched || contactFrm.firstName.dirty)">
+                          <div class="search-query-error acc-info-srch-error" *ngIf="contactFrm.firstName.errors?.required">
+                            Please enter First Name
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group" [hidden]="contactFields.mobile.isShow == 2" [ngClass]="{'has-asterisk': contactFields.mobile.isShow == 1}">
+                        <label>{{contactFields.mobile.fieldTitle}}</label>
+                        <span *ngIf="isEditMode">:&nbsp;{{contactFields.mobile.fieldValue}}</span>
+                        <input type="text" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" maxlength="15" tabindex="3" class="form-control" *ngIf="!isEditMode" formControlName="mobile" [placeholder]="placeHolder" [mask]="mobile_mask" [ngClass]="{'has-error': (contactFrm.mobile.errors && (contactFrm.mobile.touched || contactFrm.mobile.dirty))}" required />
+                        <div *ngIf="contactFrm.mobile.errors &&(contactFrm.mobile.touched || contactFrm.mobile.dirty)">
+                          <div class="search-query-error acc-info-srch-error" *ngIf="contactFrm.mobile.errors?.required">
+                            Please enter Mobile
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="form-group" [hidden]="contactFields.lastName.isShow == 2" [ngClass]="{'has-asterisk': contactFields.lastName.isShow == 1}">
+                        <label>{{contactFields.lastName.fieldTitle}}</label>
+                        <span *ngIf="isEditMode">:&nbsp;{{contactFields.lastName.fieldValue}}</span>
+                        <input type="text" tabindex="2" class="form-control" *ngIf="!isEditMode" formControlName="lastName" [ngClass]="{'has-error': (contactFrm.lastName.errors && (contactFrm.lastName.touched || contactFrm.lastName.dirty))}" required />
+                        <div *ngIf="contactFrm.lastName.errors &&(contactFrm.lastName.touched || contactFrm.lastName.dirty)">
+                          <div class="search-query-error acc-info-srch-error" *ngIf="contactFrm.lastName.errors?.required">
+                            Please enter LastName
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group" [hidden]="contactFields.email.isShow == 2" [ngClass]="{'has-asterisk': contactFields.email.isShow == 1}">
+                        <label>{{contactFields.email.fieldTitle}}</label>
+                        <span *ngIf="isEditMode">:&nbsp;{{contactFields.email.fieldValue}}</span>
+                        <input type="text" tabindex="4" class="form-control" *ngIf="!isEditMode" formControlName="email" [ngClass]="{'has-error': (contactFrm.email.errors && (contactFrm.email.touched || contactFrm.email.dirty))}"
+                                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$" required />
+                        <div *ngIf="contactFrm.email.errors &&(contactFrm.email.touched || contactFrm.email.dirty)">
+                          <div class="search-query-error acc-info-srch-error" *ngIf="contactFrm.email.errors?.pattern">
+                            Invalid Email
+                          </div>
+                          <div class="search-query-error acc-info-srch-error" *ngIf="contactFrm.email.errors?.required">
+                            Please enter Email
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-height-flex">
+                    <div></div>
+                    <div>
+                      <label class="clickable text-info" (click)="moreLess()"><i>{{moreLabel}}</i></label>
+                    </div>
+                  </div>
+                </div>
+                <div id="list" [hidden]="more">
+                  <div class="multiple-cards-section">
+                    <div class="multiple-cards-panel" *ngFor="let section of arrSortedBySection; let is = index;" [hidden]="section.items.length == 0 || isShowFields(is)">
+                      <div class="wraper-main-section">
+                        <div class="global-card-section">
+                          <div class="global-header-section">
+                            <span>{{ section.sectionName }}</span>
+                          </div>
+                          <div class="global-body-section">
+                            <div class="margin-all-area">
+                              <div class="draggable" *ngFor="let item of section.items; let i = index">
+                                <div class="form-group" *ngIf="item.fieldType == 0" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle}}</label>
+                                  <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                  <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" maxlength="12" *ngIf="!isEditMode && item.fieldTitle == 'Phone'" formControlName="{{ item.fieldName }}"
+                                          [placeholder]="placeHolder" [mask]="mobile_mask" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}" />
+                                  <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" maxlength="12" *ngIf="!isEditMode && item.fieldTitle == 'HomePhone'" formControlName="{{ item.fieldName }}"
+                                          [placeholder]="placeHolder" [mask]="mobile_mask" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}" />
+                                  <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" maxlength="12" *ngIf="!isEditMode && item.fieldTitle == 'AltPhone'" formControlName="{{ item.fieldName }}"
+                                          [placeholder]="placeHolder" [mask]="mobile_mask" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}" />
+
+                                  <input type="text" class="form-control" *ngIf="!isEditMode && item.fieldTitle == 'Zip'" placeholder="Zip" minlength="3" maxlength="9" (blur)="getCityState($event);" formControlName="{{ item.fieldName }}" (keypress)="_localService.onKeyDown($event)"
+                                          [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}" />
+
+                                  <input type="text" class="form-control" *ngIf="!isEditMode && item.fieldTitle != 'Email2' && item.fieldTitle != 'Email3' && item.fieldTitle != 'Phone' && item.fieldTitle != 'HomePhone' && item.fieldTitle != 'AltPhone' && item.fieldTitle != 'Zip' && item.fieldTitle != 'Fax' && item.fieldTitle != 'OtherFax'"
+                                          formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}" />
+
+                                  <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" *ngIf="!isEditMode && item.fieldTitle == 'Fax'" maxlength="11"
+                                          formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}" />
+
+                                  <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" *ngIf="!isEditMode && item.fieldTitle == 'OtherFax'" maxlength="11"
+                                          formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}" />
+
+                                  <input type="text" class="form-control" *ngIf="!isEditMode && item.fieldTitle == 'Email2'" formControlName="{{ item.fieldName }}"
+                                          (ngModelChange)="onemail2Change($event)" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}"
+                                          pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$" [required]="email2blastaddress" />
+                                  <div *ngIf="contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty) && item.fieldTitle == 'Email2'">
+                                    <div *ngIf="contactForm.get(item.fieldName).errors?.pattern" class=" text-danger">
+                                      Invalid Email Id
+                                    </div>
+                                  </div>
+
+                                  <input type="text" class="form-control" *ngIf="!isEditMode && item.fieldTitle == 'Email3'" formControlName="{{ item.fieldName }}"
+                                          (ngModelChange)="onemail3Change($event)" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}"
+                                          pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$" [required]="email3blastaddress" />
+                                  <div *ngIf="contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty)&& item.fieldTitle == 'Email3'">
+                                    <div *ngIf="contactForm.get(item.fieldName).errors?.pattern" class=" text-danger">
+                                      Invalid Email Id
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="form-group" *ngIf="item.fieldType == 2" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle}}</label>
+                                  <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                  <select class="form-control" *ngIf="!isEditMode && item.fieldTitle != 'EBlastAddress' && item.fieldTitle != 'Country'" formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}">
+                                    <option *ngFor="let blastItem of item.items; let i = index" [value]='blastItem.value'>
+                                      {{blastItem.display}}
+                                    </option>
+                                  </select>
+                                  <select class="form-control" *ngIf="!isEditMode && item.fieldTitle == 'Country'" formControlName="{{ item.fieldName }}" (change)="changeCountry($event)" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}">
+                                    <option *ngFor="let item of item.items; let i = index" [value]='item.strValue'>
+                                      {{item.display}}
+                                    </option>
+                                  </select>
+                                  <select class="form-control" *ngIf="!isEditMode && item.fieldTitle == 'EBlastAddress'" formControlName="{{ item.fieldName }}" (change)="blastItem($event.target.value)" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}">
+                                    <option *ngFor="let blastItem of item.items; let i = index" [value]='blastItem.value'>
+                                      {{blastItem.display}}
+                                    </option>
+                                  </select>
+                                  <span class="validation-error" *ngIf="!isEditMode && item.fieldTitle == 'EBlastAddress'">{{msg_blastaddress}}</span>
+                                </div>
+                                <div class="form-group" *ngIf="item.fieldType == 4 && item.fieldTitle != 'CompanyName'" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle}}</label>
+                                  <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                  <kendo-autocomplete *ngIf="!isEditMode" [data]="item.items" formControlName="{{ item.fieldName }}" [valueField]="'display'" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}">
+                                    <ng-template kendoAutoCompleteItemTemplate let-dataItem>{{dataItem.display}}</ng-template>
+                                  </kendo-autocomplete>
+                                </div>
+                                <div class="form-group" *ngIf="item.fieldType == 4 && item.fieldTitle == 'CompanyName'" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle}}</label>
+                                  <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                  <input type="text" class="form-control" formControlName="{{ item.fieldName }}" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}" />
+                                </div>
+                                <div class="form-group" *ngIf="item.fieldType == 5" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle}}</label>
+                                  <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                  <kendo-datetimepicker placeholder="" *ngIf="!isEditMode" formControlName="{{ item.fieldName }}" [format]="format" class="generic-width-per" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}"></kendo-datetimepicker>
+                                </div>
+                                <div class="custom-toggle">
+                                  <div class="form-group" *ngIf="item.fieldType == 1" [hidden]="item.isShow == 2" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                    <label>{{item.fieldTitle}}</label>
+                                    <span *ngIf="isEditMode">:&nbsp;{{item.fieldValue}}</span>
+                                    <label class="switch">
+                                      <input type="checkbox" *ngIf="!isEditMode" [id]="item.fieldName" [name]="item.fieldName" formControlName="{{ item.fieldName }}" (change)="onCheckboxChange($event, item.fieldName)" [ngClass]="{'has-error': (contactForm.get(item.fieldName).errors && (contactForm.get(item.fieldName).touched || contactForm.get(item.fieldName).dirty))}" />
+                                      <span class="slider round"></span>
+                                    </label>
+                                  </div>
+                                </div>
+                                <div class="form-group" *ngIf="item.fieldType == 3" [hidden]="item.isShow == 2 && item.fieldTitle != 'dtModified' && item.fieldTitle != 'dtCreated'" [ngClass]="{'has-asterisk': item.isShow == 1}">
+                                  <label>{{item.fieldTitle == 'dtModified' ? 'Last Modified' : item.fieldTitle == 'dtCreated' ? 'Created' : item.fieldTitle}}</label>
+                                  <span *ngIf="(item.fieldTitle == 'dtModified' || item.fieldTitle == 'dtCreated') && item.fieldValue != '0001-01-01T00:00:00'">&nbsp;{{item.fieldValue | date : 'MM/dd/yyyy'}}</span>
+                                  <span *ngIf="(item.fieldTitle == 'dtModified' || item.fieldTitle == 'dtCreated') && item.fieldValue == '0001-01-01T00:00:00'">&nbsp;</span>
+                                  <span *ngIf="item.fieldTitle != 'dtModified' && item.fieldTitle != 'dtCreated'">&nbsp;{{item.fieldValue}}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="multiple-cards-panel" [hidden]="true">
+                      <div class="wraper-main-section">
+                        <div class="global-card-section">
+                          <div class="global-header-section">
+                            <span>Tags</span>
+                          </div>
+                          <div class="global-body-section">
+                            <div class="margin-all-area">
+                              <div class="draggable">
+                                <!--Code Here-->
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="multiple-cards-panel" [hidden]="true">
+                      <div class="wraper-main-section">
+                        <div class="global-card-section">
+                          <div class="global-header-section">
+                            <span>Connections</span>
+                          </div>
+                          <div class="global-body-section">
+                            <div class="margin-all-area">
+                              <div class="draggable">
+                                <!--Code Here-->
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bottom-fix-footer" [hidden]="_contactSearchService.showSpinner">
+                <div class="top-common-btn">
+                  <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" [disabled]="showSpinner || isContactUpdated " type="submit"><i class="fa " [ngClass]="isContactUpdated ? 'fa-spinner fa-pulse' : 'fa-save'"></i> Save</button>
+                  <button type="button" class="btn btn-cancel" (click)="_localService.hideCommonComponentEmit('contact-detail'); _localService.showCommonComp = ''" *ngIf="currentUrl != 'contact-create'"> Cancel</button>
+                  <button class="btn btn-cancel" [routerLink]="['/contacts']" *ngIf="currentUrl == 'contact-create'">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="contactConfirmModal" tabindex="-1" role="dialog" aria-labelledby="fbcConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h4 class="modal-title modal-common-title">Confirmation</h4>
+      </div>
+      <div class="modal-body modal-common-body">
+        <h2>{{confirmText}}</h2>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn-lg btn-danger" (click)="confirmOperation(true)">Save</button>
+        <button type="button" class="btn-lg btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="currentUrl == 'contact-create' && showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

@@ -1,0 +1,418 @@
+<div class="wrapper-panel kendo-section">
+  <div [ngClass]="{'fade-out': showSpinner == true}">
+    <div class="row">
+      <div class="offset-xl-5 col-xl-7 col-lg-12 col-sm-12">
+        <div class="add-save-panel">
+          <div class="top-search-header">
+            <button *ngIf="roleFeaturePermissions?.create == true" [disabled]="giveAccessContact()" type="button" class="btn" (click)="addNewContact()"><i class="fa fa-plus"></i> New Contact</button>
+          </div>
+          <div class="top-search-header">
+            <button type="button" class="btn" [disabled]="giveAccessContact()" (click)="showSearch(true)"><i class="fa fa-plus"></i> Add Search</button>
+          </div>
+          <div class="top-search-header" *ngIf="savedQuery_Filter.length > 0">
+            <i class="fa fa-spin fa-spinner" *ngIf="isDrpSavedQueryChanged"></i>
+          </div>
+          <div class="top-search-header" *ngIf="savedQuery_Filter.length > 0">
+            <select id="drpSavedQueries" class="form-control" *ngIf="savedQuery_Filter.length > 0" (change)="drpSavedQueries_onChange($event)">
+              <option [value]='0'>Select</option>
+              <option *ngFor="let item of savedQuery_Filter" [value]='item.key'>{{item.value}}</option>
+            </select>
+          </div>
+          <div class="top-search-header ml-1" *ngIf="savedQuery_Filter.length > 0">
+            <button (click)="editSavedQuery()" class="btn-icon" [disabled]="savedQueryValue <= '0' || isDrpSavedQueryChanged"><i class="fas fa-pencil-alt"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="contact-list-section">
+          <div class="contact-list-panel">
+            <kendo-tabstrip (tabSelect)="onTabSelect($event)" >
+              <kendo-tabstrip-tab [title]="'My Contacts'" [selected]="currentUrl == '' || currentUrl == 'contacts' ? true : false">
+                <ng-template kendoTabContent>
+                  <div class="contact-list-table">
+                    <div class="table-body" *ngIf="!showSpinner">
+                      <div class="grid-search">
+                        <div class="row generic-align-contact">
+                          <div class="col-xl-5 col-lg-7 col-md-12">
+                            <input placeholder="Search in all columns..." kendoTextBox (input)="onContactsFilter($event.target.value)" />
+                            <div class="no-record" *ngIf="contactListResponse && contactListResponse.messageInt > 1000">
+                              <span class="g-font-contact-twelve">(Total contacts found:&nbsp;{{contactListResponse.messageInt | number:'2.'}})</span>
+                              <span class="green-contact-span"> Note: Only the first 1,000 contacts are displayed.</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="global-body-section">
+                        <kendo-grid class="contact-grid" #grid id="gridId" [kendoGridBinding]="contactsData" [kendoGridSelectBy]="'id'" [selectedKeys]="mySelection" [pageSize]="pageSize" [pageable]="{buttonCount:10,
+                          pageSizes:[10,50,100,200]}"
+                                    [sortable]="{mode: 'multiple'}"
+                                    [sort]="sort"
+                                    [reorderable]="true"
+                                    [resizable]="true"
+                                    [scrollable]="'scrollable'"
+                                    [columnMenu]="{ filter: true }"
+                                    [autoSize]="true"
+                                    [ngStyle]="gridHeight"
+                                    (columnReorder)="columnsOrderChanged('contactGrid', $event)"
+                                    (sortChange)="sortChange('contactGrid', $event)"
+                                    (pageChange)="pageChange($event)"
+                                    (columnResize)="columnResize('contactGrid', $event)"
+                                    (columnVisibilityChange)="onVisibilityChange($event,'contactGrid',grid)">
+                          <ng-template kendoGridToolbarTemplate>
+                            <button type="button" class="k-button" title="Reset Grid Setting" [disabled]="giveAccessContact()" (click)="resetGridSetting('contactGrid'); "><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+                            <button type="button" class="k-button" title="Export contacts in excel" (click)="saveExcel(excelexport)"><i class="fas fa-file-excel"></i> Export to Excel </button>
+                            <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export contacts in pdf">Export to PDF</button>
+                          </ng-template>
+                          <div class="grid-scroll-bar">
+                            <kendo-grid-column *ngFor="let column of columns"
+                                               [field]="column.field"
+                                               [title]="column.title | titlecase"
+                                               [width]="column.width"
+                                               [filterable]="true"
+                                               [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                               [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                               [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                               [hidden]="hiddenColumns.indexOf(column.field) > -1"
+                                               [includeInChooser]="column.field=='$' ? false : true">
+                              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                                <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                                <div class="customer-name" *ngIf="column.title == '  '"><a class="contact-cursor-pointer" (click)="gotoLink('address-card', dataItem);" title="View Contact"><i class="icon_contact"><img src="../../../assets/icon_contact.svg" /></i></a></div>
+                                <div class="customer-name" *ngIf="column.field == 'email'"><a class="contact-cursor-pointer" (click)="gotoLink('email', dataItem);" title="send email to {{dataItem.email}}" *ngIf="dataItem.email"><i class="email_new"><img src="../../../assets/email_new.svg" /></i></a></div>
+                                <div class="customer-name" *ngIf="column.field == 'phone'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--'"></span></div>
+                                <div class="customer-name" [ngClass]="[column.field=='name' ? 'text-left' : '',  column.field=='companyName' ? 'text-left' : '']" *ngIf="showColumn(column.field)" [hidden]="column.field=='$'">
+                                  <a class="webkit-any-link" (click)="gotoLink(column.field, dataItem);" [style.color]="column.field == 'userName'? '#1c0dbf':''" *ngIf="column.field == 'name' || column.field == 'userName'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</a>
+                                  <span [hidden]="column.field == 'name' || column.field == 'userName' || column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</span>
+                                  <span *ngIf="column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy' }}</span>
+                                </div>
+                              </ng-template>
+                            </kendo-grid-column>
+                            <kendo-grid-messages [pagerItemsPerPage]="'Contacts per page'" [pagerItems]="'Contacts'"> </kendo-grid-messages>
+                            <kendo-excelexport #excelexport [data]="contactsData" [fileName]=downloadFileName>
+                              <kendo-excelexport-column *ngFor="let col of exportColumnName" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+                            </kendo-excelexport>
+                            <kendo-grid-pdf [fileName]=downloadPdfFileName [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                              <kendo-grid-column *ngFor="let col of exportColumnName" [field]="col.field" [title]="col.title" [width]="col.width">
+                                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                                  <div class="customer-name" *ngIf="col.field != 'phone'">{{dataItem[col.field] ? dataItem[col.field] : '--'}}</div>
+                                  <div class="customer-name" *ngIf="col.field == 'phone'"><span [innerHTML]="dataItem[col.field] ? dataItem[col.field] : '--'"></span></div>
+                                </ng-template>
+                              </kendo-grid-column>
+                            </kendo-grid-pdf>
+                          </div>
+                        </kendo-grid>
+                      </div>
+                      <div *ngIf="loadContacts == true && !showSpinner" class="k-i-loading"></div>
+                    </div>
+                  </div>
+                </ng-template>
+              </kendo-tabstrip-tab>
+              <kendo-tabstrip-tab [title]="'Recent Contacts'" [selected]="currentUrl == '' || currentUrl == 'recent-contacts' ? true : false">
+                <ng-template kendoTabContent>
+                  <div class="contact-list-table">
+                    <div class="table-body recent-button">
+                      <div class="grid-search">
+                        <div class="row generic-align-contact">
+                          <div class="col-xl-5 col-lg-7 col-md-12">
+                            <input placeholder="Search in all columns..." kendoTextBox (input)="onRecentContactsFilter($event.target.value)" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="global-body-section">
+                        <kendo-grid #recentGrid id="gridId"
+                          [kendoGridBinding]="recentContactsData"
+                          [kendoGridSelectBy]="'id'"
+                          [selectedKeys]="recentSelectionKey"
+                          [pageSize]="recentPageSize"
+                          [pageable]="{buttonCount:10,
+                        pageSizes:[10,50,100,200]}"
+                          [sortable]="{mode: 'multiple'}"
+                          [sort]="recentSort"
+                          [reorderable]="true"
+                          [resizable]="true"
+                          [columnMenu]="{ filter: true }"
+                          [scrollable]="'scrollable'"
+                          [ngStyle]="gridHeight"
+                          (columnReorder)="columnsOrderChanged('recentContactGrid', $event)"
+                          (sortChange)="sortChange('recentContactGrid', $event)"
+                          (pageChange)="recentPageChange($event)"
+                          (columnResize)="columnResize('recentContactGrid', $event)"
+                          (columnVisibilityChange)="onVisibilityChange($event,'recentContactGrid',recentGrid)">
+                          <ng-template kendoGridToolbarTemplate>
+                            <button type="button" class="k-button" title="Reset Grid Setting" (click)="resetGridSetting('recentContactGrid'); "><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+                            <button type="button" class="k-button" title="Export contacts in excel" (click)="saveExcel(excelRecentExport)"><i class="fas fa-file-excel"></i> Export to Excel </button>
+                            <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export contacts in pdf">Export to PDF</button>
+                          </ng-template>
+
+                          <kendo-grid-column *ngFor="let column of recentColumns"
+                            [field]="column.field"
+                            [title]="column.title | titlecase"
+                            [width]="column.width"
+                            [filterable]="true"
+                            [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                            [hidden]="hiddenColumnsRecent.indexOf(column.field) > -1"
+                            [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                            [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                            [includeInChooser]="column.field=='$' ? false : true">
+                            <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                              <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                              <div class="customer-name" *ngIf="column.title == '  '"><a class="contact-cursor-pointer" (click)="gotoLink('address-card', dataItem);" title="View Contact"><i class="icon_contact"><img src="../../../assets/icon_contact.svg" /></i></a></div>
+                              <div class="customer-name" *ngIf="column.field == 'email'"><a class="contact-cursor-pointer" (click)="gotoLink('email', dataItem);" title="send email to {{dataItem.email}}" *ngIf="dataItem.email"><i class="email_new"><img src="../../../assets/email_new.svg" /></i></a></div>
+                              <div class="customer-name" *ngIf="column.field == 'phone'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--'"></span></div>
+                              <div class="customer-name" [ngClass]="[column.field=='name' ? 'text-left' : '',  column.field=='companyName' ? 'text-left' : '']" *ngIf="showColumn(column.field)" [hidden]="column.field=='$'">
+                                <a class="webkit-any-link" (click)="gotoLink(column.field, dataItem);" [style.color]="column.field == 'userName'? '#1c0dbf':''" *ngIf="column.field == 'name' || column.field == 'userName'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</a>
+                                <span [hidden]="column.field == 'name' || column.field == 'userName' || column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</span>
+                                <span *ngIf="column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy' }}</span>
+                              </div>
+                            </ng-template>
+                          </kendo-grid-column>
+                          <kendo-grid-messages [pagerItemsPerPage]="'Contacts per page'" [pagerItems]="'Contacts'"> </kendo-grid-messages>
+                          <kendo-excelexport #excelRecentExport [data]="recentContactsData" fileName="RecentContactsList.xlsx">
+                            <kendo-excelexport-column *ngFor="let col of exportColumnName" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+                          </kendo-excelexport>
+                          <kendo-grid-pdf fileName="RecentContactsList.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                            <kendo-grid-column *ngFor="let col of exportColumnName" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-grid-column>
+                          </kendo-grid-pdf>
+                        </kendo-grid>
+                      </div>
+                      <div *ngIf="loadRecentContacts == true && !showSpinner" class="k-i-loading"></div>
+                    </div>
+                  </div>
+                </ng-template>
+              </kendo-tabstrip-tab>
+              <kendo-tabstrip-tab [title]="'My Calendar'">
+                <ng-template kendoTabContent>
+                  <my-calender *ngIf="user && !isShowFirstMonth"  (showOnMonth)="isshowSecondMonth= $event;" (nextMonthDate)="nextMonthDate = $event" [user]="user" [roleFeaturePermissions]="roleFeaturePermissions"></my-calender>
+                  <my-calender *ngIf="user && isshowSecondMonth" [isShowTwoMonthBtn]=false [selectedDate]="nextMonthDate"  (isShowFirstMonth)="isShowFirstMonth= $event;" [user]="user" [roleFeaturePermissions]="roleFeaturePermissions"></my-calender>
+                </ng-template>
+              </kendo-tabstrip-tab>
+            </kendo-tabstrip>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="contract-search-modal">
+  <div class="modal fade" id="modalSearchContact" tabindex="-1" role="dialog" aria-labelledby="modalCancelContract" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered custom-modal" role="Document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title text-left" id="modalCancelContractTitle">Contact Search</h4>
+          <button (click)="hideSearch()" title="Cancel"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="">
+            <div class="grid-modal-content">
+              <div class="">
+                <div class="">
+                  <div class="height-section">
+                    <div [formGroup]="searchQueriesForm">
+                      <div formArrayName="searchQueries">
+                        <div class="alignment-bottom">
+                          <div class="">
+                            <div class="">
+                              <table class="group-grid "  border="0" id="tblSearch">
+                                <tr>
+                                  <th class="column-one"></th>
+                                  <th class="column-two" (click)="createGroups()"><img src="../../../assets/disable_group.png" [hidden]="isGroup" /><img src="../../../assets/active_group.png" [hidden]="!isGroup" /></th>
+                                  <th id="thGroup"></th>
+                                  <th class="column-three">And/Or	</th>
+                                  <th class="column-four">Field</th>
+                                  <th class="column-five">Operator</th>
+                                  <th class="column-last">Value</th>
+                                </tr>
+                                <tr class="" *ngFor="let sr of searchQueriesCtls.controls; let i = index" [formGroupName]="i">
+                                  <td class="column-one">
+                                    <i class="fa fa-plus" aria-hidden="true" (click)="addSearchQuery()"></i>
+                                    <i class="fa fa-times" aria-hidden="true" (click)="deleteSearchQuery(i,true)"></i>
+                                  </td>
+                                  <td class="column-two">
+                                    <input id="chkIschecked{{i}}" [attr.disabled]="searchQueriesCtls.controls[i].get('searchItem').value==-1 ? 'true' : null" type="checkbox" formControlName="isSelected" class="form-control" (click)="selectGroupRow(i)" />
+                                  </td>
+                                  <td id="tdGroup{{minTwoDigits(i)}}" [hidden]="true"></td>
+                                  <td class="column-three">
+                                    <select id="drpMainOperator{{i}}" formControlName="mainOperator" class="form-control" [hidden]="i==0" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.mainOperator.invalid && isSearchSubmit && i!=0}">
+                                      <option [selected]="true" [value]="null" disabled>--Select--</option>
+                                      <option value='OR'>OR</option>
+                                      <option value='AND'>AND</option>
+                                    </select>
+                                  </td>
+                                  <td class="column-four">
+                                    <select id="drpFields{{i}}" formControlName="searchItem" (change)="drpFields_onChange(i)" class="form-control" *ngIf="searchItems.length>0" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.searchItem.invalid && isSearchSubmit}">
+                                      <option [selected]="true" [value]="null" disabled>--Please select--</option>
+                                      <option *ngFor="let searchItem of searchItems; let i = index"
+                                              [value]="i">
+                                        {{searchItem.displayValue}}
+                                      </option>
+                                    </select>
+                                  </td>
+                                  <td class="column-five">
+                                    <input type="text" disabled class="form-control" *ngIf="searchQueriesCtls.controls[i].get('searchItem').value==-1" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.operator.invalid && isSearchSubmit}" />
+                                    <select id="drpOperator{{i}}" (change)="drpOperator_onChange(i)" formControlName="operator" class="form-control" *ngIf="(searchItems && searchItems.length > 1) && (searchQueriesCtls.controls[i].get('searchItem').value>=0)" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.operator.invalid && isSearchSubmit}">
+                                      <option *ngFor="let item of searchItems[searchQueriesCtls.controls[i].get('searchItem').value].searchOperators; let x = index" [value]='item.value'>{{item.operator}}</option>
+                                    </select>
+                                  </td>
+                                  <td class="column-last">
+                                    <input type="text" disabled class="form-control" *ngIf="searchQueriesCtls.controls[i].get('searchItem').value ==-1" />
+                                    <input type="text" id="txtFieldData{{i}}" formControlName="searchItemValue" class="form-control" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.searchItemValue.invalid && isSearchSubmit}" *ngIf="searchItems.length > 1 && searchQueriesCtls.controls[i].get('searchItem').value>=0 && searchItems[searchQueriesCtls.controls[i].get('searchItem').value].controlType == 't'" />
+                                    <input type="hidden" id="txtTableName{{i}}" formControlName="tableName" />
+                                    <input type="hidden" id="txtColumnName{{i}}" formControlName="columnName" />
+                                    <input type="hidden" id="txtControlType{{i}}" />
+                                    <select id="drpFieldData{{i}}" formControlName="searchItemValue" class="form-control" *ngIf="(searchItems && searchItems.length > 1) && (searchQueriesCtls.controls[i].get('searchItem').value>=0 && searchItems[searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'd')" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.searchItemValue.invalid && isSearchSubmit}">
+                                      <option *ngFor="let item of searchItems[searchQueriesCtls.controls[i].get('searchItem').value].itemData" [value]="item.value">{{item.display}}</option>
+                                    </select>
+
+                                    <mat-select id="drpFieldData{{i}}" (openedChange)="drpMultiFieldData_onChange($event,i)" formControlName="selectedValueForMultiSelect" class="form-control" multiple *ngIf="(searchItems && searchItems.length > 1) && (searchQueriesCtls.controls[i].get('searchItem').value>=0 && searchItems[searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'md')" [ngClass]="{'has-error':  searchQueriesForm.controls['searchQueries'].controls[i].controls.selectedValueForMultiSelect.invalid && isSearchSubmit}">
+                                      <mat-option *ngFor="let item of searchItems[searchQueriesCtls.controls[i].get('searchItem').value].itemData" [value]="item.value">{{item.display}}</mat-option>
+                                    </mat-select>
+
+                                    <span class="text-range" *ngIf="(searchItems && searchItems.length > 1) && (searchQueriesCtls.controls[i].get('searchItem').value>=0 && searchItems[searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'r')">
+                                      <input type="text" id="txtFieldData_rangeFrom{{i}}" formControlName="txtRangeFrom" class="form-control" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.txtRangeFrom.invalid && isSearchSubmit && (searchItems.length > 1 && searchQueriesCtls.controls[i].get('searchItem').value>=0 && searchItems[searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'r')}" />
+                                      <span class="fa fa-minus contact-span-range" ></span>
+                                      <input type="text" id="txtFieldData_rangeTo{{i}}" formControlName="txtRangeTo" class="form-control" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.txtRangeTo.invalid && isSearchSubmit && (searchItems.length > 1 && searchQueriesCtls.controls[i].get('searchItem').value>=0 && searchItems[searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'r')}" />
+                                      <span class="clear"></span>
+                                    </span>
+
+                                    <span *ngIf="(searchItems && searchItems.length > 1) && (searchQueriesCtls.controls[i].get('searchItem').value>=0 && searchItems[searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'dt')">
+                                      <mat-form-field appearance="fill" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.dtStart.invalid && isSearchSubmit || searchQueriesForm.controls['searchQueries'].controls[i].controls.dtEnd.invalid && isSearchSubmit}">
+                                        <mat-date-range-input [rangePicker]="picker" class="date-picker-panel">
+                                          <input matStartDate placeholder="Start date" formControlName="dtStart">
+                                          <input matEndDate placeholder="End date" formControlName="dtEnd">
+                                        </mat-date-range-input>
+                                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                        <mat-date-range-picker #picker></mat-date-range-picker>
+                                      </mat-form-field>
+                                    </span>
+                                    <span *ngIf="(searchItems && searchItems.length > 1) && (searchQueriesCtls.controls[i].get('searchItem').value>=0 && searchItems[searchQueriesCtls.controls[i].get('searchItem').value].controlType == 'dtCustom')">
+                                      <mat-form-field class="example-full-width" appearance="fill" [ngClass]="{'has-error': searchQueriesForm.controls['searchQueries'].controls[i].controls.searchItemValue.invalid && isSearchSubmit}">
+                                        <input matInput [matDatepicker]="picker" formControlName="searchItemValue">
+                                        <mat-datepicker-toggle matSuffix [for]="picker">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #picker></mat-datepicker>
+                                      </mat-form-field>
+                                    </span>
+                                  </td>
+                                </tr>
+                              </table>
+                              <a  class="column-one contact-cursor-pointer" (click)="addSearchQuery()">&nbsp;Add new clause</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="search-form-contact" >
+                <div class="offset-xl-3 col-xl-6 offset-lg-2 col-lg-8 col-sm-12">
+                  <div *ngIf="IsSaveSearch">
+                    <form class="form-horizontal required-section" [formGroup]="saveSearchForm">
+                      <div class="search-query-panel">
+                        <div class="" [ngClass]="{'has-error': saveSearchFrm.SearchQueryName.errors && (saveSearchFrm.SearchQueryName.touched ||  saveSearchFrm.SearchQueryName.dirty)}">
+                          <div class="search-query-alignment">
+                            <div>
+                              <label class="control-label" for="SearchQueryName">Search Name <span class="red-contact-span">*</span></label>
+                            </div>
+                            <div>
+                              <input type="text" id="SearchQueryName" class="form-control" formControlName="SearchQueryName" />
+                              <div class="search-query-error" *ngIf="saveSearchFrm.SearchQueryName.errors && ( saveSearchFrm.SearchQueryName.touched ||  saveSearchFrm.SearchQueryName.dirty)">
+                                <div *ngIf="saveSearchFrm.SearchQueryName.errors.required">Search Name is a required</div>
+                              </div>
+                              <div class="search-query-error" *ngIf="savedQuery_response && savedQuery_response.messageBool">
+                                {{ savedQuery_response.errorMsg }}
+                              </div>
+                            </div>
+                            <div>
+                              <button class="btn btn-primary" (click)="SubmitSearch()" title="Submit Search" [hidden]="isEditSavedSearch"> Submit Search</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="">
+              <div class="button-panel">
+                <div class="bottom-btn-panel">
+                  <button class="btn btn-primary" (click)="runSearch()" title="Run Search"> Run Search</button>
+                  <button class="btn btn-primary" (click)="saveSearch()" title="Save Search" *ngIf="!isEditSavedSearch"> Save Search</button>
+                  <button class="btn btn-primary" (click)="updateSearch()" title="Update Search" *ngIf="isEditSavedSearch"> Update Search</button>
+                  <button class="btn btn-danger" (click)="showDeleteSearch()" title="Delete Search" *ngIf="isEditSavedSearch"> Delete Search</button>
+                  <button class="btn btn-cancel" (click)="hideSearch()" title="Cancel"> Cancel</button>
+                </div>
+              </div>
+              <div class="spinner-container" *ngIf="showSpinner">
+                <mat-spinner></mat-spinner>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="contract-search-modal">
+  <div class="modal fade" id="modalDeleteSearch" tabindex="-1" role="dialog" aria-labelledby="modalCancelContract" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="Document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title text-left" id="modalCancelContractTitle">Delete Search</h4>
+          <button (click)="hideDeleteSearch()" title="Cancel"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="">
+            <div class="grid-modal-content">
+              <div class="">
+                <p>{{delete_string}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" (click)="deleteSavedQuery();">Yes</button>
+          <button type="button" class="btn btn-default" (click)="hideDeleteSearch()" title="Cancel">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="sendEmailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-focus="false">
+  <div class="custom-modal-panel" role="document">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content user-body-section border-radius-contact" >
+        <div class="modal-header user-body-header">
+          <h5 class="modal-title white-contact" id="exampleModalLabel" ><i  class="fas fa-envelope-open-text white-contact"></i> Outbound Email</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideSendMail();">
+            <span class="white-contact" aria-hidden="true" >&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <app-contact-email *ngIf="sendMailInfo?.isShow" [loggedUser]="user" [contactId]="sendMailInfo?.contactId"></app-contact-email>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="hideSendMail();">Close</button>
+        </div>
+      </div>
+    </div>
+    <div class="loader-body" *ngIf="_contactSearchService.showSpinner">
+      <div class="lds-ripple"><div></div><div></div></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+

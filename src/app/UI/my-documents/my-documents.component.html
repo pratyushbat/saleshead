@@ -1,0 +1,295 @@
+<div class="container-fluid common-alignment">
+  <div class="custom-security-link">
+    <a [routerLink]="['/image-bank']" *ngIf="!isEditDocument">My Images</a>
+    <a (click)="isEditDocument = false;" *ngIf="isEditDocument">My Documents</a>
+  </div>
+  <div class="row" *ngIf="!isEditDocument">
+    <div class="col-md-10">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel"><img src="../../../assets/documentstitle.svg" class="mr-1" />	My Documents</div>
+            <div class="header-button-panel">
+              <div class="button-wrapper">
+                <button class="btn btn-primary" type="button" (click)="resetGridSetting();">Reset Grid Setting</button>
+                <select class="form-control select-option ml-2" [(ngModel)]="selectedId" (change)="onDocumentsFilter($event.target.value);">
+                  <option value="-1"> -All- </option>
+                  <option value="1"> Appointments Only </option>
+                  <option value="2"> Contacts Only </option>
+                  <option value="3"> Leads Only </option>
+                  <option value="5"> Personal Only </option>
+                </select>
+                <button class="icon-btn" type="button" matTooltip="Share all checked documents." data-toggle="modal" data-target="#shareDocumentModal"><img src="../../../assets/btndocshare.svg" /></button>
+                <button class="icon-btn" type="button" matTooltip="Unshare all checked documents." data-toggle="modal" data-target="#unShareDocumentModal"><img src="../../../assets/btndocunshare.svg" /></button>
+                <button class="icon-btn" type="button" matTooltip="Delete all checked documents." data-toggle="modal" data-target="#deleteDocumentModal">
+                  <i class="fa fa-minus-circle" aria-hidden="true"></i>
+                  <span class="btn-text">Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="global-body-section">
+            <div class="global-body-section" *ngIf="isResponseMessage" [innerHTML]="responseMessage"></div>
+              <kendo-grid #grid id="gridId" class="my-document-grid"
+                [kendoGridBinding]="documentList"
+                kendoGridSelectBy="documentId"
+                [selectable]="{enabled: true, checkboxOnly: true }"
+                [(selectedKeys)]="mySelection"
+                [pageSize]="_gridCnfgService.pageSize"
+                [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                [sortable]="{mode: 'multiple'}"
+                [scrollable]="'scrollable'"
+                [sort]="_gridCnfgService.sort"
+                [columnMenu]="{ filter: true }"
+                [resizable]="true"
+                [reorderable]="true"
+                [ngStyle]="gridHeight"
+                (columnReorder)="_gridCnfgService.columnsOrderChanged('my_documents_grid', $event)"
+                (sortChange)="_gridCnfgService.sortChange('my_documents_grid', $event)"
+                (pageChange)="_gridCnfgService.pageChange('my_documents_grid', $event)"
+                (columnResize)="_gridCnfgService.columnResize(5,'my_documents_grid', $event)"
+                (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'my_documents_grid',grid)">
+                <div class="grid-scroll-bar">
+                  <kendo-grid-checkbox-column [width]="45"
+                    [headerClass]="{ 'text-center': true }"
+                    [class]="{ 'text-center': true }"
+                    [resizable]="false"
+                    [columnMenu]="false"
+                    showSelectAll="true"></kendo-grid-checkbox-column>
+                  <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                    [field]="column.field"
+                    [title]="column.title | titlecase"
+                    [width]="column.field == '$' ? '40' : column.width"
+                    [filterable]="true"
+                    [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                    [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                    [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                    [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                    [includeInChooser]="column.field=='$' ? false : true">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                      <div class="customer-name" *ngIf="column.field == 'documentType'">
+                        <ng-container [ngSwitch]="dataItem[column.field]">
+                          <ng-container *ngSwitchCase="1">
+                            <img src="../../../assets/iconppt.svg" />
+                          </ng-container>
+                          <ng-container *ngSwitchCase="3">
+                            <img src="../../../assets/iconhtml.svg" />
+                          </ng-container>
+                          <ng-container *ngSwitchCase="4">
+                            <img src="../../../assets/icontext.svg" />
+                          </ng-container>
+                          <ng-container *ngSwitchCase="6">
+                            <img src="../../../assets/iconpdf.svg" />
+                          </ng-container>
+                          <ng-container *ngSwitchCase="7">
+                            <img src="../../../assets/iconppt.svg" />
+                          </ng-container>
+                          <ng-container *ngSwitchCase="[8, 9, 10, 11].includes(dataItem[column.field]) ? dataItem[column.field] : !dataItem[column.field]">
+                            <img src="../../../assets/iconimage.svg" />
+                          </ng-container>
+                          <ng-container *ngSwitchCase="13">
+                            <img src="../../../assets/iconexcel.svg" />
+                          </ng-container>
+                          <ng-container *ngSwitchDefault>
+                            <img src="../../../assets/icontext.svg" />
+                          </ng-container>
+                        </ng-container>
+                      </div>
+                      <div class="customer-name" *ngIf="column.field == 'documentName'">
+                        <a (click)="downloadDocuments(documentList[rowIndex].documentId)">{{dataItem[column.field]}}</a>
+                      </div>
+                      <div class="customer-name" *ngIf="column.field == 'documentCategory'">
+                        <ng-container [ngSwitch]="documentList[rowIndex].documentCategory">
+                          <ng-container *ngSwitchCase="1">
+                            <button class="grid-common-btn" type="button" title="View Appointment"><a [href]="documentList[rowIndex].displayURL"><img src="../../../assets/icon_appt.svg" /></a></button>
+                          </ng-container>
+                          <ng-container *ngSwitchCase="2">
+                            <button class="grid-common-btn" type="button" title="View Contact"><a [href]="documentList[rowIndex].displayURL"><img src="../../../assets/icon_contact.svg" /></a></button>
+                          </ng-container>
+                          <ng-container *ngSwitchCase="3">
+                            <button class="grid-common-btn" type="button" title="View Lead"><a [href]="documentList[rowIndex].displayURL"><img src="../../../assets/leadstitle.svg" /></a></button>
+                          </ng-container>
+                          <ng-container *ngSwitchCase="5">
+                            <img src="../../../assets/icon_user.svg" class="mx-2" />
+                          </ng-container>
+                          <ng-container *ngSwitchCase="9">
+                            <button class="grid-common-btn" type="button" title="View Task"><a [href]="documentList[rowIndex].displayURL"><img src="../../../assets/icon_task_sm.svg" /></a></button>
+                          </ng-container>
+                          <ng-container *ngSwitchDefault>
+                            <img src="../../../assets/icon_user.svg" class="mx-2" />
+                          </ng-container>
+                        </ng-container>
+                      </div>
+                      <div class="customer-name" *ngIf="column.field == 'location'" [title]="documentList[rowIndex].displayToolTip"><a [href]="documentList[rowIndex].displayURL">{{documentList[rowIndex].display}}</a></div>
+                      <div class="customer-name" *ngIf="column.field == 'documentLength'">{{dataItem[column.field]/1024 | number: '1.0-0'}}&nbsp;KB</div>
+                      <div class="customer-name" *ngIf="column.field == 'userName'">
+                        <a class="webkit-any-link" (click)="gotoLink('userName', dataItem);">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</a>
+                      </div>
+                      <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{dataItem[column.field] | date: 'MM/dd/yy'}}</div>
+                      <div class="customer-name" *ngIf="column.field == 'isShared'">
+                        <span *ngIf="dataItem[column.field]" class="font-weight-bold">Yes</span>
+                        <span *ngIf="!dataItem[column.field]" class="text-danger font-weight-bold">No</span>
+                      </div>
+                      <div class="customer-name" *ngIf="column.field == 'update'"><a (click)="editDocument(dataItem);">Update</a></div>
+                    </ng-template>
+                  </kendo-grid-column>
+                </div>
+              </kendo-grid>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel"><span>Upload Documents</span></div>
+          </div>
+          <div class="mt-1">
+            <angular-file-uploader [config]="contactDocConfig" (ApiResponse)="apiResponse($event)" #imageUpload></angular-file-uploader>
+          </div>
+          <span class="text-success text-center d-block">max file size: 3 MB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="shareDocumentModal" tabindex="-1" role="dialog" aria-labelledby="shareDocumentModal" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h4 class="modal-title modal-common-title">Confirmation</h4>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>SHARE all checked documents?</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" (click)="onAction('Share');" data-dismiss="modal" class="btn btn-primary">ok</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="unShareDocumentModal" tabindex="-1" role="dialog" aria-labelledby="unShareDocumentModal" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h4 class="modal-title modal-common-title">Confirmation</h4>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>UNSHARE all checked documents?</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" (click)="onAction('Unshare');" data-dismiss="modal" class="btn btn-primary">ok</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="deleteDocumentModal" tabindex="-1" role="dialog" aria-labelledby="deleteDocumentModal" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h4 class="modal-title modal-common-title">Confirmation</h4>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>Caution! Are you sure you want to DELETE all checked documents?</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" (click)="onAction('Delete');" data-dismiss="modal" class="btn btn-primary">ok</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wraper-main-section" *ngIf="isEditDocument">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/tagtitle.svg" class="mr-1" />Update Document:{{documentData.documentName}}</div>
+        <div class="header-button-panel" *ngIf="isEditFile">
+          <div class="button-wrapper">
+            <button type="button" class="icon-btn" (click)="isEditFile = false">
+              <i class="fa fa-pencil" aria-hidden="true" title="Edit"></i>
+              <span class="btn-text">Edit</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="alert-panel" *ngIf="!isEditFile">Please select the document you would like to upload to replace the current document.</div>
+      <div class="alert-panel" *ngIf="isEditFile">Document has been updated.</div>
+      <div class="global-body-section">
+          <div class="wraper-body-panel">
+            <div class="wraper-body-left">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Name</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <span>{{documentData.documentName}}</span>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Location</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <span>{{documentData.documentName}}</span>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Size</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <span>{{documentData.documentLength/1024 | number: '1.0-0'}}&nbsp;KB</span>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>User</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <a class="webkit-any-link" (click)="gotoLink('userName', documentData);">{{documentData.userName}}</a>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Date created</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <span>{{documentData.dtCreated | date: 'medium'}}</span>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span>Shared</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <span *ngIf="documentData.isShared" class="font-weight-bold">Yes</span>
+                  <span *ngIf="!documentData.isShared" class="text-danger font-weight-bold">No</span>
+                </div>
+              </div>
+              <div class="cards-body-section" *ngIf="!isEditFile">
+                <div class="cards-colunm-left">
+                  <span>Upload Document</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div class="order-row-inner">
+                    <angular-file-uploader [config]="contactDocConfig" (ApiResponse)="changeFileApiResponse($event)" #imageUpload></angular-file-uploader>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+    <div class="lds-ripple"><div></div><div></div></div>
+  </div>
+</div>

@@ -1,0 +1,118 @@
+<div class="margin-all-area">
+  <div class="wraper-body-panel">
+    <div class="wraper-body-left">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="common-inner-header">
+            <div class="inner-header-bg">
+              <div class="inner-cards-panel header-inner-hidden">
+                <span>WeekOf</span>
+                <span>User Filter</span>
+                <span>Refresh</span>
+              </div>
+              <div class="inner-detail-bg">
+                <span>Details</span>
+              </div>
+            </div>
+          </div>
+          <div class="common-inner-cards">
+            <form [formGroup]="callClickReportForm" (ngSubmit)="getCallReportList()">
+              <div class="inner-cards-grid">
+                <div class="inner-card-mobile">
+                  <label>WeekOf</label>
+                  <div class="mobile-view-design">
+                    <kendo-datepicker formControlName="date"></kendo-datepicker>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <label>User Filter</label>
+                  <div class="mobile-view-design">
+                    <select class="form-control" formControlName="ddUser">
+                      <option *ngFor="let item of userList" [value]="item?.cLPUserID">{{item?.lastName}},{{item?.firstName}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <label>Refresh</label>
+                  <div class="mobile-view-design">
+                    <button type="submit" class="grid-common-btn">
+                      <i class="fa fa-refresh"></i>
+                      <span class="grid-common-text">Refresh</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wraper-body-right"></div>
+  </div>
+</div>
+
+<div class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel "><img src="../../../../../assets/appttitle.svg" class="mr-1" />Call Action Screen Button Click Report</div>
+        <div class="header-button-panel white-font">
+          <span>{{spanTitleText}}</span>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <kendo-grid #grid id="gridId"
+          [kendoGridBinding]="clickReportList"
+          [scrollable]="'false'"
+          [reorderable]="true"
+          [resizable]="true"
+          [columnMenu]="{ filter: true }">
+          <ng-template kendoGridToolbarTemplate>
+            <button class="btn btn-primary" type="button" (click)="setGrid();">Reset Grid Setting</button>
+            <button type="button" class="k-button export-icon-YTD" title="Export list in excel" (click)="saveExcel(excelexport)">
+              <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+              <span>Download Excel</span>
+            </button>
+            <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="k-button export-icon-YTD">
+              <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+              <span>Download PDF</span>
+            </button>
+          </ng-template>
+
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of columns"
+              [field]="column.field"
+              [title]="column.title"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [width]="column.width"
+              [filterable]="true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name">{{ dataItem[column.title] }}</div>
+              </ng-template>
+            </kendo-grid-column>
+            <kendo-excelexport #excelexport [data]="clickReportList" fileName='CallClickReport'>
+              <kendo-excelexport-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name">{{ dataItem[col.title] }}</div>
+                </ng-template>
+              </kendo-excelexport-column>
+            </kendo-excelexport>
+            <kendo-grid-pdf fileName="CallClickReport.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+              <kendo-grid-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name">{{ dataItem[col.title] }}</div>
+                </ng-template>
+              </kendo-grid-column>
+            </kendo-grid-pdf>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

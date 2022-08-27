@@ -1,0 +1,3 @@
+
+<contact-common-search [execMapDuplicate]="true" [isCompany]="true"></contact-common-search>
+<company *ngIf="user && roleFeaturePermissions" [user]=user [roleFeaturePermissions]="roleFeaturePermissions" [isBulkCompany]="showBulkCompany"></company>

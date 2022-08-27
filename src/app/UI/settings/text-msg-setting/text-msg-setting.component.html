@@ -1,0 +1,501 @@
+<div class="container-fluid common-alignment mt-3">
+  <div class="wraper-main-section mb-3">
+    <div class="global-card-section">
+      <form [formGroup]="txtMsgSettingForm" (ngSubmit)="txtMsgSettingFormSubmit()">
+        <div class="">
+          <div class="">
+            <div class="global-header-section">
+              <div class="svg-icon-panel"><img src="../../../../assets/txtmsgstitle.svg" class="mr-1" /> Voice and Message Settings</div>
+            </div>
+            <div class="global-body-section">
+              <div class="flex-row-inner">
+                <div class="wraper-body-left">
+                  <div class="custom-action-title">
+                    <span>General</span>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label">Status</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span>{{txtMsgSettingsData?.status == 0 ? 'Disabled' : txtMsgSettingsData?.status == 1 ? 'Voice and Messaging services are active.' : txtMsgSettingsData?.status == 2 ? 'Waiting To Be Configured' : ''}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label">Show SMS Button on Contact Home Page</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow" [ngStyle]="{'color':txtMsgSettingsData?.isShowContactIcon ? '' : 'red' }">
+                          {{txtMsgSettingsData?.isShowContactIcon==1 ? 'SMS button is viewable on the contact home page' : 'SMS button is not viewable on the contact home page'}}
+                        </span>
+                        <input type="checkbox" class="checkbox" id="isShowContactIcon" *ngIf="editShow" formControlName="isShowContactIcon" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label">Allow Free Form Texting</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow" [ngStyle]="{'color':txtMsgSettingsData?.isAllowFreeForm ? '' : 'red' }">
+                          {{txtMsgSettingsData?.isAllowFreeForm==1 ? 'Free from texting is allowed' : 'Free from texting is not allowed'}}
+                        </span>
+                        <input type="checkbox" *ngIf="editShow" class="checkbox" id="isAllowFreeForm" formControlName="isAllowFreeForm" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label">OptIn Email Template</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow" [ngStyle]="{'color':txtMsgSettingsData?.optInEmailTemplateID ? '' : 'red' }">
+                          {{txtMsgSettingsData?.optInEmailTemplateID ? getTemplateName(txtMsgSettingsData['optInEmailTemplateID']) : '-Not selected-'}}
+                        </span>
+                        <select class="custom-select txtStandard" *ngIf="editShow" formControlName="optInEmailTemplateID">
+                          <option value=0 [selected]="emailTemplateData?.length <= 0">-Select-</option>
+                          <option *ngFor="let emailtemplate of emailTemplateData" [ngValue]="emailtemplate.emailTemplateID">{{emailtemplate.emailTemplateID}} &nbsp;{{emailtemplate.templateName}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="wraper-body-right">
+                  <div class="custom-action-title">
+                    <span>Keyword Response</span>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Company Name Display</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow"> {{txtMsgSettingsData?.orgName}} </span>
+                        <input type="text" *ngIf="editShow" class="txtStandard" id="orgName" formControlName="orgName" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Support Number</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow"> {{txtMsgSettingsData?.supportNumber}} </span>
+                        <input type="text" *ngIf="editShow" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="supportNumber" formControlName="supportNumber" maxlength="12" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Link to Terms & Conditions</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow"> {{txtMsgSettingsData?.linkTC}} </span>
+                        <input type="text" *ngIf="editShow" class="txtStandard" id="linkTC" formControlName="linkTC" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">HELP</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span>{{txtMsgSettingsData?.orgName}}&nbsp; Call - {{txtMsgSettingsData?.supportNumber}} for customer support.  &nbsp; T&Cs : {{txtMsgSettingsData?.linkTC}}  Reply STOP to cancel.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-row-inner" *ngIf="user?.userRole > 3 || user?.slurpyUserId > 0">
+                <div class="wraper-body-left">
+                  <div class="custom-action-title">
+                    <span>Admin Settings</span>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Toll Free Long Code (Bandwidth)</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow">{{txtMsgSettingsData?.tollFreeLongCode}} </span>
+                        <input type="text" *ngIf="editShow" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="tollFreeLongCode" formControlName="tollFreeLongCode" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Message APIKey</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow"> {{txtMsgSettingsData?.aPIKey}} </span>
+                        <input *ngIf="editShow" type="text" class="txtStandard" id="aPIKey" formControlName="aPIKey" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Voice APIKey	</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow"> {{txtMsgSettingsData?.voiceAPIKey}} </span>
+                        <input type="text" *ngIf="editShow" class="txtStandard" id="voiceAPIKey" formControlName="voiceAPIKey" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Responsible User</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow">
+                          {{txtMsgSettingsData?.cLPUserID ? getResUser(txtMsgSettingsData['cLPUserID']) : ''}}
+                        </span>
+                        <select *ngIf="editShow" class=" custom-select dropdown" formControlName="cLPUserID">
+                          <option value="-1" [selected]="userList?.length <= 0">-Select-</option>
+                          <option *ngFor="let item of userList" [ngValue]="item.key">{{item.value}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="wraper-body-right">
+                  <div class="custom-action-title">
+                    <span>&nbsp;</span>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Enable Text Campaign Wizard</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow" [ngStyle]="{'color':txtMsgSettingsData?.isEnableTxtBlast ? '' : 'red' }">{{txtMsgSettingsData?.isEnableTxtBlast == 1 ? 'Schedule of Text Campaigns are enabled.' : 'Schedule of Text Campaigns are not enabled.'}}</span>
+                        <input type="checkbox" *ngIf="editShow" class="checkbox" id="isEnableTxtBlast" formControlName="isEnableTxtBlast" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Enable Voice Drop Campaign Wizard	</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow" [ngStyle]="{'color':txtMsgSettingsData?.isEnableVoiceDropCampaign ? '' : 'red' }">{{txtMsgSettingsData?.isEnableVoiceDropCampaign == 1 ? 'Schedule of Voice Drop Campaigns are enabled.' : 'Schedule of Voice Drop Campaigns are not enabled.'}}  </span>
+                        <input type="checkbox" *ngIf="editShow" class="checkbox" id="isEnableVoiceDropCampaign" formControlName="isEnableVoiceDropCampaign" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label">Status</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!editShow">{{txtMsgSettingsData?.status == 0 ? 'Disabled' : txtMsgSettingsData?.status == 1 ? 'Active' : txtMsgSettingsData?.status == 0 ? 'Waiting To Be Configured' : ''}}</span>
+                        <select class="custom-select dropdown" *ngIf="editShow" (change)="changeStatus($event)" id="status" formControlName="status">
+                          <option [value]=null>Select</option>
+                          <option *ngFor="let item of arrStatus" [value]="item.value">{{item.name}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left calc-width"></div>
+                <div class="cards-colunm-right">
+                  <div class="bottom-button-bar">
+                    <button class="btn btn-primary mr-2" type="submit" *ngIf="editShow && user?.userRole > 3" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" [disabled]=!submitTxtMsgSetting>Save</button>
+                    <button type="button" *ngIf="!editShow && user?.userRole > 3" [hidden]=" roleFeaturePermissions?.edit == false" (click)="editData()" class="btn btn-primary mr-2">Edit</button>
+                    <button type="button" *ngIf="!editShow " (click)="textMsgDelete()" [hidden]="roleFeaturePermissions?.delete == false" class="btn btn-danger mr-2" data-toggle="modal" data-target="#textMsgSettingDeleteModal">Clear and Reset</button>
+                    <button type="button" *ngIf="editShow" (click)="backToView()" class="btn btn-primary mr-2">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="" *ngIf="txtMsgSettingsData?.status == 1 || txtMsgSettingsData?.status == 2">
+    <div class="">  
+      <form [formGroup]="clpAddPnBillingForm" (ngSubmit)="clpAddOnBillingFormSubmit()" *ngIf="this.userId == 0">
+        <div class="wraper-main-section">
+          <div class="global-card-section">
+            <div class="global-header-section">
+              <div class="svg-icon-panel"><img src="../../../../assets/salesoptimatitle.svg" class="mr-1" /> Voice and Message Pricing Summary</div>
+              <div class="button-wrapper">
+                <div class="top-common-btn_txtmsg">
+                  <button type="submit" *ngIf="edit2Show" matTooltip="Save Voice Pricing Summary"  class="icon-btn" [disabled]=!submitBtnAddOnBilling>
+                  <i class="fas fa-save" aria-hidden="true"></i>
+                  <span class="btn-text">
+                    Save
+                    </span>
+                  </button>
+                  <button type="button" *ngIf="!edit2Show && user?.userRole > 3" matTooltip="Edit Voice Pricing Summary" class="icon-btn" (click)="editPricingData()">
+                    <i class="fas fa-pencil" aria-hidden="true"></i>
+                    <span class="btn-text">Edit</span>
+                  </button>
+                  <button type="button" *ngIf="edit2Show" matTooltip="Cancel Voice Pricing Summary" class="icon-btn" (click)="backToView2()"> <i class="fas fa-times" aria-hidden="true"></i> <span class="btn-text">Cancel</span></button>
+                </div>             
+              </div>
+            </div>
+            
+            <div class="global-body-section">
+              <div class="flex-row-inner">
+                <div class="wraper-body-left">                  
+                  <div class="custom-action-title">
+                    <span>Usage Pricing</span>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Per Short Code Text Message</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perShortCodeTxtMsgPrice}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perShortCodeTxtMsgPrice" formControlName="perShortCodeTxtMsgPrice" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Per User Alert Text Message</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perUserAlertTxtMsgPrice}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perUserAlertTxtMsgPrice" formControlName="perUserAlertTxtMsgPrice" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Per Long Code Text Message</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLongCodeTxtMsgPrice}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLongCodeTxtMsgPrice" formControlName="perLongCodeTxtMsgPrice" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Per MMS Long Code Text Message	</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLongCodeMMSTxtMsgPrice}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLongCodeMMSTxtMsgPrice" formControlName="perLongCodeMMSTxtMsgPrice" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spantext">Per Voice Drop Message</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perVoiceDropPrice}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perVoiceDropPrice" formControlName="perVoiceDropPrice" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="wraper-body-right">
+                  <div class="custom-action-title">
+                    <span>Per Line Pricing</span>
+                  </div>                 
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spanpricing">Per Long Code Line</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLineLongCode}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLineLongCode" formControlName="perLineLongCode" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spanpricing">Call Forwarding Per Line</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLineCallForwarding}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLineCallForwarding" formControlName="perLineCallForwarding" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spanpricing">Voice Drops Enabled Per Line</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLIneVoiceDrop}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLIneVoiceDrop" formControlName="perLIneVoiceDrop" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spanpricing">Click-To-Call Enabled Per Line	</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLIneClickToCall}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLIneClickToCall" formControlName="perLIneClickToCall" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spanpricing">Call Recording</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLIneVCR}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLIneVCR" formControlName="perLIneVCR" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spanpricing">Google Map Integration</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLIneKMLMapCreation}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLIneKMLMapCreation" formControlName="perLIneKMLMapCreation" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spanpricing">Slidecast Per Line</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLineVIP}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLineVIP" formControlName="perLineVIP" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="excel-main-panel">
+                    <div class="cards-body-section">
+                      <div class="cards-colunm-left">
+                        <div class="align-center">
+                          <span class="control-label spanpricing">Virtual Phone Numbers	</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <span *ngIf="!edit2Show">{{clpAddOnBillingData?.perLineVirtualPhoneNumber}} </span>
+                        <input *ngIf="edit2Show" type="text" class="txtStandard" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="perLineVirtualPhoneNumber" formControlName="perLineVirtualPhoneNumber" maxlength="7" />
+                      </div>
+                    </div>
+                  </div>
+                </div>               
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="textMsgSettingDeleteModal" tabindex="-1" role="dialog" aria-labelledby="textMsgSettingDeleteModal" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+      </div>
+      <div class="modal-body modal-common-body">
+        <h2>Caution: This completely reset text message settings.</h2><br />
+        <h5> Are you sure you want to do this?</h5>
+      </div>
+      <div class="modal-footer">
+        <button type="button" [hidden]="roleFeaturePermissions?.delete == false" (click)="textMsgDelete()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+
+

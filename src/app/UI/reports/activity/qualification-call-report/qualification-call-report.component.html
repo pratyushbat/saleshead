@@ -1,0 +1,129 @@
+<div class="margin-all-area">
+  <div class="wraper-body-panel">
+    <div class="wraper-body-left">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="inner-header-bg">
+            <div class="inner-cards-panel">
+              <span>
+                <select class="form-control" [(ngModel)]="isWeekView">
+                  <option value="true">Week Of</option>
+                  <option value="false">Date span</option>
+                </select>
+              </span>
+              <span class="hide-element">User Filter</span>
+              <span class="hide-element">Action</span>
+            </div>
+          </div>
+          <div class="common-inner-cards">
+            <form [formGroup]="qualCallForm" (ngSubmit)="getQualCallList()">
+              <div class="inner-cards-grid">
+                <div class="inner-card-mobile">
+                  <label>Week</label>
+                  <div class="mobile-view-design">
+                    <kendo-datepicker #startDate formControlName="startDate" [ngClass]="{'has-error': qualCallForm.controls.startDate.errors && (qualCallForm.controls.startDate.touched || qualCallForm.controls.startDate.dirty)}"></kendo-datepicker>
+                    <div class="login-error" *ngIf="qualCallForm.controls.startDate.errors && (qualCallForm.controls.startDate.touched || qualCallForm.controls.startDate.dirty)">
+                      <span *ngIf="qualCallForm.controls.startDate.errors.required">Start Date is required </span>
+                    </div>
+                    <div class="mt-3" *ngIf="isWeekView == 'false'">
+                      <kendo-datepicker #endDate formControlName="endDate" [ngClass]="{'has-error': qualCallForm.controls.endDate.errors && (qualCallForm.controls.endDate.touched || qualCallForm.controls.endDate.dirty)}"></kendo-datepicker>
+                      <div class="login-error" *ngIf="qualCallForm.controls.endDate.errors && (qualCallForm.controls.endDate.touched || qualCallForm.controls.endDate.dirty)">
+                        <span *ngIf="qualCallForm.controls.endDate.errors.required">End Date is required </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <label>Date span</label>
+                  <div class="mobile-view-design">
+                    <select class="form-control" formControlName="ddUser">
+                      <option *ngFor="let item of userList" [value]="item?.cLPUserID">{{item?.lastName}},{{item?.firstName}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="inner-card-mobile">
+                  <label>Action</label>
+                  <div class="mobile-view-design">
+                    <button type="submit" class="grid-common-btn" [disabled]="qualCallForm.invalid">
+                      <i class="fa fa-refresh"></i>
+                      <span class="grid-common-text">Refresh</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wraper-body-right"></div>
+  </div>
+</div>
+
+<div class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel" *ngIf="weekView"><img src="../../../../../assets/appttitle.svg" class="mr-1" />Qualification Call Report</div>
+        <div class="svg-icon-panel" *ngIf="!weekView"><img src="../../../../../assets/appttitle.svg" class="mr-1" />Qualification Call Totals</div>
+        <div class="header-button-panel white-font">
+          <span>{{spanTitleText}}</span>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <kendo-grid #grid id="gridId"
+          [kendoGridBinding]="ddFieldsResponse"
+          [scrollable]="'false'"
+          [reorderable]="true"
+          [resizable]="true"
+          [columnMenu]="{ filter: true }">
+          <ng-template kendoGridToolbarTemplate>
+            <button class="btn btn-primary" type="button" (click)="setGrid();">Reset Grid Setting</button>
+            <button type="button" class="k-button export-icon-YTD" title="Export list in excel" (click)="saveExcel(excelexport)">
+              <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+              <span>Download Excel</span>
+            </button>
+            <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="k-button export-icon-YTD">
+              <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+              <span>Download PDF</span>
+            </button>
+          </ng-template>
+
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of columns"
+              [field]="column.field"
+              [title]="column.title"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [width]="column.width"
+              [filterable]="true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name">{{ dataItem[column.title] }}</div>
+              </ng-template>
+            </kendo-grid-column>
+            <kendo-excelexport #excelexport [data]="ddFieldsResponse" fileName='QualificationCallReport'>
+              <kendo-excelexport-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                <ng-template kendoGridCellTemplate let-value="value" let-rowIndex="rowIndex">
+                  <div class="customer-name">{{ dataItem[col.title] }}</div>
+                </ng-template>
+              </kendo-excelexport-column>
+            </kendo-excelexport>
+            <kendo-grid-pdf fileName="QualificationCallReport.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+              <kendo-grid-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name">{{ dataItem[col.title] }}</div>
+                </ng-template>
+              </kendo-grid-column>
+            </kendo-grid-pdf>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+

@@ -1,0 +1,574 @@
+<div class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel">
+          <span>User Profile<span>Please edit user information and click Save.</span></span>
+          
+        </div>
+      </div>
+      <div class="global-body-section">
+        <form [formGroup]="userProfileForm" (ngSubmit)="userProfileFormSubmit()">
+          <div class="align-top-style">
+            <div class="wraper-body-panel">
+              <div class="wraper-body-left">
+                <div class="custom-action-title">
+                  <span>General</span>
+                </div>
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="firstName">First Name</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div class="w-100">
+                        <input type="text" class="form-control" id="firstName" formControlName="firstName" placeholder="First Name" [ngClass]="{'has-error':userProfileForm.controls.firstName?.errors && (userProfileForm.controls.firstName?.touched ||  userProfileForm.controls.firstName?.dirty)}" />
+                        <div class="search-query-error" *ngIf="!userProfileForm.controls.firstName?.valid && (userProfileForm.controls.firstName?.dirty
+                                  ||userProfileForm.controls.firstName?.touched )">
+                          <div *ngIf="userProfileForm.controls.firstName.errors.required">Please enter a first name.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="lastName">Last Name</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div class="w-100">
+                        <input type="text" class="form-control" id="lastName" formControlName="lastName" placeholder="Last Name" [ngClass]="{'has-error': userProfileForm.controls.lastName?.errors && (userProfileForm.controls.lastName?.touched ||  userProfileForm.controls.lastName?.dirty)}" />
+                        <div class="search-query-error" *ngIf="!userProfileForm.controls['lastName'].valid && (userProfileForm.controls['lastName'].dirty || userProfileForm.controls['lastName'].touched )">
+                          <div *ngIf="userProfileForm.controls['lastName'].errors.required">Please enter a last name.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="title">Title</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div class="cards-body-section">
+                        <input type="text" class="form-control" id="title" formControlName="title" placeholder="Title" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="companyName">Company</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div class="cards-body-section">
+                        <input type="text" class="form-control" id="companyName" formControlName="companyName" placeholder="Company Name" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="selectedTheme">Change theme</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div class="cards-body-section">
+                        <select class="form-control" id="selectedTheme" formControlName="selectedTheme">
+                          <option value="1">Default</option>
+                          <option value="2">Silk</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="custom-action-title">
+                  <span>Address</span>
+                </div>
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="add1">Address 1</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <input type="text" class="form-control" id="add1" formControlName="add1" placeholder="Address 1" />
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="add2">Address 2</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <input type="text" class="form-control" id="add2" formControlName="add2" placeholder="Address 2" />
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="add3">Address 3</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <input type="text" class="form-control" id="add3" formControlName="add3" placeholder="Address 3" />
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="zip">Zip</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <input type="text" class="form-control" [ngClass]="{'has-error': userProfileForm.controls.zip.errors && (userProfileForm.controls.zip.touched || userProfileForm.controls.zip.dirty)}" id="zip" formControlName="zip" placeholder="Zip" minlength="3" maxlength="10" (blur)="getCityState($event);" />
+                      <div *ngIf="userProfileForm.controls.zip.errors && (userProfileForm.controls.zip.touched || userProfileForm.controls.zip.dirty)">
+                        <div class="search-query-error" *ngIf="userProfileForm.controls.zip.errors.pattern">Please enter correct Zip </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="city">City</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <input type="text" class="form-control" id="city" formControlName="city" placeholder="City" />
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="state">State</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <input type="text" class="form-control" id="state" formControlName="state" placeholder="State" />
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="flex-width-panel">
+                    <div class="cards-colunm-left">
+                      <span class="control-label" for="country">Country</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <select class="form-control custom-select" id="country" formControlName="country" placeholder="Country">
+                        <option *ngFor="let country of countryList" [value]="country.code2" [attr.data-code2]="country.code2">{{country.name}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="custom-action-title">
+                    <span>Social Network</span>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="facebookURL">Facebook Page URL</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" id="facebookURL" formControlName="facebookURL" placeholder="Facebook Page URL" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="twitterURL">Twitter Page URL</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" id="twitterURL" formControlName="twitterURL" placeholder="Twitter Page URL" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="linkedInURL">LinkedIn Page URL</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" id="linkedInURL" formControlName="linkedInURL" placeholder="LinkedIn Page URL" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="custom-action-title">
+                    <span>System</span>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="emailFormat">Email Format</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <select class="form-control" id="emailFormat" formControlName="emailFormat">
+                          <option value="0">Text</option>
+                          <option value="1">HTML</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="timeZoneWinId">Time Zone</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <div class="w-100">
+                          <select class="form-control" formControlName="timeZoneWinId" (change)="updateDropDownFormValue($event.target.value,'timeZoneWinId')"
+                                  [ngClass]="{'is-invalid':usrProfileForm.timeZoneWinId.touched && usrProfileForm.timeZoneWinId.errors}">
+                            <option value=""> -None Selected- </option>
+                            <option *ngFor="let dtList of timezoneFilterList; let i = index" [value]="dtList.id">{{dtList.standardName }}</option>
+                          </select>
+                          <div class="search-query-error" *ngIf="usrProfileForm.timeZoneWinId.touched && usrProfileForm.timeZoneWinId.errors">
+                            <div *ngIf="usrProfileForm.timeZoneWinId.errors.required">Time Zone is  required</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="dateFormatId">Date Format</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <div class="w-100">
+                          <select class="form-control" formControlName="dateFormatId" (change)="updateDropDownFormValue($event.target.value,'dateFormatId')" [ngClass]="{'is-invalid':usrProfileForm.dateFormatId.touched && usrProfileForm.dateFormatId.errors}">
+                            <option value=""> -None Selected- </option>
+                            <option *ngFor="let dtList of dateFormatList; let i = index" [value]="dtList.id">{{dtList.dateFormat }}</option>
+                          </select>
+                          <div class="search-query-error" *ngIf="usrProfileForm.dateFormatId.touched && usrProfileForm.dateFormatId.errors">
+                            <div *ngIf="usrProfileForm.dateFormatId.errors.required">Date Format is  required</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="cLPUserID">User Code</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <label *ngIf="userProfile">VR9{{ userProfile.cLPUserID }}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="userRole">Role</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <label *ngIf="userProfile">{{ userProfile.userRole == 1 ? 'Administrator' :  userProfile.userRole == 2 ? 'Manager' : 'User' }}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="status">Status</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <label *ngIf="userProfile">{{ userProfile.status == 0 ? 'Disabled' :  userProfile.status == 1 ? 'Allowed' : userProfile.status == 2 ? 'Downloaded' : 'Activated' }}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="changePwd">Change Password</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <div class="custom-toggle">
+                          <label class="switch profile-switch-label">
+                            <input type="checkbox" class="form-control" id="changePW" formControlName="changePW" placeholder="Change Password" />
+                            <span class="slider round"></span>
+                          </label>
+                        </div>
+                        <span class="user-force-password">Force a password change.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="wraper-body-right">
+                <div>
+                  <div class="custom-action-title">
+                    <span>Contact</span>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="mobile">Mobile</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <div class="w-100">
+                          <input type="text" class="form-control" id="mobile" formControlName="mobile" minlength="10" maxlength="15" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" placeholder="Mobile" [ngClass]="{'has-error': userProfileForm.controls.mobile?.errors && (userProfileForm.controls.mobile?.touched ||  userProfileForm.controls.mobile?.dirty)}" />
+                          <div class="search-query-error" *ngIf="!userProfileForm.controls.mobile?.valid && (userProfileForm.controls.mobile?.dirty
+                                ||userProfileForm.controls.mobile?.touched )">
+                            <div *ngIf="userProfileForm.controls.mobile.errors?.required">Please enter your mobile.</div>
+                            <div *ngIf="userProfileForm.controls.mobile.errors?.pattern">Please enter correct mobile.</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="phone">Phone</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="phone"
+                               minlength="10" maxlength="15" formControlName="phone" placeholder="Phone" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="altPhone">Other Phone</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)"
+                               id="altPhone" minlength="10" maxlength="15" formControlName="altPhone" placeholder="Other Phone" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="fax">Fax</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" id="fax" formControlName="fax" placeholder="Fax" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <div class="">
+                          <span class="control-label" for="enableSkype">Skype</span>
+                          <span class="control-label text-success">Integration</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <div class="custom-toggle">
+                          <label class="switch profile-switch-label">
+                            <input type="checkbox" class="form-control" id="enableSkype" formControlName="enableSkype" placeholder="Skype" />
+                            <span class="slider round"></span>
+                          </label>
+                        </div>
+                        <span class="user-activate"> Activate.</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <div>
+                          <span class="control-label" for="fax2EmailFrom">Fax By Email</span>
+                          <span class="control-label text-success">Integration</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <div class="custom-toggle">
+                          <label class="switch profile-switch-label">
+                            <input type="checkbox" class="form-control" id="fax2EmailFrom" formControlName="fax2EmailFrom" placeholder="Skype" />
+                            <span class="slider round"></span>
+                          </label>
+                        </div>
+                        <span class="user-activate"> Activate.</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <div>
+                          <span class="control-label" for="email">Email</span>
+                          <span class="control-label text-success">Username</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" id="email" formControlName="email" placeholder="Email" pattern="[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,4}$" />
+                        <div class="search-query-error" *ngIf="userProfileForm.controls['email'].errors &&(userProfileForm.controls['email'].touched || userProfileForm.controls['email'].dirty)">
+                          <div [hidden]="!userProfileForm.controls['email'].errors?.pattern">
+                            Invalid Email
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <div>
+                          <span class="control-label" for="otherEmail">Other Email</span>
+                          <span class="control-label text-success">Reminders formated for mobile devices</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" id="otherEmail" formControlName="otherEmail" placeholder="Other Email" pattern="[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,4}$" />
+                        <div class="search-query-error" *ngIf="userProfileForm.controls['otherEmail'].errors &&(userProfileForm.controls['otherEmail'].touched || userProfileForm.controls['otherEmail'].dirty)">
+                          <div [hidden]="!userProfileForm.controls['otherEmail'].errors?.pattern">
+                            Invalid Other Email
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="useBothEmail">Use Both Emails</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <div class="custom-toggle">
+                          <label class="switch profile-switch-label">
+                            <input type="checkbox" class="form-control" id="useBothEmail" formControlName="useBothEmail" placeholder="Use Both Emails" />
+                            <span class="slider round"></span>
+                          </label>
+                        </div>
+                        <span class="use-both-email"> Send messages to both emails.</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <div>
+                          <span class="control-label" for="defaultSignature">Signature</span>
+                          <span class="control-label text-success">Default</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <textarea type="text" class="form-control" id="defaultSignature" formControlName="defaultSignature" placeholder="Signature"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="htmlSign">HTML Signature</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <div class="email-snippet-editor profile-kendo-email">
+                          <kendo-editor formControlName="hTMLSignature"></kendo-editor>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <div>
+                          <span class="control-label" for="enableSkype">HTML Email Template</span>
+                          <span class="control-label text-success" for="enableSkype">Default</span>
+                        </div>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <select class="form-control" formControlName="emailTemplateID">
+                          <option [value]=null>--Select--</option>
+                          <option *ngFor="let item of emailTemplates; let i = index" [value]='item.emailTemplateID'>
+                            {{item.templateName}}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="fromDisplayName">Email From: Display</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" id="fromDisplayName" formControlName="fromDisplayName" placeholder="Email From: Display" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div class="custom-action-title">
+                    <span>Company</span>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="officeCode">Office</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <select *ngIf="userProfile" class="form-control" formControlName="officeCode">
+                          <option value="0">--Select--</option>
+                          <option *ngFor="let item of officeCodeList; let i = index" [ngValue]='item.key'>
+                            {{item.value}}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="teamCode">Team</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <select class="form-control" *ngIf="userProfile " formControlName="teamCode">
+                          <option value="0">--Select--</option>
+                          <option *ngFor="let item of teamCodeList; let i = index" [ngValue]='item.key'>
+                            {{item.value}}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cards-body-section">
+                    <div class="flex-width-panel">
+                      <div class="cards-colunm-left">
+                        <span class="control-label" for="employeeID">EmployeeID</span>
+                      </div>
+                      <div class="cards-colunm-right">
+                        <input type="text" class="form-control" id="employeeID" formControlName="employeeID" placeholder="employee ID" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cards-body-section">
+            <div class="cards-colunm-right text-center">
+              <button class="btn btn-primary" [disabled]="showSpinner" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"> Save</button>
+              <button class="btn btn-primary" (click)="onreset()" type="button">Reset</button>
+              <button class="btn btn-cancel" [routerLink]="['/contacts']"> Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner ">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+
+

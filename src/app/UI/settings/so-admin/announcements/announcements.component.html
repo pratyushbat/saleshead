@@ -1,0 +1,232 @@
+<div class="container-fluid">
+  <div class="custom-security-link mt-3">
+    <a (click)="addAnnouncements();"  *ngIf="(roleFeaturePermissions?.create == true || user?.userRole > 3)">Create New Announcement</a>
+    <a (click)="cancelAnnouncement();">view list</a>
+  </div>
+  <div class="admin-accounts-section">
+    <app-admin-password-form *ngIf="!_localService.isAdminPassFrmValid"></app-admin-password-form>
+  </div>
+  <div class="wraper-main-section" *ngIf="_localService.isAdminPassFrmValid">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Announcements</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper" *ngIf="!announcementState">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputAnnouncementSearch.value=''">Reset Grid Setting</button>
+            <input class="form-control" placeholder="Search in all columns..." kendoTextBox (input)="onAnnouncementFilter($event.target.value)" #inputAnnouncementSearch />            
+            <select [(ngModel)]="defaultItemAnnouncement" (change)="announcementDDChange($event)" class="form-control">
+              <option value="-1"> -All- </option>
+              <option *ngFor="let dtList of statusList; let i = index" [ngValue]="dtList.key">{{dtList.value }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section" *ngIf="announcementState == 0;">
+        <kendo-grid #grid
+          id="gridId"
+          [kendoGridBinding]="announcementListInit"
+          [pageSize]="_gridCnfgService.pageSize"
+          [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+          [sortable]="{mode: 'multiple'}"
+          [scrollable]="'scrollable'"
+          [sort]="_gridCnfgService.sort"
+          [columnMenu]="{ filter: true }"
+          [resizable]="true"
+          [reorderable]="true"
+          (remove)="removeHandler($event)"
+          (columnReorder)="_gridCnfgService.columnsOrderChanged('announcement_grid', $event)"
+          (sortChange)="_gridCnfgService.sortChange('announcement_grid', $event)"
+          (pageChange)="_gridCnfgService.pageChange('announcement_grid', $event)"
+          (columnResize)="_gridCnfgService.columnResize(5,'announcement_grid', $event)"
+          (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'announcement_grid',grid)">
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+              [field]="column.field"
+              [title]="column.title "
+              [width]="column.width"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+              [includeInChooser]="column.field.includes('$') ? false : true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                <div class="customer-name" *ngIf="column.field == 'dtExpires'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy'}}</div>
+                <div class="customer-name announcement-parent" *ngIf="column.field == 'announceTitle'">
+                  <div class="announcement-child-left">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</div>
+                  <div class="announcement-child-right">
+                    <div [innerHTML]="dataItem['announceDesc']"></div>
+                  </div>
+                </div>
+                <div class="customer-name" *ngIf="column.field == 'status'">{{ !dataItem[column.field] ? '--' : convertStatusToView(dataItem[column.field]) }}</div>
+                <div class="customer-name" *ngIf="column.field == 'cLPCompanyID'">{{ !dataItem[column.field] ? '--' : dataItem[column.field]  }}</div>
+                <div class="customer-name" *ngIf="column.title == 'Action' && (roleFeaturePermissions?.edit == true || roleFeaturePermissions?.delete == true || user?.userRole > 3)">
+                  <button type="button" class="grid-common-btn" (click)="editAnnouncements(dataItem);" [hidden]="roleFeaturePermissions?.edit == false"><i class="fa fa-pencil" aria-hidden="true" title="Edit"></i></button>
+                  <button type="button" class="grid-delete-btn" (click)="deleteAccountConfirm(dataItem);" [hidden]="roleFeaturePermissions?.delete == false" data-toggle="modal" data-target="#announcementDeleteModal"><i class="fa fa-trash-alt" aria-hidden="true" title="Delete"></i></button>
+                </div>
+
+              </ng-template>
+            </kendo-grid-column>
+            <kendo-grid-messages [pagerItemsPerPage]="'Per page'" [pagerItems]="'Announcements'"> </kendo-grid-messages>
+          </div>
+        </kendo-grid>
+      </div>
+      <div class="global-body-section" *ngIf="announcementState == 1;">
+        <div class="wraper-body-panel">
+          <div class="wraper-body-left">
+            <form [formGroup]="annoucementForm" (ngSubmit)="announcementFormSubmit()">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Title</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="text" [ngClass]="{'has-error': annoucementFrm.announceTitle.errors && (annoucementFrm.announceTitle.touched || annoucementFrm.announceTitle.dirty)}" class="form-control" id="announceTitle" name="announceTitle" formControlName="announceTitle" placeholder="" />
+                  <div class="cards-colunm-right">
+                    <div class="col-sm-12" *ngIf="annoucementFrm.announceTitle.errors && (annoucementFrm.announceTitle.touched || annoucementFrm.announceTitle.dirty)">
+                      <div class="login-error" *ngIf="annoucementFrm.announceTitle.errors.required">Title is required </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Announcement</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <kendo-editor [ngClass]="{'has-error': annoucementFrm.announceDesc.errors && (annoucementFrm.announceDesc.touched || annoucementFrm.announceDesc.dirty)}" formControlName="announceDesc" class="announcement-editor">
+                    <kendo-toolbar>
+                      <kendo-toolbar-buttongroup>
+                        <kendo-toolbar-button kendoEditorBoldButton></kendo-toolbar-button>
+                        <kendo-toolbar-button kendoEditorItalicButton></kendo-toolbar-button>
+                        <kendo-toolbar-button kendoEditorUnderlineButton></kendo-toolbar-button>
+                      </kendo-toolbar-buttongroup>
+                      <kendo-toolbar-buttongroup>
+                        <kendo-toolbar-button kendoEditorAlignLeftButton></kendo-toolbar-button>
+                        <kendo-toolbar-button kendoEditorAlignCenterButton></kendo-toolbar-button>
+                        <kendo-toolbar-button kendoEditorAlignRightButton></kendo-toolbar-button>
+                        <kendo-toolbar-button kendoEditorAlignJustifyButton></kendo-toolbar-button>
+                      </kendo-toolbar-buttongroup>
+                      <kendo-toolbar-dropdownlist kendoEditorFormat></kendo-toolbar-dropdownlist>
+                      <kendo-toolbar-dropdownlist kendoEditorFontSize></kendo-toolbar-dropdownlist>
+                      <kendo-toolbar-colorpicker kendoEditorForeColor></kendo-toolbar-colorpicker>
+                      <kendo-toolbar-colorpicker kendoEditorBackColor view="gradient"></kendo-toolbar-colorpicker>
+                      <kendo-toolbar-buttongroup>
+                        <kendo-toolbar-button kendoEditorInsertUnorderedListButton></kendo-toolbar-button>
+                        <kendo-toolbar-button kendoEditorInsertOrderedListButton></kendo-toolbar-button>
+                      </kendo-toolbar-buttongroup>
+                      <kendo-toolbar-button kendoEditorViewSourceButton></kendo-toolbar-button>
+                    </kendo-toolbar>
+                  </kendo-editor>
+                  <div class="cards-colunm-right">
+                    <div *ngIf="annoucementFrm.announceDesc.errors && (annoucementFrm.announceDesc.touched || annoucementFrm.announceDesc.dirty)">
+                      <div class="login-error" *ngIf="annoucementFrm.announceDesc.errors.required">Description is required </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Learn More Link</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="text" id="learnMoreLink" name="learnMoreLink" formControlName="learnMoreLink" class="form-control webform-right-input" placeholder="Unique URL Name" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Take Me There Link</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="text" id="takeMeThereLink" name="takeMeThereLink" formControlName="takeMeThereLink" class="form-control webform-right-input" placeholder="Unique URL Name" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Expires</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right calendar-Icon">
+                  <kendo-datetimepicker formControlName="dtExpires" [format]="datePickerformat" class="w-25"></kendo-datetimepicker>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Show Dismiss</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="checkbox" class="checkbox" id="showDismiss" name="showDismiss" formControlName="showDismiss" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Account</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="cLPCompanyID">
+                    <option [value]="-1"> -All- </option>
+                    <option *ngFor="let dtList of accountList; let i = index" [value]="dtList.key">{{dtList.value }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <div class="align-center">
+                    <span class="control-label">Status</span>
+                  </div>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="form-control" formControlName="status">
+                    <option value=""> -Select one- </option>
+                    <option *ngFor="let dtList of statusList; let i = index" [value]="dtList.key">{{dtList.value }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"></div>
+                <div class="cards-colunm-right">
+                  <button [disabled]="annoucementForm.invalid" class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"> Save</button>
+                  <button class="btn btn-cancel" type="button" (click)="cancelAnnouncement()"> Cancel</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner ">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+<div class="modal fade" id="announcementDeleteModal" tabindex="-1" role="dialog" aria-labelledby="announcementDeleteModallabel" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+      </div>
+      <div class="modal-body modal-common-body">
+        <h5><b>Caution: </b>This Announcement will be permanently deleted.</h5>
+        <h5>Are you sure to delete this announcement ?</h5>
+      </div>
+      <div class="modal-footer">
+        <button type="button" (click)="deleteAccounts()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

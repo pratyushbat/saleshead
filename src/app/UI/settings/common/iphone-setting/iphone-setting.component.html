@@ -1,0 +1,65 @@
+<div class="iphone-setting-panel">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="top-txtmsg">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../assets/salesoptimatitle.svg" class="mr-1" />	Enable iPhone App for Users</div>
+          <div class="header-button-panel">
+            <div class="button-wrapper"></div>
+          </div>
+        </div>
+        <div class="global-body-section">
+          <div class="global-padding10">
+            <div class="label-switch-section">
+              <div class="align-label-iphone">
+                <label>In Active</label>
+              </div>
+              <!--<div class="label-switch-middle-btn"></div>-->
+              <div class="align-label-iphone">
+                <label> Active</label>
+              </div>
+            </div>
+            <div class="switch-section">
+              <div class="switch-left">
+                <div class="">
+                  <div cdkDropList
+                       #tolist="cdkDropList"
+                       [cdkDropListData]="inactiveIphoneList"
+                       [cdkDropListConnectedTo]="[frmList]"
+                       class="example-list"
+                       id="iphone-inactive"
+                       (cdkDropListDropped)="drop($event)">
+                    <div class="drag-list" *ngFor="let i of inactiveIphoneList" cdkDrag>{{i.fullname}}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="switch-middle-btn">
+                <button class="btn btn-primary" (click)="unSelectAll()"><i class="fas fa-angle-double-right"></i></button>
+                <button class="btn btn-primary" (click)="selectAll()"><i class="fas fa-angle-double-left"></i></button>
+              </div>
+              <div class="switch-right">
+                <div class="">
+                  <div cdkDropList
+                       #frmList="cdkDropList"
+                       [cdkDropListData]="activeIphoneList"
+                       [cdkDropListConnectedTo]="[tolist]"
+                       class="example-list"
+                       id="iphone-active"
+                       (cdkDropListDropped)="drop($event)"
+                       (click)="fromList_Onclick($event)">
+                    <div class="drag-list" *ngFor="let i of  activeIphoneList" cdkDrag (click)="fromList_Onclick($event)">
+                      {{i.fullname}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner ">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

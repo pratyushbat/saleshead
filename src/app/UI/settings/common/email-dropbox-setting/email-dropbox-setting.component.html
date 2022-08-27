@@ -1,0 +1,125 @@
+<div class="mb-3">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel">Email Dropbox Settings</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting()"><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+            <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onEmailDropboxFilter($event.target.value)" />
+          </div>
+        </div>
+      </div>
+      <div class="margin-all-area">
+        <select class="ddStandard-tagsettings" (change)="this.getEmailDropboxListByUser($event.target.value)">
+          <option value="0" [selected]="true">--Select--</option>
+          <option *ngFor="let item of userList" [value]="item.key">{{item.value}}</option>
+        </select>
+      </div>
+      <div class="global-body-section">
+        <div class="wraper-body-panel">
+          <div class="wraper-body-left">
+            <form [formGroup]="emailDropboxForm" *ngIf="isShowEditableSection" (ngSubmit)="emailDropboxFormSubmit()">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">User</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="text" class="txtStandard" formControlName="user" />
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Processor</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="ddStandard-tagsettings" formControlName="processor">
+                    <option value=0>--Select--</option>
+                    <option value="1">Gmail</option>
+                    <option value="2">Outlook 2007</option>
+                    <option value="3">Apple Mail</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Activate</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <input type="checkbox" class="checkbox" formControlName="status" />
+                  <span class="control-label spantext">check this box to activate these smtp settings for this user.</span>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"></div>
+                <div class="cards-colunm-right">
+                  <button class="btn btn-primary" type="submit" data-toggle="modal" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" data-target="#emailDropboxModal">Save</button>
+                  <button type="button" class="btn btn-danger" [hidden]="roleFeaturePermissions?.delete == false" (click)="onDeleteDropboxSetting()"><i class="fa fa-trash-alt mr-2"></i>Delete</button>
+                  <button type="button" class="btn btn-cancel " (click)="onCancelDropboxSetting()">Cancel</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <kendo-grid #grid id="gridId"
+                    [kendoGridBinding]="emailDropboxList"
+                    [pageSize]="_gridCnfgService.pageSize"
+                    [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                    [sortable]="{mode: 'multiple'}"
+                    [scrollable]="'scrollable'"
+                    [sort]="_gridCnfgService.sort"
+                    [columnMenu]="{ filter: true }"
+                    [resizable]="true"
+                    [reorderable]="true"
+                    (columnReorder)="_gridCnfgService.columnsOrderChanged('email_dropbox_grid', $event)"
+                    (sortChange)="_gridCnfgService.sortChange('email_dropbox_grid', $event)"
+                    (pageChange)="_gridCnfgService.pageChange('email_dropbox_grid', $event)"
+                    (columnResize)="_gridCnfgService.columnResize(9,'email_dropbox_grid', $event)"
+                    (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'email_dropbox_grid',grid)">
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                               [field]="column.field"
+                               [title]="column.title | titlecase"
+                               [width]="column.width"
+                               [filterable]="true"
+                               [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                               [includeInChooser]="column.field=='$' ? false : true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                <div class="customer-name" *ngIf="column.field == 'name'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'username'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'cLPEmailDropBoxID'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'cLPCompanyID'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'cLPUserID'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'dropBox'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'processor'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+                <div class="customer-name" *ngIf="column.field == 'status'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</div>
+              </ng-template>
+            </kendo-grid-column>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="emailDropboxModal" tabindex="-1" role="dialog" aria-labelledby="emailDropboxModal" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h4 class="modal-title modal-common-title">Confirmation</h4>
+      </div>
+      <div class="modal-body modal-common-body">
+        <h2>  Are you sure to you want to {{confirmOperation === 'save' ? 'save' : 'delete'}}  <b> Email Dropbox Settings</b></h2>
+      </div>
+      <div class="modal-footer">
+        <button type="button" (click)="onConfirmOperation()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+

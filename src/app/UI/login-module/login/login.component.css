@@ -1,0 +1,82 @@
+/*body { font-size: 100%; }
+
+--------- Login Sceen Start ------
+.Login-section { margin: 0px; padding: 0px; position: relative; display: flex; align-items: center; justify-content: center; background: url('../../../../assets/topography.jpg') no-repeat 100% top; background-size: cover; height: 100vh; z-index: 9; }
+.login-card { padding: 25px; background: #fff; border-radius: 0px 0px 5px 5px; box-shadow: inset 2px 3px 13px #e2dfdf; margin-top: 5px; }
+.login-panel .login-container { margin: 0px auto; padding: 0px; border-radius: 5px; background: #fff; border-top: solid 5px #dc1e28; box-shadow: 0px 1px 15px 0px #868181b5; }
+.login-panel .login-logo { margin: 6px auto -4px auto; position: relative; top: 0px; padding: 15px; text-align: center; }
+.login-panel .login-logo img { max-width: 48%; }
+.login-panel { height: auto; margin: 0px; }
+.login-panel .card { margin: 0px auto; border-radius: 0px 0px 5px 5px; box-shadow: inset 2px 3px 13px #e2dfdf; background: #fff; border: none; }
+.login-panel .card-body { padding: 30px; }
+.login-panel .card h3 { margin: 0px auto; text-align: center; }
+.login-form-section { margin: 0px; padding: 0px; }
+.login-form-section form { margin: 30px auto 0px auto; padding: 0px; }
+.input-icon-panel { margin: 0px; padding: 0px; }
+.input-icon-panel img { position: absolute; left: 51px; min-height: auto; margin-top: 14px; }
+.input-icon-panel input { padding: 10px 10px 10px 30px; border-radius: 40px; height: auto; }
+.input-icon-panel .fa-eye-slash { right: 9px; }
+.forgot-panel .form-check { padding: 0px 7px; }
+.forgot-panel .form-check span { margin: 0px 0 0 20px; }
+.input-icon-panel i { right: 10px; font-size: 16px; cursor: pointer; position: relative; float: right; margin-top: -31px; color: #858484; }
+.heading-text { margin-bottom: -10px; width: 100%; text-align: center; }
+.heading-text h3 { font-size: 22px; font-weight: 500; }
+.form-control:focus { box-shadow: 0px 0px 13px #99999987; transition: ease-in 0.3s; }
+.forgot-link { margin: 0px 15px; float: right }
+.forgot-link button { outline: none; }
+.login-card1 { padding: 25px; background: #fff; border-radius: 0px 0px 5px 5px; box-shadow: inset 2px 3px 13px #e2dfdf; }
+.forgot-panel { margin: 10px auto; }
+
+input::placeholder { color: #e6e6e6; font-style: italic }
+----------- Login Sceen End ---------
+
+--------- Error validation Css Start ---------
+.validation-error { margin: 0px; padding: 0px 30px; }
+.validation-error ::ng-deep span { color: #e51b24; font-size: 15px; margin-bottom: 0px; padding: 0px; font-weight: 500; display: inline; }
+.validation-error ::ng-deep span > span > span + br + span { color: #1d9fea; font-size: 13px; }
+.validation-error ::ng-deep ul { color: #1d9fea; font-weight: 500; font-size: 13px; }
+.validation-error ::ng-deep i { font-size: 20px; margin: 0px 4px; vertical-align: bottom; }
+.validation-error ::ng-deep p { color: green; }
+.has-error a + div, input + div { font-size: 12px; color: #e51b24; font-weight: 500; margin-left: 10px; }
+.toast-container .ngx-toastr { box-shadow: none !important; }
+--------- Error validation Css End --------
+
+
+------- Login Button Css Start --------
+.submit-btn { margin: 15px auto 15px auto; text-align: center }
+.submit-btn .btn { border-radius: 20px; width: 50%; max-width: 100%; padding: 6px 10px; }
+.submit-btn .btn:hover { box-shadow: 0px 0px 5px #ccc; transition: all ease-in 0.5s; }
+#forgot-btn { background: none !important; border: none; padding: 0 !important; color: #0084ff; text-decoration: underline; cursor: pointer; }
+.resend-href { text-decoration: underline; color: #0084ff; cursor: pointer; }
+button[title="Confirm"] { width: auto; }
+.version { text-align: right; position: absolute; right: 20px; bottom: 0px; color: #efefef; }
+--------- Login Button Css End ---------
+
+.footer-section { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; z-index: 999; color: #ccc; }
+
+@media(min-width:1025px) and (max-width:1700px) {
+    .login-card1 .submit-btn .btn { border-radius: 20px; width: auto; max-width: 100%; padding: 6px 30px; }
+}
+
+@media(min-width:768px) and (max-width:1024px) {
+    .login-panel .login-logo { top: 0px; }
+    .login-panel { margin: 0px; }
+        .login-panel .login-logo img { max-width: 60%; }
+}
+
+@media(min-width:320px) and (max-width:767px) {
+    .login-panel .login-container { margin: 50px auto; }
+    .login-panel .card { margin: 20px auto; }
+    .login-panel .login-logo { top: 0px; }
+    .login-panel { margin: 0px; }
+    .submit-btn { margin: 0px auto; }
+        .submit-btn .btn { width: 100%; padding: 10px 15px; }
+    .forgot-link { float: left }
+    .login-panel .login-logo img { max-width: 75%; }
+    .re-login-btn { padding: 10px; }
+    .login-card { padding: 15px; }
+    .login-card1 { padding: 15px; }
+    .input-icon-panel img { left: 40px; margin-top: 15px; }
+    .version { position: relative; right: -11px; bottom: -15px; }
+}*/
+

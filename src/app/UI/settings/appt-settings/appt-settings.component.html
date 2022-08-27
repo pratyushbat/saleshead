@@ -1,0 +1,260 @@
+<div class="container-fluid common-alignment">
+  <div class="contact-setting-tabs">
+    <div class="role-tabs-panel mt-4">
+      <kendo-tabstrip>
+        <kendo-tabstrip-tab [title]="'Appointment Settings'" [selected]="currentUrl == '' || currentUrl == 'appt-settings' ? true : false">
+          <ng-template kendoTabContent>
+            <div class="wraper-main-section mt-2">
+              <span class="text-dark" *ngIf="manipulatedApptSettings?.length === 0">No records found</span>
+              <div *ngIf="manipulatedApptSettings?.length > 0"></div>
+              <div class="mt-3 global-card-section" *ngFor="let appttype of manipulatedApptSettings; let j = index" >
+                <div class="global-header-section">
+                  <div class="svg-icon-panel" *ngIf="j == 0">Appointment Settings</div>
+                  <div class="svg-icon-panel" *ngIf="j == 1">Note Settings</div>
+                  <div class="svg-icon-panel" *ngIf="j == 2">Mailing Settings</div>
+                </div>
+                <div class="wraper-main-section">
+                  <div class="margin-all-area" *ngFor="let apptSetting of appttype; trackBy:trackBy; let i = index">
+                    <div class="global-card-section">
+                      <div class="global-header-section" >
+                        <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />{{ apptSetting.name }}</div>
+                        <div class="header-button-panel">
+                          <div class="button-wrapper">
+                            <button type="button" [matTooltip]="isExpdTypeAppt && index === i ? 'Collapse' : 'Expand'" class="icon-btn" (click)="index = i; expendStrip(apptSetting.name, 'appt')">
+                              <i class="fa " [ngClass]="isExpdTypeAppt && index === i && expdTypeApptName == apptSetting.name ? 'fa-compress' : 'fa-expand'"></i>
+                              <span class="btn-text">Expand</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="global-body-section" *ngIf="expdTypeApptName == apptSetting.name">
+                      <div class="wraper-body-panel">
+                        <div class="full-width-container">
+                          <app-contact-settings *ngIf="apptSetting?.items" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [dataSource]="apptSetting?.items" [tableName]="apptSetting.tableName" [settingName]="'appt'"></app-contact-settings>
+                        </div>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </kendo-tabstrip-tab>
+
+        <kendo-tabstrip-tab [title]="'Contact Settings'" [selected]="currentUrl == 'contact-settings' ? true : false">
+          <ng-template kendoTabContent>
+            <div class="wraper-main-section mt-2">
+              <div class="global-card-section">
+                <div class="global-header-section">
+                  <div class="svg-icon-panel"><img src="../../../../assets/contactfieldsetuptitle.svg" class="mr-1" />Contact Module Fields Setup</div>
+                  <div class="header-button-panel">
+                    <div class="button-wrapper">
+                      <button type="button" [matTooltip]="isExpdContactSetup ? 'Collapse' : 'Expand'" class="icon-btn" (click)="isExpdContactSetup = !isExpdContactSetup; collapseAll();">
+                        <i class="fa " [ngClass]="{ 'fa-compress': isExpdContactSetup, 'fa-expand': !isExpdContactSetup }"></i>
+                        <span class="btn-text">Expand</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section" *ngIf="isExpdContactSetup">
+                  <div class="">
+                    <div class="alert-panel">Customize and configure the contact screen. Changes will be reflected for all contacts in your account.</div>
+                    <app-configuration [isCommon]="true"></app-configuration>
+                  </div>
+                </div>
+              </div>
+              <span class="text-dark" *ngIf="manipulatedClassCodes?.length === 0">No records found</span>
+              <div class="mt-3" *ngIf="manipulatedClassCodes?.length > 0">
+                <div class="global-card-section">
+                  <div class="global-header-section">
+                    <div class="svg-icon-panel">Contact Classification Drop Down Configuration</div>
+                  </div>
+                  <div class="margin-all-area">
+                    <div class="global-card-section mt-2" *ngFor="let classCode of manipulatedClassCodes; trackBy:trackBy; let i = index">
+                      <div class="global-header-section">
+                        <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />{{ classCode.title }}</div>
+                        <div class="header-button-panel">
+                          <div class="button-wrapper">
+                              <button *ngIf="isExpdTypeContact && index === i && !isContactEditMode" [hidden]="roleFeaturePermissions?.edit == false && user?.userRole <= 3" type="button" matTooltip="Edit" class="icon-btn" (click)="isContactEditMode=true;contactClassificationHeading=classCode.title;">
+                              <i class="fa fa-pencil"></i>
+                              <span class="btn-text">Edit</span>
+                            </button>
+                            <input type="text" [hidden]="roleFeaturePermissions?.edit == false" [(ngModel)]="contactClassificationHeading" *ngIf=" isExpdTypeContact && index === i && isContactEditMode " class="form-control" />
+                            <button *ngIf=" isExpdTypeContact && index === i && isContactEditMode " type="button" [hidden]="roleFeaturePermissions?.edit == false && user?.userRole <= 3 " matTooltip="Save Contact" class="icon-btn" (click)="saveSettingsHeading(i ,'contact')">
+                              <i class="fa fa-save" aria-hidden="true"></i>
+                              <span class="btn-text">Save</span>
+                            </button>
+                            <button *ngIf="isExpdTypeContact && index === i && isContactEditMode  " type="button" matTooltip="Cancel Company" class="icon-btn" (click)="isContactEditMode=false;">
+                              <span class="btn-text">Cancel</span>
+                              <i class="fa fa-times" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" [matTooltip]="isExpdTypeContact && index === i ? 'Collapse' : 'Expand'" class="icon-btn" (click)="index = i; expendStrip(classCode.key, 'contact')">
+                              <i class="fa " [ngClass]="isExpdTypeContact && index === i && expdTypeContactName == classCode.key ? 'fa-compress' : 'fa-expand'"></i>
+                              <span class="btn-text">Expand</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="global-body-section mb-2" *ngIf="expdTypeContactName == classCode.key">
+                        <app-contact-settings *ngIf="classCode?.value" [loggedUser]="user" [dataSource]="classCode?.value" [tableName]="classCode.tableName" [roleFeaturePermissions]="roleFeaturePermissions"></app-contact-settings>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </kendo-tabstrip-tab>
+
+        <kendo-tabstrip-tab [title]="'Lead Settings'" [selected]="currentUrl == 'lead-settings' ? true : false">
+          <ng-template kendoTabContent>
+            <div class="wraper-main-section mt-2">
+              <div class="global-card-section">
+                <div class="global-header-section">
+                  <div class="svg-icon-panel"><img src="../../../../assets/leadfieldsetuptitle.svg" class="mr-1" />Lead Module Fields Setup</div>
+                  <div class="header-button-panel">
+                    <div class="button-wrapper">
+                      <button type="button" [matTooltip]="isExpdLeadSetup ? 'Collapse' : 'Expand'" class="icon-btn" (click)="isExpdLeadSetup = !isExpdLeadSetup; collapseAll();">
+                        <i class="fa " [ngClass]="{ 'fa-compress': isExpdLeadSetup, 'fa-expand': !isExpdLeadSetup }"></i>
+                        <span class="btn-text">Expand</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section" *ngIf="isExpdLeadSetup">
+                  <div class="">
+                    <div class="alert-panel">Please set up the mandatory fields for the Lead Module.</div>
+                  </div>
+                  <app-lead-configuration></app-lead-configuration>                  
+                </div>
+              </div>
+              <span class="text-dark" *ngIf="manipulatedLeadSettings?.length === 0">No records found</span>
+              <div class="mt-3" *ngIf="manipulatedLeadSettings?.length > 0">
+                <div class="global-card-section">
+                  <div class="global-header-section ">
+                    <div class="svg-icon-panel">Lead Classification Drop Down Configuration</div>
+                  </div>
+                  <div class="margin-all-area">
+                    <div class="global-card-section mt-2" *ngFor="let leadSetting of manipulatedLeadSettings; trackBy:trackBy; let i = index">
+                      <div class="global-header-section">
+                        <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />{{ leadSetting.title }}</div>
+                        <div class="header-button-panel">
+                          <div class="button-wrapper">
+                            <button *ngIf="isExpdTypeLead && index === i && !isLeadEditMode" [hidden]="roleFeaturePermissions?.edit == false " type="button" matTooltip="Edit" class="icon-btn" (click)="isLeadEditMode=true;leadClassificationHeading=leadSetting.title;">
+                              <i class="fa fa-pencil"></i>
+                              <span class="btn-text">Edit</span>
+                            </button>
+                            <input type="text" [(ngModel)]="leadClassificationHeading" *ngIf=" isExpdTypeLead && index === i && isLeadEditMode " class="form-control" />
+                            <button *ngIf=" isExpdTypeLead && index === i && isLeadEditMode " type="button" [hidden]="roleFeaturePermissions?.edit == false" matTooltip="Save Contact" class="icon-btn" (click)="saveSettingsHeading(i ,'lead')">
+                              <i class="fa fa-save" aria-hidden="true"></i>
+                              <span class="btn-text">Save</span>
+                            </button>
+                            <button *ngIf="isExpdTypeLead && index === i && isLeadEditMode  " type="button" matTooltip="Cancel Company" class="icon-btn" (click)="isLeadEditMode=false;">
+                              <span class="btn-text">Cancel</span>
+                              <i class="fa fa-times" aria-hidden="true"></i>
+                            </button>
+
+                            <button type="button" [matTooltip]="isExpdTypeLead && index === i ? 'Collapse' : 'Expand'" class="icon-btn" (click)="index = i; expendStrip(leadSetting.key, 'lead')">
+                              <i class="fa " [ngClass]="isExpdTypeLead && index === i && expdTypeLeadName == leadSetting.key ? 'fa-compress' : 'fa-expand'"></i>
+                              <span class="btn-text">Expand</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="global-body-section  mb-2" *ngIf="expdTypeLeadName == leadSetting.key">
+                        <div class="wraper-body-panel">
+                          <div class="wraper-body-left">
+                            <app-contact-settings [roleFeaturePermissions]="roleFeaturePermissions" *ngIf="leadSetting?.value" [loggedUser]="user" [dataSource]="leadSetting?.value" [tableName]="leadSetting.tableName" [settingName]="'lead'"></app-contact-settings>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </kendo-tabstrip-tab>
+
+        <kendo-tabstrip-tab [title]="'Company Settings'" [selected]="currentUrl == '' || currentUrl == 'company-settings' ? true : false">
+          <ng-template kendoTabContent>
+            <div class="wraper-main-section mt-2">
+              <div class="global-body-section">
+                <div class="global-card-section">
+                  <div class="global-header-section">
+                    <div class="svg-icon-panel"><img src="../../../../assets/companyfieldsetuptitle.png" class="mr-1" /> Company Module Fields Setup</div>
+                    <div class="header-button-panel">
+                      <div class="button-wrapper">
+                        <button type="button" [matTooltip]="isExpdCompanySetup ? 'Collapse' : 'Expand'" class="icon-btn" (click)="isExpdCompanySetup = !isExpdCompanySetup; collapseAll();">
+                          <i class="fa " [ngClass]="{ 'fa-compress': isExpdCompanySetup, 'fa-expand': !isExpdCompanySetup }"></i>
+                          <span class="btn-text">Expand</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="global-body-section" *ngIf="isExpdCompanySetup">
+                    <div class="">
+                      <div class="alert-panel">Please set up the mandatory fields for the Company Module.</div>
+                    </div>
+                    <company-configuration></company-configuration>                   
+                  </div>
+                </div>
+              </div>
+              <span class="text-dark" *ngIf="manipulatedCompanySettings?.length === 0">No records found</span>
+              <div class="mt-3" *ngIf="manipulatedCompanySettings?.length > 0">
+                <div class="global-card-section">
+                  <div class="global-header-section">
+                    <div class="svg-icon-panel">Company Classification Drop Down Configuration</div>
+                  </div>
+                  <div class="margin-all-area">
+                    <div class="global-card-section mt-2" *ngFor="let companySetting of manipulatedCompanySettings; trackBy:trackBy; let i = index">
+                      <div class="global-body-section">
+                        <div class="global-header-section">
+                          <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />{{ companySetting.title }}</div>
+                          <div class="header-button-panel">
+                            <div class="button-wrapper">
+                              <button *ngIf="isExpdTypeCompany && index === i && !isCompanyEditMode" [hidden]="roleFeaturePermissions?.edit == false" type="button" matTooltip="Edit" class="icon-btn" (click)="isCompanyEditMode=true;companyClassificationHeading=companySetting.title;">
+                                <i class="fa fa-pencil"></i>
+                                <span class="btn-text">Edit</span>
+                              </button>        
+                              <input type="text" [(ngModel)]="companyClassificationHeading" *ngIf=" isExpdTypeCompany && index === i && isCompanyEditMode " class="form-control" />
+                              <button *ngIf=" isExpdTypeCompany && index === i && isCompanyEditMode " type="button" [hidden]="roleFeaturePermissions?.edit == false" matTooltip="Save Company" class="icon-btn" (click)="saveSettingsHeading(i , 'company')">
+                                <i class="fa fa-save" aria-hidden="true"></i>
+                                <span class="btn-text">Save</span>
+                              </button>
+                              <button *ngIf="isExpdTypeCompany && index === i && isCompanyEditMode  " type="button" matTooltip="Cancel Company" class="icon-btn" (click)="isCompanyEditMode=false;">
+                                <span class="btn-text">Cancel</span>
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                              </button>
+                              <button type="button" [matTooltip]="isExpdTypeCompany && index === i ? 'Collapse' : 'Expand'" class="icon-btn" (click)="index = i; expendStrip(companySetting.key, 'company')">
+                                <i class="fa " [ngClass]="isExpdTypeCompany && index === i && expdTypeCompanyName == companySetting.key ? 'fa-compress' : 'fa-expand'"></i>
+                                <span class="btn-text">Expand</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="global-body-section mb-2" *ngIf="expdTypeCompanyName == companySetting.key">
+                          <div class="wraper-body-panel">
+                            <div class="wraper-body-left">
+                              <app-contact-settings *ngIf="companySetting?.value" [roleFeaturePermissions]="roleFeaturePermissions" [loggedUser]="user" [dataSource]="companySetting?.value" [tableName]="companySetting.tableName" [settingName]="'company'"></app-contact-settings>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </kendo-tabstrip-tab>
+      </kendo-tabstrip>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

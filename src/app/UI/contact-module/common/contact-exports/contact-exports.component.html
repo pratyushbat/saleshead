@@ -1,0 +1,37 @@
+<div class="" [class.fade-out]="showSpinner">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="inner-header-bg">
+        <div class="inner-cards-panel">
+          <span>Recent Export</span>
+          <span>Short Description</span>
+          <span>Type</span>
+          <span>Status</span>     
+        </div>
+      </div>
+      <div class="inner-cards-grid-height">
+        <div class="" *ngFor="let i of  mapRecentContact;">
+          <div class="inner-cards-grid">
+            <div class="">
+              <p *ngIf="!isContactReport">{{i?.requestTime | date:'medium'}}</p>
+              <p *ngIf="isContactReport">{{i?.dtCreated | date:'medium'}}</p>
+            </div>
+            <div class="">
+              <p *ngIf="!isContactReport">{{i?.downloadNavURL}}</p>
+              <p *ngIf="isContactReport">{{i?.fileName}}</p>
+            </div>
+            <div class="">
+              <p *ngIf="!isContactReport">{{requestType[i?.typeDisplay]}}</p>
+              <p *ngIf="isContactReport">{{requestType[i?.objectType]}}</p>
+            </div>
+            <div class="">
+              <p [ngStyle]="{'color': (i.typeDisplay == 1) ? 'red' :  (i.typeDisplay == 3) ? 'green' :''}" *ngIf="!isContactReport">  {{requestStatus[i?.statusDisplay]}} </p>
+              <p [ngStyle]="{'color': (i.typeDisplay == 1) ? 'red' :  (i.typeDisplay == 3) ? 'green' :''}" *ngIf="isContactReport">  {{requestStatus[i?.status]}} </p>
+            </div>
+          </div>
+          <div class="team-example-box" *ngIf="mapRecentContact?.length === 0"><h6>No records found</h6></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

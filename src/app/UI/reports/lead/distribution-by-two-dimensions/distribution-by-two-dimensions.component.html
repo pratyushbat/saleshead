@@ -1,0 +1,282 @@
+<div class="container-fluid mt-3">
+  <div class="p-2">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="inner-header-bg">
+          <div class="inner-cards-panel header-inner-hidden">
+            <span>Rows</span>
+            <span>Columns</span>
+            <span>Date Filter</span>
+            <span></span>
+            <span></span>
+            <span>User Filter</span>
+            <span>Measure</span>
+            <span></span>
+          </div>
+        </div>
+        <form [formGroup]="getTwoDimensionsForm" (ngSubmit)="getLeadTwoDimensionResponse()">
+          <div class="inner-cards-grid">
+            <div class="inner-card-mobile">
+              <label>Rows</label>
+              <div class="mobile-view-design">
+                <select class="form-control" formControlName="rows">
+                  <option *ngFor="let item of ddRows; let i= index;" [value]="item?.value">{{item?.text}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <label>Columns</label>
+              <div class="mobile-view-design">
+                <select class="form-control" formControlName="columns">
+                  <option *ngFor="let item of ddRowsColumns; let i= index;" [value]="item?.value">{{item?.text}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <label>Date Filter</label>
+              <div class="mobile-view-design">
+                <span class="mr-2 font-weight-bold">Date</span>
+                <select class="form-control" formControlName="dtFilter">
+                  <option *ngFor="let item of ddDateFilter; let i= index;" [value]="item?.value">{{item?.text}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <div class="mobile-view-design">
+                <span class="mr-2 font-weight-bold">Start</span>
+                <kendo-datepicker formControlName="startDt" placeholder=""></kendo-datepicker>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <div class="mobile-view-design">
+                <span class="mr-2 font-weight-bold">End</span>
+                <kendo-datepicker formControlName="endDt" placeholder=""></kendo-datepicker>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <label>User Filter</label>
+              <div class="mobile-view-design">
+                <div class="order-row-inner" *ngIf="showRevenueFilterDropdown('team')">
+                  <span class="font-weight-bold">Team</span>
+                  <select class="form-control" formControlName="teamCode" (change)="getUserList()">
+                    <option value="0">-All-</option>
+                    <option *ngFor="let item of teamFilterDD; let i= index;" [value]="item?.teamCode">{{item?.display}}</option>
+                  </select>
+                </div>
+                <div class="order-row-inner" *ngIf="showRevenueFilterDropdown('office')">
+                  <span class="font-weight-bold">Office</span>
+                  <select class="form-control" formControlName="officeCode" (change)="getUserList()">
+                    <option value="0">-All-</option>
+                    <option *ngFor="let item of officeFilterDD; let i= index;" [value]="item?.officeCode">{{item?.display}}</option>
+                  </select>
+                </div>
+                <div class="order-row-inner">
+                  <span class="font-weight-bold">User</span>
+                  <select class="form-control" formControlName="userCode">
+                    <option value="0">-All-</option>
+                    <option *ngFor="let item of isUserDD; let i= index;" [value]="item?.value ">{{item?.text}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <label>Measure</label>
+              <div class="mobile-view-design">
+                <select class="form-control" formControlName="measure">
+                  <option *ngFor="let item of ddMeasure; let i= index;" [value]="item?.value">{{item?.text}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="inner-card-mobile">
+              <label>Action</label>
+              <div class="mobile-view-design">
+                <div class="text-right">
+                  <button type="submit" class="common-colunm-btn">
+                    <i class="fa fa-refresh" title="Refresh"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="company-2d-alert" *ngIf="isSameRowCol"><span>Rows and Columns cannot be the same value.</span></div>
+
+    <div class="wraper-main-section mt-4" *ngIf="!isSameRowCol">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel d-flex appt-2D-heading">
+            <img src="../../../../../assets/rptappttitle.svg" class="mr-1" />Number of Leads: <p>{{tableRowName}}</p> &nbsp;by <p>&nbsp;{{tableColumnName}}</p><p class="text-danger">&nbsp;(Filter: by Users)</p>
+          </div>
+        </div>
+        <div class="global-body-section">
+          <kendo-grid #grid id="gridId"
+                      [kendoGridBinding]="leadTwoDimensionResponse"
+                      [pageSize]="10"
+                      [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                      [scrollable]="'false'"
+                      [reorderable]="true"
+                      [resizable]="true"
+                      [columnMenu]="{ filter: true }">
+            <ng-template kendoGridToolbarTemplate>
+              <button class="btn btn-primary" type="button" (click)="setgrid();">Reset Grid Setting</button>
+              <button type="button" class="k-button export-icon-YTD" title="Export list in excel" (click)="saveExcel(excelexport)">
+                <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                <span>Download Excel</span>
+              </button>
+              <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="k-button export-icon-YTD">
+                <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                <span>Download PDF</span>
+              </button>
+            </ng-template>
+
+            <div class="grid-scroll-bar">
+              <kendo-grid-column *ngFor="let column of columns; let i=index"
+                                 [field]="column.field"
+                                 [title]="column.title"
+                                 [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                 [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                 [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                 [width]="column.width"
+                                 [filterable]="true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="dataItem[column.title] != null">
+                    <a *ngIf="forSplit(dataItem[column.title],2)[1]" (click)="loadContactList(forSplit(dataItem[column.title],1)[0])">{{forSplit(dataItem[column.title],3)[0]}}</a>
+                    <span *ngIf="!forSplit(dataItem[column.title],2)[1]">{{dataItem[column.title]}}</span>
+                  </div>
+                  <div class="customer-name" *ngIf="dataItem[column.title] == null">0</div>
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-excelexport #excelexport [data]="leadTwoDimensionResponse" fileName='Distribution By Two Dimension'>
+                <kendo-excelexport-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name">{{ dataItem[col?.field] }}</div>
+                  </ng-template>
+                </kendo-excelexport-column>
+              </kendo-excelexport>
+              <kendo-grid-pdf fileName="Distribution By Two Dimension.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                <kendo-grid-column *ngFor="let col of columns" [field]="col.field" [title]="col.title" [width]="col.width">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name">{{dataItem[col?.title]}}</div>
+                  </ng-template>
+                </kendo-grid-column>
+              </kendo-grid-pdf>
+            </div>
+          </kendo-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isShowLadSearch" class="margin-all-area">
+  <div class="dist-manager-margin">
+    <div class="wraper-main-section">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../../assets/leadstitle.svg" class="mr-1" /> Lead Search Results</div>
+          <div class="header-button-panel white-font">
+            <div class="button-wrapper">
+              <button class="btn btn-primary" type="button" (click)="resetGridSetting(); ">Reset Grid Setting</button>
+              <button class="icon-btn" type="button" [routerLink]="['/lead-create']">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <span class="btn-text">Edit</span>
+              </button>
+              <button type="button" class="icon-btn" data-toggle="collapse" data-target="#leadGrid">
+                <i class="fas fa-angle-down up-hide-icon" aria-hidden="true"></i>
+                <i class="fas fa-angle-up icon-hide" aria-hidden="true"></i>
+                <span class="btn-text">Expand</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <contact-exports [user]="user"></contact-exports>
+        <div id="leadGrid" class="show">
+          <div class="global-body-section">
+            <kendo-grid #grid id="gridId"
+                        [kendoGridBinding]="leadSearchUserList"
+                        [sortable]="{mode: 'multiple'}"
+                        [sort]="_gridCnfgService.sort"
+                        [pageSize]="_gridCnfgService.pageSize"
+                        [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+                        [scrollable]="false"
+                        [reorderable]="true"
+                        [resizable]="true"
+                        [columnMenu]="{ filter: true }"
+                        (columnReorder)="_gridCnfgService.columnsOrderChanged('lead_two_dim_grid', $event)"
+                        (sortChange)="_gridCnfgService.sortChange('lead_two_dim_grid', $event)"
+                        (pageChange)="_gridCnfgService.pageChange('lead_two_dim_grid', $event)"
+                        (columnResize)="_gridCnfgService.columnResize(4,'lead_two_dim_grid', $event)"
+                        (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'lead_two_dim_grid',grid)">
+              <ng-template kendoGridToolbarTemplate>
+                <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexportLeadSearch)">
+                  <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+                  <span>Download Excel</span>
+                </button>
+                <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon">
+                  <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+                  <span>Download PDF</span>
+                </button>
+              </ng-template>
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                                   [field]="column.field"
+                                   [title]="column.title"
+                                   [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                   [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                                   [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                                   [width]="column.width"
+                                   [filterable]="true">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.field == '$' && column.title == '' ">{{ rowIndex+1 }}</div>
+                    <div class="customer-name" *ngIf="column.field == '$$' && column.title == '' "><a class="contact-cursor-pointer" (click)="gotoLink('lead', dataItem);" title="View Lead"><i class="icon_contact"><img src="../../../assets/leadstitle.svg" /></i></a></div>
+                    <div class="customer-name" *ngIf="column.field == 'LeadDesc'"><a class="contact-cursor-pointer" (click)="gotoLink('lead', dataItem);">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</a></div>
+                    <div class="customer-name" *ngIf="column.field == 'ContactLast'"><a class="contact-cursor-pointer" (click)="gotoLink('name', dataItem);" title="View Contact">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</a></div>
+                    <div class="customer-name" *ngIf="column.field == 'CompanyName'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'UserName'"> <a class="webkit-any-link" (click)="gotoLink('userName', dataItem);">{{dataItem[column.field]?forSplit( dataItem[column.field],4):'--'  }}</a></div>
+                    <div class="customer-name" *ngIf="column.field == 'RevenueShow'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'WinProbability'">{{dataItem[column.field] }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'dtModifiedDisplay'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'NextTask'">{{ dataItem[column.field]? dataItem[column.field]:'--'  }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'NextTaskDateDisplay'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'dtRevenueShow'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--' "></span></div>
+                    <div class="customer-name" *ngIf="column.field == 'LeadClass9Display'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'VolumeShow'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'dtEndShow'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--' "></span></div>
+                    <div class="customer-name" *ngIf="column.field == 'dtCustom1Show'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--' "></span></div>
+                    <div class="customer-name" *ngIf="column.field == 'ProjectedNetShow'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'dtStartShow'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--' "></span></div>
+                    <div class="customer-name" *ngIf="column.field == 'StatusDisplay'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                    <div class="customer-name" *ngIf="column.field == 'dtCreatedDisplay'">{{dataItem[column.field]? dataItem[column.field]:'--'   }}</div>
+                  </ng-template>
+
+                </kendo-grid-column>
+                <kendo-excelexport #excelexportLeadSearch [data]="leadSearchUserList" fileName='Lead Search Two Dimension'>
+                  <kendo-excelexport-column *ngFor="let col of leadSearchColumn" [field]="col.field" [title]="col.title" [width]="col.width">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name">{{ dataItem[col.title] }}</div>
+                    </ng-template>
+                  </kendo-excelexport-column>
+                </kendo-excelexport>
+                <kendo-grid-pdf fileName="Lead Search Two Dimension.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+                  <kendo-grid-column *ngFor="let col of leadSearchColumn" [field]="col.field" [title]="col.title" [width]="col.width">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="customer-name">{{ dataItem[col.field] }}</div>
+                    </ng-template>
+                  </kendo-grid-column>
+                </kendo-grid-pdf>
+              </div>
+            </kendo-grid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

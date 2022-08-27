@@ -1,0 +1,132 @@
+<div class="container-fluid mt-3">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel" *ngIf="isUserCode"><img src="../../../../../assets/userlisttitle.svg" class="mr-1" />Outlook Add-in User List</div>
+        <div class="svg-icon-panel" *ngIf="!isUserCode"><img src="../../../../../assets/userlisttitle.svg" class="mr-1" />Outlook User List</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputSearch.value=''"><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+            <input  class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onFilter($event.target.value)" #inputSearch/>
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <kendo-grid #grid id="gridId2"
+          [kendoGridBinding]="clpOutlookUsers"
+          [pageSize]="_gridCnfgService.pageSize"
+          [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+          [sortable]="{mode: 'multiple'}"
+          [scrollable]="'scrollable'"
+          [sort]="_gridCnfgService.sort"
+          [columnMenu]="{ filter: true }"
+          [resizable]="true"
+          [reorderable]="true"
+          (columnReorder)="_gridCnfgService.columnsOrderChanged('outlook_addin_grid', $event)"
+          (sortChange)="_gridCnfgService.sortChange('outlook_addin_grid', $event)"
+          (pageChange)="_gridCnfgService.pageChange('outlook_addin_grid', $event)"
+          (columnResize)="_gridCnfgService.columnResize(12,'outlook_addin_grid', $event)"
+          (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'outlook_addin_grid',grid)"
+          (edit)="editHandler($event)"
+          (cancel)="cancelHandler($event)"
+          (save)="saveHandler($event)">
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+              [field]="column.field"
+              [title]="column.title | titlecase"
+              [width]="column.width"
+              [editable]="column.field == 'userCode' || column.field == 'lastFirst' || column.field == 'userRole' || column.field == 'outlookPluginVersion'  ? false: true"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1 || (column.field == 'status' && user?.userRole <= 3) || (column.field == 'userCode' && isUserCode == false)"
+              [includeInChooser]="column.field.includes('$') ? false : (column.field == 'status' && user?.userRole <= 3) ? false : (column.field == 'userCode' && isUserCode == false) ? false : true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.field == '$' && column.title == ''">{{ rowIndex+1 }}</div>
+                <div class="customer-name" *ngIf="column.field == 'userRole'"> {{ getEnumValue('userRole', dataItem[column.field]) }}</div>
+                <div class="customer-name" *ngIf="column.field == 'primaryAddMap'"> {{ getEnumValue('primaryAddMap', dataItem[column.field]) }}</div>
+                <div class="customer-name" *ngIf="column.field == 'otherAddMap'"> {{ getEnumValue('otherAddMap', dataItem[column.field]) }}</div>
+                <div class="customer-name" *ngIf="column.field == 'allowSyncContact' || column.field == 'allowSyncAppt' || column.field == 'allowSyncEmail'" [ngClass]="{'text-danger': !dataItem[column.field]}"> {{ dataItem[column.field] ? 'Yes' : 'No' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'adminStatus'" [ngClass]="{ 'text-danger': dataItem[column.field] == 0 }"> {{ dataItem[column.field] == 0 ? 'Disabled' : 'Enabled'  }}</div>
+                <div class="customer-name" *ngIf="column.field == 'status'" [ngClass]="{ 'text-danger': dataItem[column.field] == 0 }"> {{ getEnumValue('status', dataItem[column.field]) }}</div>
+
+                <div class="customer-name" *ngIf="showColumns(column)"> {{dataItem[column.field] ? dataItem[column.field] : '--' }}</div>
+              </ng-template>
+
+              <ng-template kendoGridEditTemplate let-dataItem="dataItem" let-formGroup="formGroup"
+                            let-column="column">
+                <div class="customer-name" *ngIf="column.field=='primaryAddMap'">
+                  <select class="form-control" #primaryAddMap [formControl]="formGroup.get(column.field)">
+                    <option value="0">None </option>
+                    <option value="1"> Business </option>
+                    <option value="2"> Home </option>
+                    <option value="3"> Other </option>
+                  </select>
+                </div>
+
+                <div class="customer-name" *ngIf="column.field=='otherAddMap'">
+                  <select class="form-control" #otherAddMap [formControl]="formGroup.get(column.field)">
+                    <option value="0">None </option>
+                    <option value="1"> Business </option>
+                    <option value="2"> Home </option>
+                    <option value="3"> Other </option>
+                  </select>
+                </div>
+
+                <div class="custom-toggle" *ngIf="column.field=='allowSyncContact'">
+                  <label class="switch">
+                    <input type="checkbox" [checked]="dataItem.allowSyncContact" #allowSyncContact [formControl]="formGroup.get(column.field)">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="custom-toggle" *ngIf="column.field=='allowSyncAppt'">
+                  <label class="switch">
+                    <input type="checkbox" [checked]="dataItem.allowSyncAppt" #allowSyncAppt [formControl]="formGroup.get(column.field)">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="custom-toggle" *ngIf="column.field=='allowSyncEmail'">
+                  <label class="switch">
+                    <input type="checkbox" [checked]="dataItem.allowSyncEmail" #allowSyncEmail [formControl]="formGroup.get(column.field)">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="customer-name" *ngIf="column.field=='adminStatus'">
+                  <select class="form-control" #adminStatus [formControl]="formGroup.get(column.field)">
+                    <option value="0" [selected]="true">Disabled</option>
+                    <option value="1"> Enabled </option>
+                  </select>
+                </div>
+
+                <div class="customer-name" *ngIf="column.field=='status'">
+                  <select class="form-control" #status [formControl]="formGroup.get(column.field)">
+                    <option value="0">Disabled </option>
+                    <option value="1"> Allowed </option>
+                    <option value="2"> Downloaded </option>
+                    <option value="3"> Activated </option>
+                  </select>
+                </div>
+
+              </ng-template>
+            </kendo-grid-column>
+
+            <kendo-grid-command-column title="Action" width="80" [hidden]="roleFeaturePermissions?.edit == false">
+              <ng-template kendoGridCellTemplate let-isNew="isNew">
+                <button kendoGridEditCommand [hidden]="roleFeaturePermissions?.edit == false" [primary]="true" icon="edit" title="Edit"></button>
+
+                <button kendoGridSaveCommand [disabled]="disableAddUpdate(formGroup)" [primary]="true" icon="check" title="Update"> </button>
+                <button kendoGridCancelCommand icon="times" [primary]="true">  {{ isNew ? "" : "" }} </button>
+              </ng-template>
+            </kendo-grid-command-column>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

@@ -1,0 +1,8 @@
+/*.input-main-div .CountryNumberInput {height: 28px !important; min-width: 325px !important;}
+.panel-collapse.collapse.in {font-weight: 500;}
+.custom{background: red;}
+::ng-deep.mat-input-element{border: 1px solid #ccc !important;}
+.change_country {font-size: 10px; text-align: right; color: gray; margin-top: 3px; cursor: pointer; height: 20px;}
+.info{margin:10px 0px;}
+.info > .form-group > .control-label {float: left;}
+*/

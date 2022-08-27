@@ -1,0 +1,284 @@
+<div class="create-email" [@filterAnimation]="showAnimation">
+  <fieldset>
+    <legend *ngIf="!isCalenderTask">Create Task</legend>
+    <div class="email-module">
+      <div *ngIf="!isCalenderTask" class="text-right">
+        <!--<button class="btn btn-cancel task-btn-margin" type="button" (click)="onCloseTask();"><i class="fas fa-times"></i> Close</button>-->
+        <button class="btn btn-primary task-btn-margin" (click)="addNewHandler()" data-toggle="collapse" data-target="#taskForm"><i class="fa fa-plus"></i> Add New</button>
+      </div>
+
+      <div id="taskForm" class="collapse cancel-collapse" [@filterAnimation]="showAnimation">
+        <form class="form-horizontal required-section" [formGroup]="taskForm" (ngSubmit)="taskFormSubmit()">
+          <div class="lead-wraper-section">
+            <div class="wraper-main-section">
+              <div class="global-card-section">
+                <div class="create-task-header">
+                  <div class="global-header-section">
+                    <div class="svg-icon-panel">Create Task</div>
+                    <div class="header-button-panel">
+                      <div class="button-wrapper">
+                        <button type="button" (click)="onCloseTask();" class="icon-btn">
+                          <i class="fas fa-times"></i>
+                          <span class="btn-text">Close</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section">
+                  <div class="margin-all-area">
+                    <div class="wraper-body-panel">
+                      <div class="wraper-body-left">
+                        <div class="templates-alignment">
+                          <div class="full-width-container">
+                            <div class="form-group">
+                              <span class="control-label" for="priority">Priority</span>
+                              <div>
+                                <select id="priority" class="form-control" formControlName="priority">
+                                  <option value="1" [selected]="true">Low</option>
+                                  <option value="2">Medium</option>
+                                  <option value="3">High</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="full-width-container margin-left10">
+                            <div class="form-group">
+                              <span class="control-label" for="dueDate">Due Date</span>
+                              <div class="" [ngClass]="{'has-error': taskFrm.dtDue.errors && (taskFrm.dtDue.touched ||  taskFrm.dtDue.dirty)}">
+                                <kendo-datepicker formControlName="dtDue"></kendo-datepicker>
+                              </div>
+                              <div class="search-query-error" *ngIf="taskFrm.dtDue.errors && ( taskFrm.dtDue.touched ||  taskFrm.dtDue.dirty)">
+                                <div *ngIf="taskFrm.dtDue.errors.required">Please Enter valid date.</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="full-width-container margin-left10">
+                            <div class="form-group">
+                              <span class="control-label" for="hours">Hours</span>
+                              <div>
+                                <input id="hours" type="text" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" class="form-control" formControlName="hours" maxlength="5">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="templates-alignment">
+                          <div class="full-width-container">
+                            <div class="form-group">
+                              <span class="control-label" for="task">Task</span>
+                              <div class="" [ngClass]="{'has-error': taskFrm.taskDesc.errors && (taskFrm.taskDesc.touched ||  taskFrm.taskDesc.dirty)}">
+                                <textarea id="task" class="form-control contact-text-auto-height" row="1" cols="1" formControlName="taskDesc"></textarea>
+                              </div>
+                              <div class="search-query-error text-xs-left" *ngIf="taskFrm.taskDesc.errors && ( taskFrm.taskDesc.touched ||  taskFrm.taskDesc.dirty)">
+                                <div *ngIf="taskFrm.taskDesc.errors.required">Please describe the task.</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="wraper-body-right margin-left10">
+                        <div class="templates-alignment">
+                          <div class="full-width-container">
+                            <div class="form-group">
+                              <span class="control-label" for="cost">Cost</span>
+                              <div>
+                                <input id="cost" type="text" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" class="form-control" formControlName="cost" maxlength="5">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="full-width-container margin-left10">
+                            <div class="form-group">
+                              <span class="control-label" for="status">Status</span>
+                              <div>
+                                <select id="status" class="form-control" formControlName="status">
+                                  <option value="0" [selected]="true">Pending</option>
+                                  <option value="1">Completed</option>
+                                  <option value="2">OnHold</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="full-width-container margin-left10">
+                            <div class="form-group">
+                              <span class="control-label" for="user">User</span>
+                              <div>
+                                <select id="user" class="form-control" formControlName="cLPUserID" *ngIf="users && users.length > 0">
+                                  <option *ngFor="let user of users" [value]="user.key">{{user.value}}</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="templates-alignment">
+                          <div class="full-width-container">
+                            <div class="form-group">
+                              <span class="control-label" for="status">Reminder</span>
+                              <div class="message-center-section">
+                                <div class="message-center-panel">
+                                  <label class="k-label ml-0" [for]="messageCenter">Message Center </label>
+                                  <input #messageCenter type="checkbox" name="messageCenter" formControlName="reminderCLP" kendoCheckBox />
+                                </div>
+                                <div class="message-center-panel">
+                                  <label class="k-label ml-0" [for]="chkEmail"> Email </label>
+                                  <input #chkEmail type="checkbox" name="type" formControlName="reminderEmail" kendoCheckBox />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="templates-alignment">
+                      <div class="full-width-container">
+                        <div class="bottom-panel">
+                          <button class="btn btn-primary" [disabled]="isTaskSubmit" type="submit"><i class="fas fa-check"></i> {{ !isFormEdit ? 'Save' : 'Update' }}</button>
+                          <button class="btn btn-cancel" type="button" data-toggle="collapse" data-target=".cancel-collapse" aria-expanded="false" aria-controls="taskForm">Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="grid-wrapper mt-3">
+        <kendo-grid class="create-task-grid" *ngIf="!isCalenderTask" [kendoGridBinding]="tasks" [pageSize]="10" [pageable]="{buttonCount:10, pageSizes:[10,50,100,200]}">
+          <kendo-grid-column field="priority" title="Priority" width="110">
+            <ng-template kendoGridCellTemplate let-dataItem>
+              <span [ngClass]="dataItem.priority == 1 ? 'text-success' : dataItem.priority == 2 ? 'text-warning' : 'text-danger'">{{ dataItem.priority == 1 ? 'Low' : dataItem.priority == 2 ? 'Medium' : 'High' }}</span>
+            </ng-template>
+          </kendo-grid-column>
+
+          <kendo-grid-column field="taskDesc" title="Task"></kendo-grid-column>
+
+          <kendo-grid-column title="" width="40">
+            <ng-template kendoGridCellTemplate let-dataItem><a (click)="getTaskDocuments(dataItem.taskID, dataItem.cLPUserID);"><i class="fas fa-paperclip"></i></a></ng-template>
+          </kendo-grid-column>
+
+          <kendo-grid-column field="dtDue" title="Due Date">
+            <ng-template kendoGridCellTemplate let-dataItem> {{ dataItem.dtDue | date:'MM/dd/yyyy' }}</ng-template>
+          </kendo-grid-column>
+
+          <kendo-grid-column field="hours" title="Hours" width="70"> </kendo-grid-column>
+
+          <kendo-grid-column field="cost" title="Cost" width="60">
+            <ng-template kendoGridCellTemplate let-dataItem> ${{ dataItem.cost }}</ng-template>
+          </kendo-grid-column>
+
+          <kendo-grid-column field="status" title="Status" width="80">
+            <ng-template kendoGridCellTemplate let-dataItem>
+              <img *ngIf="dataItem.status == 0" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+              <img *ngIf="dataItem.status == 1" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+              <img *ngIf="dataItem.status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+              <img *ngIf="dataItem.status == 3 || dataItem.status == 9" src="../../../../assets/activity/main/statuscancelled.svg" class="status-img" />
+            </ng-template>
+          </kendo-grid-column>
+
+          <kendo-grid-column field="cLPUserID" title="User">
+            <ng-template kendoGridCellTemplate let-dataItem> <a class="task-grid-user" (click)="goToLink('user', dataItem.cLPUserID);">{{ getUser(dataItem.cLPUserID)?.value }}</a> </ng-template>
+          </kendo-grid-column>
+
+          <kendo-grid-column title="Reminder" width="120">
+            <ng-template kendoGridCellTemplate let-dataItem> {{ dataItem.reminderCLP ? 'Message Center' : '' }} <br />{{dataItem.reminderEmail ? 'Email' : ''}}</ng-template>
+          </kendo-grid-column>
+
+          <kendo-grid-column title="" width="60">
+            <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+              <a title="Edit task" (click)="taskGridCRUD('edit', dataItem, rowIndex);"><i class="fas fa-pencil-alt"></i></a>
+              <a title="Delete task" (click)="taskGridCRUD('delete', dataItem, rowIndex);"><i class="fa fa-trash ml-2"></i></a>
+            </ng-template>
+          </kendo-grid-column>
+
+        </kendo-grid>
+        <div *ngIf="showSpinner" class="k-i-loading"></div>
+      </div>
+
+        <div class="border-panel slidecast-panel" *ngIf="showAttachmentsDiv">
+          <!--Attached file grid-->
+          <div class="email-form-group" *ngIf="taskAttachedFiles && taskAttachedFiles.length <= 0">
+            <div class="messageInfo">No file(s) found.</div>
+          </div>
+          <div class="attach-alignment" *ngIf="taskAttachedFiles && taskAttachedFiles.length > 0">
+            <div>
+              <kendo-grid class="create-task-grid" #gridAttach id="attachGridId" [kendoGridBinding]="taskAttachedFiles" [sort]="attachFileSort" [skip]="skip" [pageSize]="pageSize" [pageable]="{ buttonCount: 0 }">
+                <kendo-grid-column [width]="2">
+                  <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                    <img class="img-slidecast" src="{{ dataItem.documentTypeIcon ? soUrl + dataItem.documentTypeIcon : 'https://dev.salesoptima.com/images/framework/iconimagequick.png' }}" />
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column title="File" [width]="20">
+                  <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                    {{dataItem.documentName}}
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column title="" [width]="4">
+                  <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                    <button type="button" class="btn btn-sm btn-success" (click)="deleteTaskFile(dataItem, rowIndex)"><i class="fas fa-trash"></i> Dalete</button>
+                  </ng-template>
+                </kendo-grid-column>
+
+              </kendo-grid>
+            </div>
+          </div>
+          <!--Attached file grid-->
+          <!--File uploader-->
+          <div class="file-attach-uploader" [hidden]="hideAFU">
+            <div class="attach-alignment">
+              <div class="email-form-group">
+                <div class="file-uploader">
+                  <div class="border">
+                    <angular-file-uploader [config]="afuConfig" [resetUpload]=resetUpload (ApiResponse)="fileUpload($event)"></angular-file-uploader>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--File Uploader-->
+        </div>
+
+      </div>
+</fieldset>
+
+  <!--Delete task model-->
+  <div class="modal fade" id="modalDeleteTask" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h4 class="modal-title modal-common-title">Task Delete</h4>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>Do you want to delete {{currentTaskToDelete}} task..</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" (click)="deleteTask();" data-dismiss="modal" class="btn btn-primary">Yes</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal" (click)="hideDeleteTask()">No</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!--Delete task model-->
+  <!--Update task model-->
+  <div class="modal fade" id="modalUpdateTask" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h4 class="modal-title modal-common-title">Task Update</h4>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>You are about to transfer this task.  Click the Save button to confirm...</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" (click)="createUpdateTask();" data-dismiss="modal" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal" (click)="hideUpdateTask()">Cancel</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--Update task model-->
+
+</div>

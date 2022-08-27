@@ -1,0 +1,112 @@
+<div class="container-fluid">
+  <div class="wraper-main-section mt-2">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="mt-2">
+          <div class="spinner-grow" role="status" *ngIf="showSpinner">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <contact-exports *ngIf="user" [user]="user"></contact-exports>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <ul class="step">
+          <li class="active">Search Contacts To Map</li>
+          <li [ngClass]="{'active': step == 3}">Confirm Contacts To Map</li>
+          <li [ngClass]="{'active': step == 4}">Contacts To Map Request</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <contact-common-search ></contact-common-search>
+    </div>
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/gsynctitle.svg" class="mr-1" /> SalesOptima Google Maps Integration</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <label class="info-text">Contacts selected: {{contactsMapData.length}}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="success-alert" *ngIf="step == 1">
+        <p>Please use the Quick Search panel to search for contacts.</p>
+      </div>
+      <div class="success-alert" *ngIf="step == 2">
+        <p>Please select the contacts that you would like to map.  <button class="btn btn-primary" [disabled]="contactsMapData.length<=0" type="button" (click)="step=3; "><i class="fa fa-check"></i> Select and Continue</button></p>
+      </div>
+
+      <div class="wraper-body-panel" *ngIf="step == 3">
+        <div class="wraper-body-left">
+          <div class="success-alert">
+            <p>Enter a title for your map and confirm that you would like to map the selected contacts.  </p>
+          </div>
+          <form #formCtrl="ngForm">
+            <div class="cards-body-section">
+              <div class="cards-colunm-left"><p>Map Title</p></div>
+              <div class="cards-colunm-right">
+                <input class="form-control" type="text" id="mapTitle" name="mapTitle" placeholder="Enter Title" [(ngModel)]="mapTitle" required>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left"></div>
+              <div class="cards-colunm-right">
+                <div class="bottom-button-bar">
+                  <button class="btn btn-primary" [disabled]="!formCtrl.form.valid" type="button" (click)=" addMapContacts(); "> Confirm and Submit</button>
+                </div>
+              </div>
+            </div>
+            <div class="alert-panel">
+              <span>Total records selected: {{contactsMapData.length}}</span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="global-body-section" *ngIf="step <= 3">
+        <app-contact-map-common *ngIf="user" [contactsMapData]="contactsMapData"  [user]="user" [isSearch]=true ></app-contact-map-common>
+      </div>
+
+      <div *ngIf="step == 4">
+        <div class="success-alert">
+          <p>Your request has been submitted. Please wait while we create your file. </p>
+          <p>Your file is still waiting to get processed. </p>
+        </div>
+        <div class="alert-panel">
+          <span>Total records selected: {{contactsMapData.length}}</span>
+        </div>
+      </div>
+      <div class="contact-bottom-info" *ngIf="contactMapFailed">
+          <p>Oops. It looks like your account needs this feature activated. Please contact your SalesOptima account manager or <a class="text-cornflower">submit a support ticket</a> for more information.</p>
+        </div>
+      
+    </div>
+
+    <div class="important-msg-section">
+      <div class="important-msg-panel">
+        <table>
+          <thead>
+            <tr>
+              <td> <b class="activated-contact-map-header">Basic Instructions</b><a class="text-cornflower"> (Open Help Topic)</a>  </td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p class="activated-contact-map">1.	You will need to be logged into your Google account to display your contacts on a map.</p></td>
+            </tr>
+            <tr>
+              <td><p class="activated-contact-map">2.	Once you are logged into your Google account and your download is ready, click the Download File button.</p></td>
+            </tr>
+            <tr>
+              <td><p class="activated-contact-map">3.	Next,<a class="text-cornflower"> CLICK HERE</a> to create a new map.</p></td>
+            </tr>
+            <tr>
+              <td><p class="activated-contact-map">4.	When your new map opens, click the blue Import link and drag your downloaded file (.KML) into the screen and drop it into the center.</p></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,568 @@
+<div class="user-tabs-panel">
+    <form [formGroup]="accountInfoForm" (ngSubmit)="accountFormSubmit()">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel">Account Information</div>
+          </div>
+          <div class="admin-row-flex">
+            <div class="admin-row-colunm">
+              <div class="form-group">
+                <span class="control-label" for="companyName">Company Name<span class="acc-info-red">*</span> </span>
+                <div [ngClass]="{'has-error': accountInfoFrm.companyName.errors && (accountInfoFrm.companyName.touched || accountInfoFrm.companyName.dirty)}">
+                  <input type="text" class="form-control" id="companyName" formControlName="companyName" placeholder="Company Name" />
+                </div>
+                <div *ngIf="!accountInfoFrm.companyName?.valid && (accountInfoFrm.companyName?.dirty || accountInfoFrm.companyName?.touched )">
+                  <div class="search-query-error acc-info-srch-error" *ngIf="accountInfoFrm.companyName.errors?.required">Please enter Company Name.</div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-row-colunm">
+              <div class="form-group">
+                <span class="control-label" for="add1">Billing Address<span class="acc-info-red">*</span></span>
+                <div [ngClass]="{'has-error': accountInfoFrm.add1.errors && (accountInfoFrm.add1.touched || accountInfoFrm.add1.dirty)}">
+                  <input type="text" class="form-control" id="add1" formControlName="add1" placeholder="Billing Address" />
+                </div>
+                <div *ngIf="!accountInfoFrm.add1?.valid && (accountInfoFrm.add1?.dirty || accountInfoFrm.add1?.touched )">
+                  <div class="search-query-error acc-info-srch-error" *ngIf="accountInfoFrm.add1.errors?.required">Please enter billing Address.</div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-row-colunm">
+              <div class="form-group">
+                <span class="control-label" for="add2">Address 2</span>
+                <div>
+                  <input type="text" class="form-control" id="add2" formControlName="add2" placeholder="Billing Address 2" />
+                </div>
+              </div>
+            </div>                 
+          </div>
+          <div class="admin-row-flex">
+            <div class="admin-row-colunm">
+              <div class="form-group">
+                <span class="control-label" for="zip">Zip<span class="acc-info-red">*</span></span>
+                <div [ngClass]="{'has-error': accountInfoFrm.zip.errors && (accountInfoFrm.zip.touched || accountInfoFrm.zip.dirty)}">
+                  <input type="text" class="form-control" id="zip" formControlName="zip" placeholder="Zip" minlength="3" maxlength="9" (blur)="getCityState($event,'account');"  (keypress)="_localService.onKeyDown($event)"  />
+                </div>
+                <div *ngIf="!accountInfoFrm.zip?.valid && (accountInfoFrm.zip?.dirty || accountInfoFrm.zip?.touched )">
+                  <div class="search-query-error acc-info-srch-error" *ngIf="accountInfoFrm.zip.errors?.required">Please enter zip.</div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-row-colunm">
+              <div class="form-group">
+                <span class="control-label" for="city">City<span class="acc-info-red">*</span></span>
+                <div [ngClass]="{'has-error': accountInfoFrm.city.errors && (accountInfoFrm.city.touched || accountInfoFrm.city.dirty)}">
+                  <input type="text" class="form-control" id="city" formControlName="city" placeholder="City" />
+                </div>
+                <div *ngIf="!accountInfoFrm.city?.valid && (accountInfoFrm.city?.dirty || accountInfoFrm.city?.touched )">
+                  <div class="search-query-error acc-info-srch-error" *ngIf="accountInfoFrm.city.errors?.required">Please enter city.</div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-row-colunm">
+              <div class="form-group">
+                <span class="control-label" for="state">State<span class="acc-info-red">*</span></span>
+                <div [ngClass]="{'has-error': accountInfoFrm.state.errors && (accountInfoFrm.state.touched || accountInfoFrm.state.dirty)}">
+                  <input type="text" class="form-control" id="state" formControlName="state" placeholder="State" />
+                </div>
+                <div *ngIf="!accountInfoFrm?.state?.valid && (accountInfoFrm?.state?.dirty || accountInfoFrm?.state?.touched )">
+                  <div class="search-query-error acc-info-srch-error" *ngIf="accountInfoFrm.state.errors?.required">Please enter state.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="admin-row-flex">
+            <div class="admin-row-colunm">
+              <div class="form-group">
+                <span class="control-label" for="country">Country</span>
+                <div>
+                  <select class="form-control custom-select" id="country" formControlName="country">
+                    <option *ngFor="let country of countryList" [value]="country.code2" [attr.data-code2]="country.code2">{{country.name}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="admin-row-colunm">
+              <div class="form-group">
+                <span class="control-label" for="companyURL">Web Site</span>
+                <div>
+                  <input type="text" class="form-control" id="companyURL" formControlName="companyURL" placeholder="Web Site" />
+                </div>
+                <div *ngIf="!accountInfoFrm.companyURL?.valid && (accountInfoFrm.companyURL?.dirty || accountInfoFrm.companyURL?.touched )">
+                  <div class="search-query-error acc-info-srch-error" *ngIf="accountInfoFrm.companyURL.errors.pattern">Please enter valid url.</div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-row-colunm">
+              <div class="form-group">
+                <span class="control-label" for="logoURL">Logo URL</span>
+                <div>
+                  <input type="text" class="form-control" id="logoURL" formControlName="logoURL" placeholder="Logo URL" />
+                </div>
+              </div>
+            </div>
+          </div>                
+          <!--***********Admin Option & Admin Billing Options ********-->
+          <div class="global-body-section" *ngIf="router.url === '/account-setting'">
+            <div class="wraper-body-panel">
+              <div class="wraper-body-left">
+                <div class="custom-action-title">
+                  <span>Admin Options</span>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">System</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <span>Nimbus</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Status</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" id="status" formControlName="status">
+                      <option value="0" hidden>Does not Exist</option>
+                      <option value="1">Is Valid</option>
+                      <option value="2">On Intro</option>
+                      <option value="3">Expired</option>
+                      <option value="4">Disabled</option>
+                      <option value="5">Free Account</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Account Cancellation</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <button type="button" class="btn btn-primary">Cancel the account</button>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">CRM Client(process monthly billing)</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isSOCRM" formControlName="isSOCRM" />
+                    <span class="pl-2">CRM Client</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">SalesOptima Digital Client</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isSODigital" formControlName="isSODigital" />
+                    <span class="pl-2">SalesOptima Digital Client</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">SalesOptima Professional Services Client</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isSOProServ" formControlName="isSOProServ" />
+                    <span class="pl-2">SalesOptima professional Services Client</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable SalesOptima Mobile</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isMobileIncluded" formControlName="isMobileIncluded" />
+                    <span class="pl-2">Active SalesOptima Mobile</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable SFA</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isSFAIncluded" formControlName="isSFAIncluded" />
+                    <span class="pl-2">Activate SFA Module</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable HTML EmailTemplates</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isHTMLEmailIncluded" formControlName="isHTMLEmailIncluded" />
+                    <span class="pl-2">Activate HTML Email Templates</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable Outlook Plugin</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isOutlookIncluded" formControlName="isOutlookIncluded" />
+                    <span class="pl-2">Activate Outlook Plugin</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable Branding</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isBrandingIncluded" formControlName="isBrandingIncluded" />
+                    <span class="pl-2">Activate CLP Branding</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable Contact More Fields</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="enableMoreFields" formControlName="enableMoreFields" />
+                    <span class="pl-2">Enable Contact More Fields</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable Single Sign-on Security Check</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="enableCLPSS" formControlName="enableCLPSS" />
+                    <span class="pl-2">Enable Single Sign-on Security Check</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable Multiple From Addresses</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isMultipleFromAddresses" formControlName="isMultipleFromAddresses" />
+                    <span class="pl-2">Enable Multiple From Addresses</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable Email Validation via TowerData</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isEmailValidation" formControlName="isEmailValidation" />
+                    <span class="pl-2">Enable Email Validation via TowerData</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable Invoice Module</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="isProjectModuleInstalled" formControlName="isProjectModuleInstalled" />
+                    <span class="pl-2">Enable Invoice Module</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable Skype Call Log</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="blnLogSkypeCalls" formControlName="blnLogSkypeCalls" />
+                    <span class="pl-2">Enable Skype Call Log</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable Mailing "From" Type</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="blnMailingFromType" formControlName="blnMailingFromType" />
+                    <span class="pl-2">Enable Mailing From Type</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Enable iPhone App</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="checkbox" class="checkbox" id="blnEnableiPhone" formControlName="blnEnableiPhone" />
+                    <span class="pl-2">Enable iPhone App</span>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Company Module Installed</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <span [ngClass]="companyModuleValue? 'text-success':'text-danger'">{{companyModuleValue? 'In use':'Not In use'}} </span>
+                  </div>
+                </div>
+
+                <div class="custom-action-title">
+                  <span>Admin Billing Options</span>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Maximum# of contacts per <br />Email blast</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="number" id="contactPerEmailBlast" name="contactPerEmailBlast" formControlName="maxContacts" />
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Maximum # of contacts for <br />account</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="number" id="contactForAccount" name="contactForAccount" formControlName="maxEblast" />
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Additional Contacts Rule</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <div class="order-row-inner">
+                      <div class="">
+                        <input type="number" class="form-control" id="feeAdditionalContacts" formControlName="feeAdditionalContacts" />
+                        <span>for</span>
+                      </div>
+                      <div style="margin-left:10px;">
+                        <input type="number" class="form-control" id="additionalContactsIncrements" formControlName="additionalContactsIncrements" />
+                        <span>Contacts</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Support Hour Credits</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="number" class="form-control" id="supportCredit" formControlName="supportCredit" />
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Additional Support Per Hour Fee</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="number" class="form-control" id="feeSupportHour" formControlName="feeSupportHour" />
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Setup Fee</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="number" class="form-control" id="feeSetup" formControlName="feeSetup" />
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Company Fee</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="number" class="form-control" id="feeCompany" formControlName="feeCompany" />
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">User Fee</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <input type="number" class="form-control" id="feeUser" formControlName="feeUser" />
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Contract</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" id="contract" formControlName="contract">
+                      <option value="0" hidden>Does not Exist</option>
+                      <option value="1">Monthly Contract</option>
+                      <option value="2">Annual Contract(Paid Monthly)</option>
+                      <option value="3">Annual Contract(Paid Up-Front)</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Next Billing Date</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right fordate">
+                    <kendo-datetimepicker id="dtNextBillDate" formControlName="dtNextBillDate" [format]="datePickerformat"></kendo-datetimepicker>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Contract Date</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right fordate">
+                    <kendo-datetimepicker id="dtContractExpire" formControlName="dtContractExpire" [format]="datePickerformat"></kendo-datetimepicker>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span class="control-label">Promotion</span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <div class="excel-main-panel">
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left">
+                          <div class="align-center">
+                            <span class="control-label for-color-fields">Is On Promotion</span>
+                          </div>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <input type="checkbox" class="checkbox" id="isOnPromo" formControlName="isOnPromo" />
+                          <span class="pl-2">Activate Promotion</span>
+                        </div>
+                      </div>
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left">
+                          <span class="control-label for-color-fields">User Fee Discount</span>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <input type="number" class="form-control" id="discountUser" formControlName="discountUser" />
+                        </div>
+                      </div>
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left">
+                          <span class="control-label">Promo Expire Date</span>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <kendo-datetimepicker id="dtPromoExpire" formControlName="dtPromoExpire" [format]="datePickerformat"></kendo-datetimepicker>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">VAR</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" id="cLPVARID" formControlName="cLPVARID">
+                      <option value="0">-None Selected-</option>
+                      <option value="1">Active</option>
+                      <option value="2">InActive</option>
+                      <option value="3">AppliedFor</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Comments</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <textarea class="form-control" id="comments" formControlName="comments" placeholder="write a comment..." rows="3"></textarea>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Billing User</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select class="form-control" id="cLPUserID" formControlName="cLPUserID">
+                      <option value="0" hidden>-None Selected-</option>
+                      <option *ngFor="let item of userList; let i = index" [value]="item.key">{{item.value }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <div class="align-center">
+                      <span class="control-label">Payment Summary</span>
+                    </div>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <span>Billing Admin:&nbsp;{{userToName}},</span>
+                    <span>&nbsp;Method:&nbsp;CC,</span>
+                    <span>&nbsp;Last4:&nbsp;{{creditCardNumber}},&nbsp;Name on card:&nbsp;{{creditCardName}},&nbsp;Expires:&nbsp;{{creditCardExMonth}}/{{creditCardExYear}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--***** Admin Option & Admin Billing Options  END *****-->
+        <div class="cards-body-section">
+          <div class="cards-colunm-right">
+            <button [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" class="btn btn-primary" type="submit"> Save</button>
+            <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.edit == false" (click)="onreset()" type="button">Reset</button>
+            <button class="btn btn-cancel" [routerLink]="['/contacts']"> Cancel</button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </form>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

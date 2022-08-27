@@ -1,0 +1,170 @@
+<div class="contact-container">
+  <div class="main-module">
+    <kendo-splitter orientation="horizontal">
+      <kendo-splitter-pane min="15%" max="30%" [(size)]="leftPanelSize" (sizeChange)="panelSizeChange('left', $event)">
+        <div class="left-section">
+          <fieldset>
+            <legend>
+              Contact Module
+              <a *ngIf="user?.userRole > 3" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" href="javascript:void(0)" class="create-contact-icon" (click)="_localService.showCommonComp ='contact-new'; showCommonComponent(); _localService.scrollTop(activeDashboardId);this.contactId=0;showContactDetail=false" title="Create new contact"><i class="fas fa-user-plus"></i></a>
+            </legend>
+            <div class="contact-module-panel">
+              <div class="profile-module">
+                <span class="profile-main"><i class="fa fa-user"></i><input type="file" /></span>
+                <div class="profile-edit" *ngIf="selectedContact">
+                  <p>
+                    {{selectedContact.lastName}} {{selectedContact.firstName}}
+                    <span>{{selectedContact.companyName}}</span>
+                    <span>{{selectedContact.email}}</span>
+                    <span>{{selectedContact.mobile}}</span>
+                  </p>
+                  <span>
+                    <a data-toggle="modal" data-target="#contactDeleteModal"  *ngIf="roleFeaturePermissions?.delete == true || user?.userRole > 3"><i class="fas fa-trash-alt"></i></a>
+                    <a href="javascript:void(0)" (click)="editContact(activeDashboardId)" *ngIf="roleFeaturePermissions?.edit == true || user?.userRole > 3"><i class="fas fa-user-edit"></i></a>
+                  </span>
+                </div>
+              </div>
+
+              <div class="sort-filter-module">
+                <div class="sort-panel">
+                  <label>Sort</label>
+                  <select class="form-control" (change)="changeContactSort($event);">
+                    <option value="">-Select-</option>
+                    <option value="created">Created on</option>
+                    <option value="updated">Updated on</option>
+                  </select>
+                </div>
+                <div class="filter-panel">
+                  <label>Filter</label>
+                  <select id="drpSavedQueries" class="form-control" (change)="_contactSearchService.drpSavedQueries_onChange($event)">
+                    <option [value]='0'>-Select-</option>
+                    <option *ngFor="let item of _contactSearchService.savedQuery_Filter" [value]='item.key'>{{item.value}}</option>
+                    <option [value]='-2'>New Search</option>
+                  </select>
+                </div>
+                <div class="filter-edit-btn">
+                  <button (click)="_contactSearchService.editSavedQuery()" class="btn-icon" [disabled]="_contactSearchService.savedQueryValue <= '0' || _contactSearchService.isDrpSavedQueryChanged">
+                    <i class="fas fa-pencil-alt btn-square-md"></i>
+                    <span>Edit</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="list-module">
+                <div class="grid-search">
+                  <div class="align-items-start">
+                    <input placeholder="Search(Name,Number,Email, etc)" kendoTextBox (input)="onContactsFilter($event.target.value)" />
+                  </div>
+                </div>
+                <kendo-grid #grid id="gridId" [kendoGridBinding]="contactList" [kendoGridSelectBy]="'contactID'" [selectedKeys]="mySelection" [skip]="skip"
+                            [pageSize]="pageSize"
+                            [pageable]="{ buttonCount: 10 }" [sortable]="{mode: 'multiple'}" [sort]="sort" [columnMenu]="true" [resizable]="true" [selectable]="true" [rowClass]="rowCallback.bind(this)"
+                            (sortChange)="sortChange('contact_contact_list', $event)" (columnResize)="columnResize('contact_contact_list', $event)" (columnVisibilityChange)="onVisibilityChange($event,'contact_contact_list',grid)"
+                            (selectionChange)="rowSelectionChange($event)" (pageChange)="onPageChange($event)">
+
+                  <kendo-grid-column *ngFor="let column of columns"
+                                     [field]="column.field"
+                                     [title]="column.title | titlecase"
+                                     [width]="column.width"
+                                     [filterable]="true"
+                                     [headerStyle]="{'text-align': 'center','background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                                     [hidden]="hiddenColumns.indexOf(column.field) > -1">
+                    <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+                      <span *ngIf="column.field == 'name'">{{dataItem.name}}</span>
+                      <span *ngIf="column.title == 'handled'">
+                        <kendo-switch [checked]="false" onLabel=" " offLabel=" " [readonly]="true" [hidden]="selectedContact && selectedContact.contactID == dataItem.contactID && showContactChecked"></kendo-switch>
+                        <kendo-switch [checked]="true" onLabel=" " offLabel=" " [readonly]="true" *ngIf="selectedContact && selectedContact.contactID == dataItem.contactID && showContactChecked"></kendo-switch>
+                      </span>
+                    </ng-template>
+                  </kendo-grid-column>
+                  <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                    <kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+                    <kendo-pager-numeric-buttons [buttonCount]="2"></kendo-pager-numeric-buttons>
+                    <kendo-pager-next-buttons></kendo-pager-next-buttons>
+                    <kendo-pager-page-sizes [pageSizes]="[10,50,100,200]"></kendo-pager-page-sizes>
+                    <kendo-pager-info></kendo-pager-info>
+                  </ng-template>
+                  <kendo-grid-messages [pagerItemsPerPage]="''" [pagerItems]="'Contacts'"> </kendo-grid-messages>
+                </kendo-grid>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        <div class="modal fade" id="contactDeleteModal" tabindex="-1" role="dialog" aria-labelledby="contactDeleteMdl" aria-hidden="true">
+          <div class="modal-dialog  modal-common-dialog" role="document">
+            <div class="modal-content modal-common-content">
+              <div class="modal-header modal-common-background">
+                <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+              </div>
+              <div class="modal-body modal-common-body">
+                <h5>Are you sure to delete {{selectedContact?.name}} ?</h5>
+              </div>
+              <div class="modal-footer">
+                <button type="button" (click)="deleteContacts()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                <button type="button" class="btn btn-cancel" data-dismiss="modal"> Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </kendo-splitter-pane>
+
+      <kendo-splitter-pane>
+        <div class="middle-section" [class.fade-out]="showSpinner || _contactSearchService.showSpinner">
+          <fieldset #activeDashboardId>
+            <legend>Active Dashboard</legend>
+            <div class="middle-section-alignment">
+              <div class="common-section-module">
+                <form>
+                  <span *ngIf="loadOtherComponents && _localService.contactFields && selectedContactId">
+                    <app-contact-email [hidden]="!showEmailComponent" [loggedUser]="user" [contactId]="selectedContactId"></app-contact-email>
+                    <app-contact-task [hidden]="!showTaskComponent" [loggedUser]="user" [contactId]="selectedContactId"></app-contact-task>
+                    <app-contact-note [hidden]="!showNoteComponent" [loggedUser]="user" [ownerId]="selectedContactId"></app-contact-note>
+                    <app-contact-meeting *ngIf="_localService.showCommonComp == 'meeting'" [loggedUser]="user" [contactFields]="contactFields"></app-contact-meeting>
+                    <app-contact-sms [hidden]="!showTextComponent" [loggedUser]="user" [contactId]="selectedContactId"></app-contact-sms>
+                    <app-contact-detail [hidden]="!showContactDetail" [contactId]="selectedContactId" [resetDetailSubject]="resetDetailSubject.asObservable()"></app-contact-detail>
+                  </span>
+
+                  <app-contact-search [isEdit]="_contactSearchService.isSearchEditClick" *ngIf="_contactSearchService.savedQueryValue == '-2' || _contactSearchService.isSearchEditClick"></app-contact-search>
+                  <app-contact-detail *ngIf="_localService.showCommonComp == 'contact-new' && !showContactDetail" [contactId]="0"></app-contact-detail>
+                  <app-contact-activity-history *ngIf="contactHistory" [contactHistory]="contactHistory" [contactId]="selectedContactId" (viewLoaded)="loadOtherComponents = true"></app-contact-activity-history>
+                </form>
+              </div>
+            </div>
+            <div class="common"></div>
+          </fieldset>
+        </div>
+      </kendo-splitter-pane>
+
+      <kendo-splitter-pane min="13%" max="18%" [(size)]="rightPanelSize" (sizeChange)= "panelSizeChange('right', $event)">
+        <div class="right-section">
+          <fieldset>
+            <legend>Action Module</legend>
+            <fieldset>
+              <legend>Engagement</legend>
+              <div class="lead-button-panel">
+                <button class="upload-doc-btn" [disabled]="!(roleFeaturePermissions?.create || roleFeaturePermissions?.edit || roleFeaturePermissions?.isAdmin || user?.userRole > 3)"(click)="_localService.showCommonComp ='email'; _localService.scrollTop(activeDashboardId); showCommonComponent();  _localService.showPristneForm();">
+                  <i class="fas fa-envelope"></i> Send Email
+                </button>
+                <button class="link-group-btn" [disabled]="!(roleFeaturePermissions?.create || roleFeaturePermissions?.edit || roleFeaturePermissions?.isAdmin || user?.userRole > 3 )"(click)="_localService.showCommonComp ='sms'; _localService.scrollTop(activeDashboardId); showCommonComponent(); _localService.showPristneForm(); ">
+                  <i class="fas fa-comments"></i> Send Text
+                </button>
+                <!--Don't' remove commented code-->
+                <!--<button class="btn" (click)="_localService.showCommonComp ='call'; _localService.scrollTop(activeDashboardId);"><i class="fas fa-phone-alt"></i> Make Call</button>
+                <button class="btn" (click)="_localService.showCommonComp ='meeting'; _localService.scrollTop(activeDashboardId);"><i class="far fa-calendar-alt"></i> Schedule Meeting</button>-->
+                <button class="notes-btn"  [disabled]="!(roleFeaturePermissions?.create || roleFeaturePermissions?.edit || roleFeaturePermissions?.isAdmin || user?.userRole > 3 )" (click)="_localService.showCommonComp ='note'; _localService.scrollTop(activeDashboardId); showCommonComponent();  _localService.showPristneForm();">
+                  <i class="far fa-plus-square"></i> Add Note
+                </button>
+                <button class="task-btn" [disabled]="!(roleFeaturePermissions?.create || roleFeaturePermissions?.edit || roleFeaturePermissions?.isAdmin || user?.userRole > 3 )" (click)="_localService.showCommonComp ='task'; _localService.scrollTop(activeDashboardId); showCommonComponent();  _localService.showPristneForm();">
+                  <i class="fas fa-thumbtack"></i> Create Task
+                </button>
+              </div>
+            </fieldset>
+          </fieldset>
+        </div>
+      </kendo-splitter-pane>
+    </kendo-splitter>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner || _contactSearchService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

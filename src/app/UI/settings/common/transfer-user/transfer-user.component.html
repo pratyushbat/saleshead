@@ -1,0 +1,88 @@
+<div class="mb-2">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/activity/config/userlisttitle.svg" class="mr-1" />Transfer or Purge User Data</div>
+      </div>
+      <div class="global-body-section">
+        <div class="wraper-body-left">
+          <div [ngClass]="hideUserData==false ? '' : ''" *ngIf="showBtn<=1">
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <div class="">
+                  <span class="control-label">Select FROM User:</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <select class="form-control" (change)="getUserTransferData($event.target.value)" [(ngModel)]="fromUser">
+                  <option value=0> -Select- </option>
+                  <option *ngFor="let item of userList; let i = index" [value]="item.key">{{item.value }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <div class="align-center">
+                  <span class="control-label">Select To User:</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <select class="form-control" [(ngModel)]="toUser" (change)="getToUser($event.target.value)">
+                  <option value=0> -None (Purge Data)- </option>
+                  <option *ngFor="let item of userList; let i = index" [value]="item.key">{{item.value }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <div class="align-center">
+                  <span class="control-label">Mark Data</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <input type="text" [(ngModel)]="markData" />
+              </div>
+            </div>
+          </div>
+          <div [ngClass]="showBtn>1 ? '' : ''" *ngIf="hideUserData">
+            <div class="user-data-section">
+              <span>{{userName}} data item are : </span><br />
+              <span [innerText]="userDataDisplay"></span>
+            </div>
+          </div>
+        </div>
+        <div class="cards-body-section">
+          <div class="cards-colunm-left"></div>
+          <div class="cards-colunm-right">
+            <button class="btn btn-primary" type="button" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" *ngIf="showBtn == 2 && user?.userRole > 3" data-toggle="modal" data-target="#transferDataModal"> Save</button>
+            <button class="btn btn-danger" type="button" [hidden]="roleFeaturePermissions?.delete == false" *ngIf="showBtn == 3 && user?.userRole > 3" data-toggle="modal" data-target="#transferDataModal">Delete</button>
+            <button class="btn btn-cancel" type="button" *ngIf="showBtn == 2 || showBtn == 3" (click)="cancel()"> Cancel</button>
+            <button class="btn btn-primary" type="button" *ngIf="showBtn == 1" (click)="goToNext()"> Next</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="transferDataModal" tabindex="-1" role="dialog" aria-labelledby="transferDataModal" aria-hidden="true">
+        <div class="modal-dialog  modal-common-dialog" role="document">
+          <div class="modal-content modal-common-content">
+            <div class="modal-header modal-common-background">
+              <h4 class="modal-title modal-common-title">Confirmation</h4>
+            </div>
+            <div class="modal-body modal-common-body">
+              <span>You have chosen to <b>{{showBtn === 2 ? 'transfer' : 'purge'}}</b> data.</span>
+              <span>All data items belonging to <b>{{userName}}</b> will be  {{showBtn === 2 ? 'transferred to' : 'purged permanently and user will be reset.'}}</span><span *ngIf="showBtn === 2">&nbsp;&nbsp;<b>{{userToName}}</b>.</span>
+              <span *ngIf="showBtn === 2">All non-pending items will be marked with <b>{{markData}}</b> on the subject line or description area.</span>
+              <span>Are you sure you want to do this? It cannot be undone.</span>
+            </div>
+            <div class="modal-footer">
+              <button type="button" (click)="onConfirmOperation()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+              <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

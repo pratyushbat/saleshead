@@ -1,0 +1,545 @@
+<div class="container-fluid common-alignment">
+  <div class="teamoffice-setup-section">
+    <div class="account-setup-section">
+      <div class="company-setup-panel">
+        <div class="config-header-button">
+          <div class="display-row">
+            <div class="svg-icon-panel"> <span class="contact-create-header">Teams and Offices Setup </span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="important-msg-section">
+      <div class="important-msg-panel">
+        <table>
+          <tbody>
+            <tr>
+              <td><b class="teamOfficeBold">Activate Teams</b><input type="checkbox" class="checkbox ml-2" [checked]="showTeam" (change)="updateTeamCheck()"><span class="activatedTeams ml-2">Once activated and set up, teams can be assigned to users from </span><a (click)="routeUser()" class="text-primary">Users Setup</a>.</td>
+            </tr>
+            <tr>
+              <td><b class="teamOfficeBold">Activate Offices</b> <input type="checkbox" class="checkbox ml-2" [checked]="showOffice" (change)="updateOfficeCheck()"><span class="activatedTeams ml-2">Once activated and set up, offices can be assigned to users from </span><a (click)="routeUser()" class="text-primary">Users Setup</a>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="order-row-inner">
+      <div class="txt-right" *ngIf="showTeam">
+        <div class="wraper-main-section">
+          <div class="global-card-section">
+            <div class="global-header-section">
+              <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Teams Configuration</div>
+              <div class="header-button-panel">
+                <div class="button-wrapper">
+                  <button type="button" [matTooltip]="isExpandedTeam ? 'Collapse' : 'Expand'" class="icon-btn" (click)="isExpandedTeam=!isExpandedTeam">
+                    <i class="fa " [ngClass]="{ 'fa-compress': isExpandedTeam, 'fa-expand': !isExpandedTeam }"></i>
+                    <span class="btn-text">Expand</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-2">
+              <div class="wraper-main-section">
+                <div class="global-card-section" *ngIf="isExpandedTeam">
+                  <div class="common-inner-header">
+                    <div class="inner-header-bg">
+                      <div class="inner-cards-panel header-inner-hidden">
+                        <span>Order</span>
+                        <span>Display</span>
+                        <span>Code</span>
+                        <span class="text-right" [hidden]="roleFeaturePermissions?.edit == false && roleFeaturePermissions?.delete == false"></span>
+                      </div>
+                      <div class="inner-detail-bg">
+                        <span>Details</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="global-body-section" *ngIf="teamCodeEdit==1">
+                    <div class="wraper-body-panel" [formGroup]="teamOfficeForm">
+                      <div class="wraper-body-left">
+                        <div class="common-inner-cards">
+                          <div cdkDropList
+                               #frmList="cdkDropList"
+                               [cdkDropListData]="teamFormCtls.controls"
+                               (cdkDropListDropped)="dropTeam($event)">
+                            <div formArrayName="teamConfigs" class="inner-cards-grid-height">
+                              <div *ngFor="let name of teamFormCtls.controls;trackBy:identifyTeam; let i = index">
+                                <div *ngIf="i>=skipSize && i<skipSize+pageSize" [formGroupName]="i" cdkDrag>
+                                  <div class="inner-cards-grid">
+                                    <div class="inner-card-mobile">
+                                      <label>Order</label>
+                                      <div class="mobile-view-design">
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          {{i+1}}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="inner-card-mobile">
+                                      <label>Display</label>
+                                      <div class="mobile-view-design">
+                                        <div *ngIf="!sortTeamMode" class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          <input [ngClass]="{'has-error': teamFormCtls.controls[i].invalid && (teamFormCtls.controls[i].touched || teamFormCtls.controls[i].dirty)}" formControlName="display" placeholder="Enter display" class="form-control" *ngIf="editRowIndexTeam == -1" required>
+                                          <input [ngClass]="{'has-error': teamFormCtls.controls[i].invalid && (teamFormCtls.controls[i].touched || teamFormCtls.controls[i].dirty)}" formControlName="display" placeholder="Enter display" class="form-control" *ngIf="editRowIndexTeam > -1 && editRowIndexTeam == i" required>
+                                          <span *ngIf="editRowIndexTeam > -1 && editRowIndexTeam != i">{{name.value.display}}</span>
+                                        </div>
+                                        <div *ngIf="sortTeamMode" class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          {{name.value.display}}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="inner-card-mobile">
+                                      <label>Code</label>
+                                      <div class="mobile-view-design">
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          {{name.value.code}}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class=""></div>
+                                  </div>
+                                </div>
+                                <div class="team-example-box" *ngIf="teamFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="global-body-section" *ngIf="teamCodeEdit==0">
+                    <div class="wraper-body-panel" [formGroup]="teamOfficeForm">
+                      <div class="wraper-body-left">
+                        <div class="common-inner-cards">
+                          <div cdkDropList
+                               #frmList="cdkDropList"
+                               [cdkDropListData]="teamFormCtls.controls"
+                               (cdkDropListDropped)="dropTeam($event)">
+                            <div formArrayName="teamConfigs" class="inner-cards-grid-height">
+                              <div class="" *ngFor="let i of  teamFormCtls.controls;trackBy:identifyTeam;let idx=index;">
+                                <div *ngIf="idx>=skipSize && idx<skipSize+pageSize" [formGroupName]="idx" cdkDrag>
+                                  <div class="inner-cards-grid">
+                                    <div class="inner-card-mobile">
+                                      <label>Order</label>
+                                      <div class="mobile-view-design">
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          {{idx+1}}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="inner-card-mobile">
+                                      <label>Display</label>
+                                      <div class="mobile-view-design">
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          {{i.value.display}}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="inner-card-mobile">
+                                      <label>Code</label>
+                                      <div class="mobile-view-design">
+                                        <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                          {{i.value.code}}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="text-right">
+                                      <button type="button" [hidden]="roleFeaturePermissions?.edit == false" class="common-colunm-btn" [disabled]="sortTeamMode || showSpinner" (click)="teamItemtoEdit(idx)"> <i class="fa fa-pencil" aria-hidden="true" title="Edit"></i></button>
+                                      <button type="button" [hidden]="roleFeaturePermissions?.delete == false" class="grid-delete-btn" [disabled]="sortTeamMode || showSpinner" (click)="teamItemtoDelete(idx)" data-toggle="modal" data-target="#teamDeleteModal"> <i class="fa fa-trash-alt" aria-hidden="true" title="Delete"></i></button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="team-example-box" *ngIf="teamFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="reloadTeamCodes">
+                    <app-pagination *ngIf="teamCodes" (newData)="emitPagination($event)" [teamOffice]="'team'" [total]="teamCodes.length" [data]="teamCodes" [originalData]="originalTeamCodes"></app-pagination>
+                  </div>
+                  <div class="margin-all-area" *ngIf="teamCodeEdit==1">
+                    <button class="btn btn-primary" [disabled]="showSpinner || teamFormCtls?.length<=0 || teamFormCtls.invalid" (click)="saveTeamItems()" type="submit"> {{ teamCodeEdit==1 ? 'Update' : teamCodeEdit==2 ?  'Save' : 'Save' }}</button>
+                    <button class="btn btn-cancel" (click)="cancelTeamCode()"> Cancel</button>
+                  </div>
+                  <div class="margin-all-area" *ngIf="!sortTeamMode && teamCodeEdit==0">
+                    <button class="btn btn-primary" (click)=" editTeamCodes()" [hidden]="roleFeaturePermissions?.edit == false" [disabled]="teamFormCtls.controls?.length<=0">
+                      <i class="fa-star" [ngClass]="{ 'fas ': teamCodeEdit, far: !teamCodeEdit }"></i>Edit All Items
+                    </button>
+                    <button class="btn btn-primary" (click)="addTeamItems(); scrollToNewTeam()" [hidden]="roleFeaturePermissions?.create == false"> Add Items</button>
+                    <button class="btn btn-primary" (click)="sortAlphaTeamCode()" [hidden]="roleFeaturePermissions?.edit == false" [disabled]="teamFormCtls.controls?.length<=0"> Sort Alphabetically</button>
+                  </div>
+                  <div class="margin-all-area" *ngIf="sortTeamMode && teamCodeEdit==0">
+                    <button class="btn btn-primary" [disabled]="showSpinner" (click)="saveTeamItems(); cancleTeam = true;" type="submit">{{ teamCodeEdit==1 ? 'Update' : teamCodeEdit==2 ?  'Save' : 'Save' }}</button>
+                    <button class="btn btn-cancel" (click)="cancelTeamCode()"> Cancel</button>
+                  </div>
+                  <div class="modal fade" id="teamDeleteModal" tabindex="-1" role="dialog" aria-labelledby="teamDeleteModalLabel" aria-hidden="true" *ngIf="teamCodeEdit==0">
+                    <div class="modal-dialog  modal-common-dialog" role="document">
+                      <div class="modal-content modal-common-content">
+                        <div class="modal-header modal-common-background">
+                          <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+                        </div>
+                        <div class="modal-body modal-common-body">
+                          <h5>Are you sure to delete Team record  - <b> {{teamCodeDisplay}} </b> ?</h5>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" (click)="deleteTeamItems()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                          <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="isExpandedTeam && teamCodeEdit==2 ">
+                    <div>
+                      <div>
+                        <div class="common-inner-header">
+                          <div class="inner-header-bg">
+                            <div class="inner-cards-panel header-inner-hidden">
+                              <span>Order</span>
+                              <span>Display</span>
+                              <span>Code</span>
+                              <span class="text-right"></span>
+                            </div>
+                            <div class="inner-detail-bg">
+                              <span>Details</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="global-body-section">
+                          <div class="wraper-body-panel" [formGroup]="teamOfficeForm">
+                            <div class="wraper-body-left">
+                              <div class="common-inner-cards">
+                                <div formArrayName="teamConfigs" class="inner-cards-grid-height">
+                                  <div class="" *ngFor="let i of  teamFormCtls.controls;trackBy:identifyTeam; let idx=index;">
+                                    <div *ngIf="idx>=skipSize && idx<skipSize+pageSize">
+                                      <div class="inner-cards-grid">
+                                        <div class="inner-card-mobile">
+                                          <label>Order</label>
+                                          <div class="mobile-view-design">
+                                            <div class="">{{idx+1}}</div>
+                                          </div>
+                                        </div>
+                                        <div class="inner-card-mobile">
+                                          <label>Display</label>
+                                          <div class="mobile-view-design">
+                                            <div class="">{{i.value.display}}</div>
+                                          </div>
+                                        </div>
+                                        <div class="inner-card-mobile">
+                                          <label>Code</label>
+                                          <div class="mobile-view-design">
+                                            <div class="">{{i.value.code}}</div>
+                                          </div>
+                                        </div>
+                                        <div class="inner-card-mobile">
+                                          <label>Action</label>
+                                          <div class="mobile-view-design">
+                                            <div class="text-right"></div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="team-example-box" *ngIf="teamFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="wraper-body-left" id="scrollId">
+                            <div class="cards-body-section">
+                              <div class="cards-colunm-left">
+                                <span class="control-label" for="teamSName">New Item List </span>
+                              </div>
+                              <div class="cards-colunm-right">
+                                <textarea [(ngModel)]="teamCodeData" type="text" class="form-control" id="teamSName"></textarea>
+                                <label><span class="acc-info-red">Note: Do not exceed 25 lines.</span></label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <app-pagination *ngIf="teamCodes" (newData)="emitPagination($event)" [teamOffice]="'team'" [total]="teamCodes.length" [data]="teamCodes" [originalData]="originalTeamCodes"></app-pagination>
+                        <div class="margin-all-area">
+                          <button class="btn btn-primary" [disabled]="showSpinner" (click)="saveBulkTeams()" type="submit">{{ teamCodeEdit==1 ? 'Update' : teamCodeEdit==2 ?  'Save' : 'Save' }}</button>
+                          <button class="btn btn-cancel" (click)="cancelTeamCode()"> Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="txt-right" *ngIf="showOffice">
+        <div class="wraper-main-section">
+          <div class="global-card-section">
+            <div class="global-header-section">
+              <div class="svg-icon-panel"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Offices Configuration</div>
+              <div class="header-button-panel">
+                <div class="button-wrapper">
+                  <button type="button" [matTooltip]="isExpandedOffice ? 'Collapse' : 'Expand'" class="icon-btn" (click)="isExpandedOffice=!isExpandedOffice">
+                    <i class="fa " [ngClass]="{ 'fa-compress': isExpandedOffice, 'fa-expand': !isExpandedOffice }"></i>
+                    <span class="btn-text">Expand</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="global-body-section">
+              <div class="p-2">
+                <div class="wraper-main-section" *ngIf="isExpandedOffice">
+                  <div class="global-card-section">
+                    <div class="common-inner-header">
+                      <div class="inner-header-bg">
+                        <div class="inner-cards-panel header-inner-hidden">
+                          <span>Order</span>
+                          <span>Display</span>
+                          <span>Code</span>
+                          <span class="text-right" [hidden]="roleFeaturePermissions?.edit == false && roleFeaturePermissions?.delete == false"></span>
+                        </div>
+                        <div class="inner-detail-bg">
+                          <span>Details</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="global-body-section" *ngIf="officeCodeEdit==1">
+                      <div class="wraper-body-panel" [formGroup]="officeForm">
+                        <div class="wraper-body-left">
+                          <div class="common-inner-cards">
+                            <div cdkDropList
+                                 #frmList="cdkDropList"
+                                 [cdkDropListData]="officeFormCtls.controls"
+                                 (cdkDropListDropped)="dropOffice($event)">
+                              <div formArrayName="officeConfigs" class="inner-cards-grid-height">
+                                <div class="" *ngFor="let name of officeFormCtls.controls;trackBy:identifyOffice; let i = index">
+                                  <div *ngIf="i>=skipOfficeSize && i<skipOfficeSize+pageSizeOffice" [formGroupName]="i" cdkDrag>
+                                    <div class="inner-cards-grid">
+                                      <div class="inner-card-mobile">
+                                        <label>Order</label>
+                                        <div class="mobile-view-design">
+                                          <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                            <!--  <input formControlName="sOrder" placeholder="Enter Order" class="form-control">-->
+                                            {{i+1}}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="inner-card-mobile">
+                                        <label>Display</label>
+                                        <div class="mobile-view-design">
+                                          <div *ngIf="!sortOfficeMode" class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                            <input [ngClass]="{'has-error': officeFormCtls.controls[i].invalid && (officeFormCtls.controls[i].touched || officeFormCtls.controls[i].dirty)}" formControlName="display" placeholder="Enter display" class="form-control" *ngIf="editRowIndexOffice == -1" required>
+                                            <input [ngClass]="{'has-error': officeFormCtls.controls[i].invalid && (officeFormCtls.controls[i].touched || officeFormCtls.controls[i].dirty)}" formControlName="display" placeholder="Enter display" class="form-control" *ngIf="editRowIndexOffice > -1 && editRowIndexOffice == i" required>
+                                            <span *ngIf="editRowIndexOffice > -1 && editRowIndexOffice != i">{{name.value.display}}</span>
+                                          </div>
+                                          <div *ngIf="sortOfficeMode" class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                            {{name.value.display}}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="inner-card-mobile">
+                                        <label>Code</label>
+                                        <div class="mobile-view-design">
+                                          <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                            {{name.value.officeCode}}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="inner-card-mobile">
+                                        <label>Action</label>
+                                        <div class="mobile-view-design">
+                                          <div class="text-right"></div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="team-example-box" *ngIf="officeFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="global-body-section" *ngIf="officeCodeEdit==0">
+                      <div class="wraper-body-panel" [formGroup]="officeForm">
+                        <div class="wraper-body-left">
+                          <div class="common-inner-cards">
+                            <div cdkDropList
+                                 #frmList="cdkDropList"
+                                 [cdkDropListData]="officeFormCtls.controls"
+                                 (cdkDropListDropped)="dropOffice($event)">
+                              <div formArrayName="officeConfigs" class="inner-cards-grid-height">
+                                <div class="" *ngFor="let i of officeFormCtls.controls;trackBy:identifyOffice; let idx=index;">
+                                  <div *ngIf="idx>=skipOfficeSize && idx<skipOfficeSize+pageSizeOffice" [formGroupName]="idx" cdkDrag>
+                                    <div class="inner-cards-grid">
+                                      <div class="inner-card-mobile">
+                                        <label>Order</label>
+                                        <div class="mobile-view-design">
+                                          <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                            {{idx+1}}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="inner-card-mobile">
+                                        <label>Display</label>
+                                        <div class="mobile-view-design">
+                                          <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                            {{i.value.display}}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="inner-card-mobile">
+                                        <label>Code</label>
+                                        <div class="mobile-view-design">
+                                          <div class="" [matTooltip]="_localService.matTooltipSetting.msg" [matTooltipPosition]="_localService.matTooltipSetting.position" [matTooltipShowDelay]="_localService.matTooltipSetting.delay">
+                                            {{i.value.officeCode}}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="inner-card-mobile">
+                                        <label>Action</label>
+                                        <div class="mobile-view-design">
+                                          <div class="text-right">
+                                            <button type="button" [hidden]="roleFeaturePermissions?.edit == false" class="common-colunm-btn" [disabled]="sortOfficeMode ||showSpinner" (click)="officeItemtoEdit(idx)"> <i class="fa fa-pencil" aria-hidden="true" title="Edit"></i></button>
+                                            <button type="button" [hidden]="roleFeaturePermissions?.delete == false" class="grid-delete-btn" [disabled]="sortOfficeMode ||showSpinner" (click)="officeItemtoDelete(idx)" data-toggle="modal" data-target="#officeDeleteModal"> <i class="fa fa-trash-alt" aria-hidden="true" title="Delete"></i></button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="team-example-box" *ngIf="officeFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="reloadOfficeCodes">
+                      <app-pagination *ngIf="officeCodes" (newDataOffice)="emitPaginationOffice($event)" [teamOffice]="'office'" [totalOffice]="officeCodes.length" [dataOffice]="officeCodes" [originalDataOffice]="originalOfficeCodes"></app-pagination>
+                    </div>
+                    <div class="margin-all-area" *ngIf="officeCodeEdit==1">
+                      <button class="btn btn-primary" [disabled]="showSpinner || officeFormCtls?.length<=0 || officeFormCtls.invalid" (click)="saveOfficeItems()" type="submit">{{ officeCodeEdit==1 ? 'Update' : officeCodeEdit==2 ?  'Save' : 'Save' }}</button>
+                      <button class="btn btn-cancel" (click)="cancelOfficeCode()"> Cancel</button>
+                    </div>
+                    <div class="margin-all-area" *ngIf="!sortOfficeMode && officeCodeEdit==0">
+                      <button class="btn btn-primary" (click)="editOfficeCodes()" [hidden]="roleFeaturePermissions?.edit == false" [disabled]="officeFormCtls.controls?.length<=0">
+                        <i class="fa-star" [ngClass]="{ 'fas ': officeCodeEdit, far: !officeCodeEdit }"></i>Edit All Items
+                      </button>
+                      <button class="btn btn-primary" (click)="addOfficeItems(); scrollToNewOffice()" [hidden]="roleFeaturePermissions?.create == false"><i class="fa fa-plus"></i> Add Items</button>
+                      <button class="btn btn-primary" (click)="sortAlphaOfficeCode()" [hidden]="roleFeaturePermissions?.edit == false" [disabled]="officeFormCtls.controls?.length<=0"> Sort Alphabetically</button>
+                    </div>
+                    <div class="margin-all-area" *ngIf="sortOfficeMode && officeCodeEdit==0">
+                      <button class="btn btn-primary" [disabled]="showSpinner" (click)="saveOfficeItems()" type="submit"> {{ officeCodeEdit==1 ? 'Update' : officeCodeEdit==2 ?  'Save' : 'Save' }}</button>
+                      <button class="btn btn-cancel" (click)="cancelOfficeCode()">Cancel</button>
+                    </div>
+                    <div class="modal fade" id="officeDeleteModal" tabindex="-1" role="dialog" aria-labelledby="officeDeleteModalLabel" aria-hidden="true" *ngIf="officeCodeEdit==0">
+                      <div class="modal-dialog  modal-common-dialog" role="document">
+                        <div class="modal-content modal-common-content">
+                          <div class="modal-header modal-common-background">
+                            <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+                          </div>
+                          <div class="modal-body modal-common-body">
+                            <h5>Are you sure to delete Office code  - <b> {{officeCodeDisplay}} </b> ?</h5>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" (click)="deleteOfficeItems()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                            <button type="button" class="btn-lg btn-cancel" data-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="isExpandedOffice && officeCodeEdit==2">
+                    <div class="">
+                      <div class="common-inner-header">
+                        <div class="inner-header-bg">
+                          <div class="inner-cards-panel header-inner-hidden">
+                            <span>Order</span>
+                            <span>Display</span>
+                            <span>Code</span>
+                            <span class="flex-box"></span>
+                          </div>
+                          <div class="inner-detail-bg">
+                            <span>Details</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="global-body-section">
+                        <div class="wraper-body-panel" [formGroup]="officeForm">
+                          <div class="wraper-body-left">
+                            <div class="common-inner-cards">
+                              <div formArrayName="officeConfigs" class="inner-cards-grid-height">
+                                <div class="" *ngFor="let i of  officeFormCtls.controls;trackBy:identifyOffice;let idx=index;">
+                                  <div *ngIf="idx>=skipOfficeSize && idx<skipOfficeSize+pageSizeOffice">
+                                    <div class="inner-cards-grid">
+                                      <div class="inner-cards-grid">
+                                        <div class="inner-card-mobile">
+                                          <label>Order</label>
+                                          <div class="">{{idx+1}}</div>
+                                        </div>
+                                      </div>
+                                      <div class="inner-cards-grid">
+                                        <div class="inner-card-mobile">
+                                          <label>Display</label>
+                                          <div class="">{{i.value.display}}</div>
+                                        </div>
+                                      </div>
+                                      <div class="inner-cards-grid">
+                                        <div class="inner-card-mobile">
+                                          <label>Code</label>
+                                          <div class="">{{i.value.officeCode}}</div>
+                                        </div>
+                                      </div>
+                                      <div class="inner-cards-grid">
+                                        <div class="inner-card-mobile">
+                                          <label>Action</label>
+                                          <div class="text-right"></div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="team-example-box" *ngIf="officeFormCtls.controls?.length === 0"><h6>No records found</h6></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="wraper-body-left" id="scrollIdOffice">
+                          <div class="cards-body-section">
+                            <div class="cards-colunm-left">
+                              <span class="control-label" for="officeCodeName">New Item List </span>
+                            </div>
+                            <div class="cards-colunm-right">
+                              <textarea [(ngModel)]="officeCodeData" type="text" class="form-control" id="officeCodeName"></textarea>
+                              <label><span class="acc-info-red">Note: Do not exceed 25 lines.</span></label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <app-pagination *ngIf="officeCodes" (newDataOffice)="emitPaginationOffice($event)" [teamOffice]="'office'" [totalOffice]="officeCodes.length" [dataOffice]="officeCodes" [originalDataOffice]="originalOfficeCodes"></app-pagination>
+                      <div class="margin-all-area">
+                        <button class="btn btn-primary" [disabled]="showSpinner" (click)="saveBulkOffices()" type="submit"><i class="fas fa-save"></i>  {{ officeCodeEdit==1 ? 'Update' : officeCodeEdit==2 ?  'Save' : 'Save' }}</button>
+                        <button class="btn btn-cancel" (click)="cancelOfficeCode()"> Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

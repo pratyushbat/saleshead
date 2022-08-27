@@ -1,0 +1,58 @@
+<div><h1>Contact Search</h1></div>
+<div>
+  <div [formGroup]="searchQueriesForm">
+    <div formArrayName="searchQueries">
+      <div class="container-fluid" *ngFor="let sr of searchQueriesCtls.controls; let i = index" [formGroupName]="i">
+        <div class="row">
+          <div class="form-group col-sm-12">
+            <div>
+              <table class="generic-width-per" border="0" >
+                <tr>
+                  <td class="contact-width-two">
+                    <i class="fa fa-plus contact-width-ninen-r" aria-hidden="true" (click)="addSearchQuery()" ></i>
+                  </td>
+                  <td class="contact-width-two">
+                    <i class="fa fa-times contact-width-ninen-r" aria-hidden="true" (click)="deleteSearchQuery(i)" ></i>
+                  </td>
+                  <td class="contact-width-two">
+                    <input id="'chkIschecked'+i" type="checkbox" formControlName="isSelected" class="contact-width-ninen" />
+                  </td>
+                  <td  class="contact-width-ten" >
+                    <select id="'drpMainOperator' + i" formControlName="mainOperator" class="contact-width-ninen">
+                      <option value='-1'>Please select</option>
+                      <option value='0'>OR</option>
+                      <option value='1'>AND</option>
+                    </select>
+                  </td>
+                  <td class="contact-width-forty">
+                    <select id="drpFields{{i}}" formControlName="searchItem" (change)="drpFields_onChange(i)" class="contact-width-ninen">
+                      <option value='-1'>Please select</option>
+                      <option *ngFor="let searchItem of searchItems"
+                              [value]="searchItem.displayValue">
+                        {{searchItem.displayValue}}
+                      </option>
+                    </select>
+                  </td>
+                  <td class="contact-width-ten">
+                    <select id="'drpOperator' + i" formControlName="operator" class="contact-width-ninen">
+                      <option value='-1'>Please select</option>
+                      <option value='0'>=</option>
+                      <option value='1'><></option>
+                      <option value='1'>IN</option>
+                    </select>
+                  </td>
+                  <td class="contact-width-fortyfour">
+                    <input type="text" id="txtFieldData{{i}}" formControlName="searchItemValue" class="contact-width-ninen-d" />
+                    <select id="drpFieldData{{i}}" formControlName="searchItemValue" class="contact-width-ninen">
+                    </select>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,125 @@
+<div class="create-email" #scrollIdTarget [@filterAnimation]="showAnimation">
+  <fieldset>
+    <legend>Create Appointment</legend>
+    <div class="email-module">
+      <div class="text-right">       
+        <button class="btn btn-primary task-btn-margin" (click)="addNewHandler()"><i class="fa fa-plus"></i> Add New</button>
+      </div>
+      <form class="form-horizontal" *ngIf="showApptForm" [formGroup]="apptForm" (ngSubmit)="apptFormSubmit()">
+        <div class="lead-wraper-section">
+          <div class="wraper-main-section">
+            <div class="global-card-section">
+              <div class="appointment-header">
+                <div class="global-header-section">
+                  <div class="svg-icon-panel">Appointment</div>
+                  <div class="header-button-panel">
+                    <div class="button-wrapper">
+                      <button type="button" (click)="onCloseAppt();" class="icon-btn">
+                        <i class="fas fa-times"></i>
+                        <span class="btn-text">Close</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="global-body-section">
+                <div class="margin-all-area">
+                  <div class="templates-alignment">
+                    <div class="full-width-container">
+                      <div class="form-group">
+                        <span class="control-label" for="dateTime">Date/Time</span>
+                        <div>
+                          <kendo-datetimepicker  formControlName="apptDateTime" [ngClass]="{'has-error': apptForm.controls.apptDateTime.errors && (apptForm.controls.apptDateTime.touched || apptForm.controls.apptDateTime.dirty)}"></kendo-datetimepicker>
+                          <div *ngIf="apptForm.controls.apptDateTime.errors && (apptForm.controls.apptDateTime.touched || apptForm.controls.apptDateTime.dirty)">
+                            <div class="login-error" *ngIf="apptForm.controls.apptDateTime.errors.required">Please enter appointment date </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="full-width-container margin-left10">
+                      <div class="form-group">
+                        <span class="control-label" for="noteType">Appointment Type</span>
+                        <div>
+                          <select id="noteType" class="form-control" formControlName="apptType">
+                            <option value=null>-None Selected-</option>
+                            <option *ngFor="let apptCode of apptTypeCodes" [value]="apptCode.apptLeadTypeCode">{{ apptCode.display }}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="full-width-container margin-left10">
+                      <div class="form-group">
+                        <span class="control-label" for="note">Phone Call</span>
+                        <input type="checkbox" class="checkbox ml-2" id="isPhoneCall" formControlName="isPhoneCall" />
+                      </div>
+                    </div>
+                    <div class="full-width-container">
+                      <div class="form-group">
+                        <span class="control-label" for="note">Completed Call</span>
+                        <input type="checkbox" class="checkbox ml-2" id="isCompleted" formControlName="isCompleted" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="templates-alignment">
+                    <div class="full-width-container">
+                      <div class="form-group">
+                        <span class="control-label" for="subject">Subject</span>
+                        <div [ngClass]="{'has-error': apptFrm.subject.errors && (apptFrm.subject.touched ||  apptFrm.subject.dirty)}">
+                          <textarea id="subject" class="form-control contact-text-auto-height" row="1" cols="1" formControlName="subject" placeholder="subject"></textarea>
+                        </div>
+                        <div class="search-query-error" *ngIf="apptFrm.subject.errors && ( apptFrm.subject.touched ||  apptFrm.subject.dirty)">
+                          <div *ngIf="apptFrm.subject.errors.required">Please enter a subject.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="templates-alignment">
+                    <div class="full-width-container">
+                      <div class="bottom-panel">
+                        <button class="btn btn-primary" [disabled]="isApptSubmit" type="submit"> {{ apptId == 0 ? 'Save' : 'Update' }}</button>
+                        <button class="btn btn-cancel" type="button" (click)="onCancel();">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="grid-wrapper">
+      <kendo-grid #grid id="gridId" class="create-appointment-grid"
+        [kendoGridBinding]="apptList"
+        [pageSize]="10" [pageable]="{buttonCount:10, pageSizes:[10,50,100,200]}">
+        <div class="grid-scroll-bar">
+          <kendo-grid-column *ngFor="let column of columns"
+            [field]="column.field"
+            [title]="column.title | titlecase"
+            [width]="column.width">
+            <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+              <div class="customer-name" *ngIf="column.field == '$'">{{ rowIndex+1 }}</div>
+              <div class="customer-name" *ngIf="column.field == 'subject'">{{ dataItem[column.field] }}</div>
+              <div class="customer-name" *ngIf="column.field == 'status'">
+                <img *ngIf="dataItem.status == 0" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                <img *ngIf="dataItem.status == 1" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                <img *ngIf="dataItem.status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                <img *ngIf="dataItem.status == 3 || dataItem.status == 9" src="../../../../assets/activity/main/statuscancelled.svg" class="status-img" />
+              </div>
+              <div class="customer-name" *ngIf="column.field == 'isPhoneCall'">{{ dataItem[column.field] }}</div>
+              <div class="customer-name" *ngIf="column.field == 'typeID'">   {{ dataItem[column.field] > 0 ? getType(dataItem[column.field]) : '-None Selected-' }}</div>
+              <div class="customer-name" *ngIf="column.field == 'apptStartTime'" [ngClass]="checkDate(dataItem[column.field])? 'text-danger' : 'text-primary'">{{dataItem[column.field] | date:'medium'}}</div>
+            </ng-template>
+          </kendo-grid-column>
+
+          <kendo-grid-column title="" width="60">
+            <ng-template kendoGridCellTemplate let-dataItem="dataItem" let-rowIndex="rowIndex">
+              <a title="Edit task" (click)="apptGridCRUD('edit', dataItem, rowIndex);"><i class="fas fa-pencil-alt"></i></a>
+            </ng-template>
+          </kendo-grid-column>
+        </div>
+      </kendo-grid>
+      <div *ngIf="showSpinner" class="k-i-loading"></div>
+    </div>
+  </fieldset>
+</div>

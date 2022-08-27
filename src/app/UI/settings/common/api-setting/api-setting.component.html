@@ -1,0 +1,101 @@
+<div class="mb-3">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+          <div class="svg-icon-panel">API Oauth v2 Settings</div>
+      </div>
+      <div class="global-body-section">
+        <div class="wraper-body-panel">
+          <div class="wraper-body-left">
+            <form [formGroup]="apiSettingForm" (ngSubmit)="apiSettingFormSubmit()">
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Client ID</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div matTooltip="Click on generate key to fill client ID" [matTooltipDisabled]="isOperationPerformed == false ? 'disabled' : null" [matTooltipPosition]="'after'">
+                    <input type="text" class="txtStandard" matTooltip="Delete Contract" formControlName="clientId" [attr.disabled]="true" required />
+                    <div *ngIf="apiSettingForm.controls.clientId.errors && (apiSettingForm.controls.clientId.touched || apiSettingForm.controls.clientId.dirty)">
+                      <div class="login-error" *ngIf="apiSettingForm.controls.clientId.errors.required">Client Id is required </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Client Secret</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div matTooltip="Click on generate key to fill client Secret" [matTooltipDisabled]="isOperationPerformed == false ? 'disabled' : null" [matTooltipPosition]="'after'">
+                    <input type="text" class="txtStandard" formControlName="clientSecret" [attr.disabled]="true" required />
+                    <div *ngIf="apiSettingForm.controls.clientSecret.errors && (apiSettingForm.controls.clientSecret.touched || apiSettingForm.controls.clientSecret.dirty)">
+                      <div class="login-error" *ngIf="apiSettingForm.controls.clientSecret.errors.required">Client Secret Id is required </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Redirect URL</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <div>
+                    <input type="text" class="txtStandard" formControlName="redirectURI" [attr.disabled]="isOperationPerformed == false ? 'disabled' : null" required />
+                    <div *ngIf="apiSettingForm.controls.redirectURI.errors && (apiSettingForm.controls.redirectURI.touched || apiSettingForm.controls.redirectURI.dirty)">
+                      <div class="login-error" *ngIf="apiSettingForm.controls.redirectURI.errors.required">URL is required </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left">
+                  <span class="control-label spantext">Default Web Form</span>
+                </div>
+                <div class="cards-colunm-right">
+                  <select class="custom-select txtStandard" formControlName="webFormId" [attr.disabled]="isOperationPerformed == false ? 'disabled' : null" required>
+                    <option value=null> -Select- </option>
+                    <option *ngFor="let item of webFormList" [value]="item.webFormID">{{item.formName}}</option>
+                  </select>
+                  <div *ngIf="apiSettingForm.controls.webFormId.errors && (apiSettingForm.controls.webFormId.touched || apiSettingForm.controls.webFormId.dirty)">
+                    <div class="login-error" *ngIf="apiSettingForm.controls.webFormId.errors.required">Web Form is required </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cards-body-section">
+                <div class="cards-colunm-left"></div>
+                <div class="cards-colunm-right">                    
+                  <div class="">
+                    <button type="submit" class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false"  *ngIf="isOperationPerformed" data-toggle="modal" data-target="#apiSettingModal" [disabled]="apiSettingForm.invalid">Save</button>
+                    <button type="button" class="btn btn-primary" [hidden]="roleFeaturePermissions?.edit == false" *ngIf="isOperationPerformed == false && isConfirm == false && user?.userRole > 3" (click)="onEditApiSetting()"><i class="fa fa-pencil mr-2"></i>Edit</button>
+                    <button type="button" class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" *ngIf="isOperationPerformed" (click)="onGenerateKey()"><i class="fa fa-plus mr-2"></i>Generate Key</button>
+                    <button type="button" class="btn btn-cancel" *ngIf="isOperationPerformed" (click)="onCancelApiSetting()"><i class="fa fa-times mr-2"></i>Cancel</button>
+                    <button type="button" class="btn btn-danger" [hidden]="roleFeaturePermissions?.delete == false" *ngIf="isOperationPerformed" (click)="onDeleteApiSetting()"><i class="fa fa-trash-alt mr-2"></i>Delete</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="apiSettingModal" tabindex="-1" role="dialog" aria-labelledby="apiSettingModal" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content modal-common-content">
+      <div class="modal-header modal-common-background">
+        <h4 class="modal-title modal-common-title">Confirmation</h4>
+      </div>
+      <div class="modal-body modal-common-body">
+        <h2>  Are you sure do you want to {{confirmOperation === 'save' ? 'save' : 'delete'}}<b> API Settings</b></h2>
+      </div>
+      <div class="modal-footer">
+        <button type="button" (click)="onConfirmOperation()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

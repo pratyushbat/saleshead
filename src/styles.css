@@ -1,0 +1,58 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Provide sufficient contrast against white background */
+/*login-module*/
+html, body { /*height: 100%;*/}
+.has-error {color: #d9534f;}
+.mat-snack-bar-container {margin-top: 66px !important; background: #28a745; border-color: #d6e9c6; letter-spacing: 0.9px; box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+  color: #fff; font-weight: 400;
+}
+/*login-module*/
+
+/*contact-module*/
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+a {color: #0366d6;}
+code {color: #e01a76;}
+.btn-primary {color: #fff; /*background-color: #1b6ec2; border-color: #1861ac;*/}
+.toast-success{background:#68a1f9!important;}
+.toast-success:hover{background:#0080ff!important;}
+.loader-body{position:absolute; height:100vh; width:100%; background: #f3f3f387; top: 0; z-index: 9;}
+.loader3 {width:60px; height:60px; display:block; padding:0px; text-align:left; position:fixed; left:0; right:0; margin:10px auto; top:35%;}
+.loader3 span {position:absolute; display:inline-block; width:50px; height:50px; border-radius:100%; background:rgba(25, 86, 156,1); -webkit-animation:loader3 1.5s linear infinite;
+   animation:loader3 1.5s linear infinite;
+}
+.loader3 span:last-child {animation-delay:-0.9s; -webkit-animation-delay:-0.9s;}
+@keyframes loader3 {
+   0% {transform: scale(0, 0);opacity:0.8;}
+   100% {transform: scale(1, 1);opacity:0;}
+}
+@-webkit-keyframes loader3 {
+   0% {-webkit-transform: scale(0, 0);opacity:0.8;}
+   100% {-webkit-transform: scale(1, 1);opacity:0;}
+}
+
+@media (min-width:768px) and (max-width:1024px){
+    .loader3{top:40%;}
+}
+fieldset{margin:10px;/* padding:10px;*/ /*border: solid 1px rgb(203, 214, 226);*/ position:relative;}
+legend{width:auto; margin:0px; font-size:18px; font-weight: 600; padding: 0px 5px;}
+fieldset fieldset{padding:0px 10px; border: solid 1px rgb(203, 214, 226); background:#fff; border-radius:3px; margin:0px;
+  box-shadow: 0 2px 1px -1px rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%), 0 1px 3px 0 rgb(0 0 0 / 12%);  border-bottom: solid 1px rgb(203, 214, 226);}
+fieldset fieldset legend{margin:0px; padding:0px 5px; font-size:15px; font-weight:600; color: #506e91;}
+
+/* ----- Loader Ripple ----- */
+.lds-ripple { display: block; position: relative; width: 80px; height: 80px;  left:0; right:0; margin:10px auto; top:40%; }
+.lds-ripple div { position: absolute; border: 3px solid #55808b; opacity: 1; border-radius: 50%; animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite; }
+.lds-ripple div:nth-child(2) { animation-delay: -0.5s; }
+@keyframes lds-ripple {
+  0% { top: 36px; left: 36px; width: 0; height: 0; opacity: 1; }
+  100% { top: 0px; left: 0px; width: 72px; height: 72px; opacity: 0; }
+}
+/* ----- Loader Ripple ----- */
+/*contact-module*/
+.clickable {color: #68A1F9 !important; text-decoration: none; background-color: transparent; cursor: pointer; margin-bottom:10px;}
+.clickable:hover {color: #0056b3 !important; text-decoration: underline;}
+.clickable-white {color: #FFF; text-decoration: none; background-color: transparent; cursor: pointer;}
+.clickable-white:hover {color: #FFF; text-decoration: underline;}
+.text-info {color: #456dff !important; font-weight:600;}

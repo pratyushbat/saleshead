@@ -1,0 +1,126 @@
+<div class="container-fluid mt-3">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../../assets/activity/config/automationprocesstitle.svg" class="mr-1" />	Import SFA, Webforms, HTML</div>
+]     </div>
+      <div class="global-body-section">
+        <div class="wraper-body-left">
+          <form [formGroup]="importSfaForm">
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <div class="align-center">
+                  <span class="control-label">To: CLP Company</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <span>{{companyName}}</span>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <div class="align-center">
+                  <span class="control-label">Who will own the processes?</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <select class="ddStandard-tagsettings" formControlName="newClpUserID" required>
+                  <option value=null [selected]="true">--Select--</option>
+                  <option *ngFor="let item of userList" [value]="item.key">{{item.value}}</option>
+                </select>
+                <div *ngIf="importSfaForm.controls.newClpUserID.errors && (importSfaForm.controls.newClpUserID.touched || importSfaForm.controls.newClpUserID.dirty)">
+                  <div class="login-error" *ngIf="importSfaForm.controls.newClpUserID.errors.required">Please select user </div>
+                </div>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <div class="align-center">
+                  <span class="control-label">From: CLP Company ID	</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <div class="order-row-inner">
+                  <div class="txt-right">
+                    <input class="form-control" type="text" (keydown)="companyIdEvent($event.target.value)" (keypress)="_localService.onKeyDown($event)" formControlName="clpCompanyID" id="example-search-input" minlength="1" maxlength="9" required>
+                  </div>
+                  <div class="click-txt-left">
+                    <span class="">
+                      <button class="btn btn-outline-secondary border-start-0 border" (click)="searchUser('sfaUser' , 0)" type="button" [disabled]="importSfaForm.controls.clpCompanyID.errors">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </span>
+                    <span class="">
+                      <button type="button" class="btn btn-primary" (click)="searchUser('default',116)">Use Default Company</button>
+                    </span>
+                  </div>
+                </div>
+                <div *ngIf="importSfaForm.controls.clpCompanyID.errors && (importSfaForm.controls.clpCompanyID.touched || importSfaForm.controls.clpCompanyID.dirty)">
+                  <div class="login-error" *ngIf="importSfaForm.controls.clpCompanyID.errors.required">Please enter company Id </div>
+                </div>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <div class="align-center">
+                  <span class="control-label">Select From SFA User</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <select class="ddStandard-tagsettings" formControlName="fromUserID" required>
+                  <option value=null [selected]="true">--Select--</option>
+                  <option *ngFor="let item of SfaUserList" [value]="item.key">{{item.value}}</option>
+                </select>
+                <div *ngIf="importSfaForm.controls.fromUserID.errors && (importSfaForm.controls.fromUserID.touched || importSfaForm.controls.fromUserID.dirty)">
+                  <div class="login-error" *ngIf="importSfaForm.controls.fromUserID.errors.required">Please select SFA user </div>
+                </div>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <div class="align-center">
+                  <span class="control-label">Select which objects</span>
+                </div>
+              </div>
+              <div class="cards-colunm-right">
+                <div class="order-row-inner">
+                  <div class=""><input type="checkbox" class="checkbox" formControlName="sfa" />SFA Processes&nbsp;&nbsp;</div>
+                  <div class=""><input type="checkbox" class="checkbox" formControlName="webform" />Web Forms&nbsp;&nbsp;</div>
+                  <div class=""><input type="checkbox" class="checkbox" formControlName="html" />Email Templates &nbsp;&nbsp;</div>
+                </div>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left"></div>
+              <div class="cards-colunm-right">
+                <div class="">
+                  <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" [disabled]="importSfaForm.invalid" type="button" data-toggle="modal" data-target="#importSfaModal"> Save</button>
+                  <button class="btn btn-cancel" (click)="cancel()" type="button"> Cancel</button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="modal fade" id="importSfaModal" tabindex="-1" role="dialog" aria-labelledby="importSfaModal" aria-hidden="true">
+            <div class="modal-dialog  modal-common-dialog" role="document">
+              <div class="modal-content modal-common-content">
+                <div class="modal-header modal-common-background">
+                  <h4 class="modal-title modal-common-title">Confirmation</h4>
+                </div>
+                <div class="modal-body modal-common-body">
+                  <h2>  Are you sure do you want to Import ? </h2>
+                </div>
+                <div class="modal-footer">
+                  <button  [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="button" (click)="onConfirmOperation()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

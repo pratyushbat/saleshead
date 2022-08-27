@@ -1,0 +1,363 @@
+<div *ngIf="!isBulkCompany" class="container-fluid mt-3 common-alignment">
+  <div class="custom-security-link">
+    <a [routerLink]="['/contact-create']">New Contact</a>
+    <a [routerLink]="['/contacts']">View History</a>
+  </div>
+  <div class="row" *ngIf="stepper == 'create'">
+    <div [ngClass]="companyId>0 ? 'col-md-10' : 'col-md-12'">
+      <div class="row">
+        <div class="col-md-12"><company-create (viewCompany)="viewCompanyList($event)" [companyId]="companyId"></company-create></div>
+        <div class="col-md-12"><contact-exports [user]="user"></contact-exports></div>
+      </div>
+    </div>
+    <div class="col-md-2" *ngIf="companyId>0">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="wraper-main-section">
+            <div class="global-card-section">
+              <div class="global-header-section">
+                <div class="svg-icon-panel"><span>Recent Documents</span></div>
+              </div>
+              <div class="mt-1">
+                <angular-file-uploader [config]="recentDocConfig" (ApiResponse)="changeFileApiResponse($event)" #imageUpload></angular-file-uploader>
+              </div>
+              <span class="text-success text-center d-block">max file size: 3 MB</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="margin-all-area" *ngIf="stepper == 'view'">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/companystitleheader.svg" class="mr-1" />Companies Search Results</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper" *ngIf="!isBulkCompany">
+            <button type="button" *ngIf="stepper=='create'" [hidden]="roleFeaturePermissions?.create == false && user?.userRole <= 3" matTooltip="Cancel Company" class="icon-btn" (click)="stepper='view'">
+              <i class="fa fa-times" aria-hidden="true"></i>
+              <span class="btn-text">Cancel</span>
+            </button>
+            <button type="button" *ngIf="stepper=='view'" [hidden]="roleFeaturePermissions?.create == false && user?.userRole <= 3" matTooltip="Create New Company" class="icon-btn" (click)="createNewCompany();">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              <span class="btn-text">Add</span>
+            </button>
+          </div>
+          <div class="button-wrapper" *ngIf="isBulkCompany">
+            <div class="excel-btn-panel">
+              <div class="excel-btn-icon">
+                <input type="image" name="selectCompanyFields" (click)="onSelectAllChange('checked')" title="Select all from all pages" src="../../../../assets/btncapcheckbox.svg">
+              </div>
+              <div class="excel-btn-icon">
+                <input type="image" (click)="editField(); isEditField = true; isBulkEditColumn=true;formeFilledLevel=1;actionPerformdType=1;" name="editContactFields" title="Edit a field for all checked contacts." src="../../../../assets/btneditcontacts.svg">
+              </div>
+              <div class="excel-btn-icon">
+                <input type="image" (click)="actionPerformdType=2;" name="editContactFields" title="Transfer ownership of checked contacts." src="../../../../assets/btntransfercontacts.svg">
+              </div>
+              <div class="excel-btn-icon">
+                <input type="image" (click)="actionPerformdType=3;" name="editContactFields" title="Delete all checked companies with no contact" src="../../../../assets/trash-btn.svg">
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section" *ngIf="!isBulkCompany">
+        <div>
+          <kendo-grid #companyGrid class="company-grid"
+            id="gridId"
+            [kendoGridBinding]="companyList"
+            [pageSize]="_gridCnfgService.pageSize"
+            [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+            [sortable]="{mode: 'multiple'}"
+            [scrollable]="'scrollable'"
+            [sort]="_gridCnfgService.sort"
+            [columnMenu]="{ filter: true }"
+            [resizable]="true"
+            [reorderable]="true"
+            [ngStyle]="gridHeight"
+            (columnReorder)="_gridCnfgService.columnsOrderChanged('company_grid', $event)"
+            (sortChange)="_gridCnfgService.sortChange('company_grid', $event)"
+            (pageChange)="_gridCnfgService.pageChange('company_grid', $event)"
+            (columnResize)="_gridCnfgService.columnResize(14,'company_grid', $event)"
+            (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'company_grid',companyGrid)">
+            <div class="grid-scroll-bar">
+              <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                [field]="column.field"
+                [title]="column.title | titlecase"
+                [width]="column.width"
+                [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                [filterable]="true"
+                [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                [includeInChooser]="column.field=='$' ? false : true">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="customer-name" *ngIf="column.field == 'companyName'" (click)="rowSelectionCompanyChange(dataItem['companyID'])"><a class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</a></div>
+                  <div class="customer-name" *ngIf="column.field == 'webSite'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'phone'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'numContacts'">{{ dataItem[column.field]  }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'city'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'state'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'cLPUserID'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'dtModified'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd /yyyy' }}</div>
+                  <div class="customer-name" *ngIf="column.field == 'dtCreated'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yyyy' }}</div>
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-grid-messages [pagerItemsPerPage]="'Per page'" [pagerItems]="'Companies'"> </kendo-grid-messages>
+            </div>
+          </kendo-grid>
+        </div>
+      </div>
+      <div class="global-body-section" *ngIf="isBulkCompany ">
+        <div class="alert-panel" *ngIf="saveConfirmation">Please confirm the field and value you would like to edit for all {{mySelection.length}} selected companies.</div>
+        <div class="wraper-body-left">
+          <div class="bulk-action-body">
+            <ng-container [ngSwitch]="actionPerformdType">
+              <ng-container *ngSwitchCase="1">
+                <div class="warning-alert">
+                  <ng-container [ngSwitch]="formeFilledLevel">
+                    <ng-container *ngSwitchCase="1"><p>Please select the field you would like to edit.</p></ng-container>
+                    <ng-container *ngSwitchCase="2"><p>Please select the type of edit you would like to perform on this field.</p></ng-container>
+                    <ng-container *ngSwitchCase="3"><p>{{messageStep3}}</p></ng-container>
+                    <ng-container *ngSwitchCase="4"><p>Please confirm the field and value you would like to edit for all checked companies.</p></ng-container>
+                    <ng-container *ngSwitchDefault><p>Please confirm the field and value you would like to edit for all checked companies.</p></ng-container>
+                  </ng-container>
+                </div>
+                <div class="wraper-body-panel">
+                  <div class="wraper-body-left">
+                    <form [formGroup]="uploadEditFieldForm" (ngSubmit)="updateBulkCompanyForm()" *ngIf="uploadEditFieldForm ">
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left">
+                          <span>Select Field </span>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <select class="form-control" formControlName="ddField" *ngIf="uploadEditFieldForm?.controls.ddField.value == ''" (change)="changeDDFields()">
+                            <option disabled value=""> -Select one- </option>
+                            <option *ngFor="let option of lookUpFields" [ngValue]="option.value">{{ option.tilte }}</option>
+                          </select>
+                          <span *ngIf="uploadEditFieldForm?.controls.ddField.value != ''">{{uploadEditFieldForm?.controls.ddField.value}}</span>
+                        </div>
+                      </div>
+                      <div class="cards-body-section" *ngIf="uploadEditFieldForm?.controls.ddField.value != '' &&  editMode">
+                        <div class="cards-colunm-left">
+                          <span>Edit Type </span>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <select class="form-control" formControlName="editType" *ngIf="uploadEditFieldForm?.controls.editType.value == -1" (change)="changeField()">
+                            <option disabled value="-1">Select one</option>
+                            <option [value]="key" *ngFor="let key of editTypeKeys" [label]="enumForEditType[key]"></option>
+                          </select>
+                          <span *ngIf="uploadEditFieldForm?.controls.editType.value == 0">Replace</span>
+                          <span *ngIf="uploadEditFieldForm?.controls.editType.value == 1">Add to</span>
+                          <span *ngIf="uploadEditFieldForm?.controls.editType.value == 2">Clear</span>
+                          <span *ngIf="uploadEditFieldForm?.controls.editType.value == 3">Remove</span>
+                        </div>
+                      </div>
+                      <div class="cards-body-section" *ngIf="uploadEditFieldForm?.controls.editType.value >= 0  && editMode">
+                        <div class="cards-colunm-left">
+                          <span>Value </span>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <ng-container [ngSwitch]="true">
+                            <ng-container *ngSwitchCase="uploadEditFieldForm?.controls.ddField.value == 'Shareable' ||uploadEditFieldForm?.controls.ddField.value == 'Check1' ||uploadEditFieldForm?.controls.ddField.value == 'Check2' ||uploadEditFieldForm?.controls.ddField.value == 'Check3' ||uploadEditFieldForm?.controls.ddField.value == 'Check4' ||uploadEditFieldForm?.controls.ddField.value == 'Check5' ||uploadEditFieldForm?.controls.ddField.value == 'Check6' ">
+                              <div>
+                                <input class="form-control" type="checkbox" formControlName="textValue" [ngClass]="{'has-error': uploadEditFieldForm?.controls.textValue.errors && (uploadEditFieldForm?.controls.textValue.touched || uploadEditFieldForm?.controls.textValue.dirty)}" />
+                                <div *ngIf="uploadEditFieldForm?.controls.textValue.errors && (uploadEditFieldForm?.controls.textValue.touched || uploadEditFieldForm?.controls.textValue.dirty)">
+                                  <div class="login-error" *ngIf="uploadEditFieldForm?.controls.textValue.errors.required">Value is required </div>
+                                </div>
+                              </div>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="uploadEditFieldForm?.controls.ddField.value == 'Notes' || uploadEditFieldForm?.controls.ddField.value == 'Comments'">
+                              <div>
+                                <textarea id="note" class="form-control contact-text-auto-height" row="1" cols="1" formControlName="textValue" placeholder="note"></textarea>
+                                <div *ngIf="uploadEditFieldForm?.controls.textValue.errors && (uploadEditFieldForm?.controls.textValue.touched || uploadEditFieldForm?.controls.textValue.dirty)">
+                                  <div class="login-error" *ngIf="uploadEditFieldForm?.controls.textValue.errors.required">Note is required </div>
+                                </div>
+                              </div>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="uploadEditFieldForm?.controls.ddField.value == 'CMCustomDate1' || uploadEditFieldForm?.controls.ddField.value == 'CMCustomDate1 : Issue' || uploadEditFieldForm?.controls.ddField.value == 'CMCustomDate2' ||uploadEditFieldForm?.controls.ddField.value == 'CMCustomDate2 : Request Info' || uploadEditFieldForm?.controls.ddField.value == 'CMCustomDate3' || uploadEditFieldForm?.controls.ddField.value == 'CMCustomDate3 : Expiration'">
+                              <div>
+                                <kendo-datetimepicker class="form-control" id="textValue" formControlName="textValue" name="textValue"></kendo-datetimepicker>
+                                <div *ngIf="uploadEditFieldForm?.controls.textValue.errors && (uploadEditFieldForm?.controls.textValue.touched || uploadEditFieldForm?.controls.textValue.dirty)">
+                                  <div class="login-error" *ngIf="uploadEditFieldForm?.controls.textValue.errors.required">Value is required </div>
+                                </div>
+                              </div>
+                            </ng-container>
+
+                            <ng-container *ngSwitchCase=" uploadEditFieldForm?.controls.ddField.value == 'Tag'">
+                              <div>
+                                <div class="example-wrapper">
+                                  <kendo-dropdownlist [defaultItem]="{ text: 'Select Tag value', value: null , lookupName: null }"
+                                      [data]="tagData"
+                                      [filterable]="true"
+                                      textField="text"
+                                      valueField="value"
+                                      formControlName="textValue"
+                                      [valuePrimitive]="true"
+                                      (filterChange)="handleTagFilter($event)"
+                                      required>
+                                  </kendo-dropdownlist>
+                                  <div *ngIf="uploadEditFieldForm?.controls.textValue.errors && (uploadEditFieldForm?.controls.textValue.touched || uploadEditFieldForm?.controls.textValue.dirty)">
+                                    <div class="login-error" *ngIf="uploadEditFieldForm?.controls.textValue.errors.required">Value is required </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </ng-container>
+                            <ng-container *ngSwitchCase=" uploadEditFieldForm?.controls.ddField.value == 'Class1Code' ||uploadEditFieldForm?.controls.ddField.value == 'Class2Code' || uploadEditFieldForm?.controls.ddField.value == 'Class3Code' ||uploadEditFieldForm?.controls.ddField.value == 'Class4Code' ||uploadEditFieldForm?.controls.ddField.value == 'Class5Code' ||uploadEditFieldForm?.controls.ddField.value == 'Class6Code' ||uploadEditFieldForm?.controls.ddField.value == 'Class7Code' ||uploadEditFieldForm?.controls.ddField.value == 'Class8Code' || uploadEditFieldForm?.controls.ddField.value == 'Class1Code : Status' || uploadEditFieldForm?.controls.ddField.value == 'Class2Code : Marketing Channel' || uploadEditFieldForm?.controls.ddField.value == 'Class3Code : Best time to call' || uploadEditFieldForm?.controls.ddField.value == 'Class4Code : DQ/Dead Factors' || uploadEditFieldForm?.controls.ddField.value == 'Class5Code : BEM ONLY (do not use)'|| uploadEditFieldForm?.controls.ddField.value == 'Class6Code : Channel'|| uploadEditFieldForm?.controls.ddField.value == 'Class7Code : Source'|| uploadEditFieldForm?.controls.ddField.value == 'Class8Code : Campaign' ">
+                              <div>
+                                <select class="form-control" formControlName="textValue">
+                                  <option disabled value=""> -Select one- </option>
+                                  <option *ngFor="let key of classCode; let i = index" [value]="key.code">{{key.display }}</option>
+                                </select>
+                                <div *ngIf="uploadEditFieldForm?.controls.textValue.errors && (uploadEditFieldForm?.controls.textValue.touched || uploadEditFieldForm?.controls.textValue.dirty)">
+                                  <div class="login-error" *ngIf="uploadEditFieldForm?.controls.textValue.errors.required">Value is required </div>
+                                </div>
+                              </div>
+                            </ng-container>
+                            <ng-container *ngSwitchDefault>
+                              <div>
+                                <input type="text" formControlName="textValue" [ngClass]="{'has-error': uploadEditFieldForm?.controls.textValue.errors && (uploadEditFieldForm?.controls.textValue.touched || uploadEditFieldForm?.controls.textValue.dirty)}" />
+                                <div *ngIf="uploadEditFieldForm?.controls.textValue.errors && (uploadEditFieldForm?.controls.textValue.touched || uploadEditFieldForm?.controls.textValue.dirty)">
+                                  <div class="login-error" *ngIf="uploadEditFieldForm?.controls.textValue.errors.required">Value is required </div>
+                                </div>
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                        </div>
+                      </div>
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left"></div>
+                        <div class="cards-colunm-right">
+                          <div class="bottom-button-bar" *ngIf="uploadEditFieldForm?.controls.editType.value != -1">
+                            <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" *ngIf="!saveConfirmation" type="button" (click)="preSaveContact();"> Save</button>
+                            <button class="btn btn-primary" *ngIf="saveConfirmation" [disabled]="showSpinner" type="submit"> Click to Confirm Save</button>
+                            <button class="btn btn-cancel" type="button" (click)="cancelSaveCompany()"> Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+
+              </ng-container>
+              <ng-container *ngSwitchCase="2">
+                <div class="alert-panel">
+                  <div>Please select the field you would like to edit.</div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left">
+                    <span>New Owner </span>
+                  </div>
+                  <div class="cards-colunm-right">
+                    <select [(ngModel)]="assignedUserTransfer" class="form-control" >
+                      <option disabled value="-1"> -Select one- </option>
+                      <option *ngFor="let option of userFilterAssign" [ngValue]="option.cLPUserID">{{ option.userName }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="cards-body-section">
+                  <div class="cards-colunm-left"></div>
+                  <div class="cards-colunm-right">
+                      <button class="btn btn-primary" type="button" (click)="transferBulkUser();">Save</button>
+                      <button (click)="actionPerformdType = -1;" class="btn btn-primary" type="button">Cancel </button>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngSwitchCase="3">
+                <div class="warning-alert">
+                  <p>Caution: You are about to permanently delete all checked companies that have no associated contacts... Please confirm.</p>
+                </div>
+                <div class="alert-panel">
+                  <div>Important Information</div>
+                  <div>*This action will ONLY delete the selected companies with NO associated contacts.</div>
+                  <div>*If you need to delete contacts in bulk, please refer to the Bulk Contact Wizard.</div>
+                  <div>*You CANNOT undo this action.</div>
+                </div>
+                <div class="margin-all-area">
+                  <button class="btn btn-primary" type="button" (click)="deleteBulkUser()">Confirm</button>
+                  <button (click)="actionPerformdType = -1;" class="btn btn-primary" type="button">Cancel </button>
+                </div>
+              </ng-container>
+              <ng-container *ngSwitchDefault><div></div></ng-container>
+            </ng-container>
+          </div>
+        </div>
+        <div class="alert-panel" *ngIf="!companyList">
+          <div>record found {{companyList?.length}}</div>
+          <div> Please use the quick search panel to select companies.</div>
+        </div>
+        <kendo-grid #companyGrid  class="company-grid"
+          id="gridId"
+          [(selectedKeys)]="mySelection"
+          kendoGridSelectBy="companyID"
+          [selectable]="{enabled: true, checkboxOnly: true }"
+          [kendoGridBinding]="companyList"
+          [pageSize]="_gridCnfgService.pageSize"
+          [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+          [sortable]="{mode: 'multiple'}"
+          [scrollable]="'scrollable'"
+          [sort]="_gridCnfgService.sort"
+          [columnMenu]="{ filter: true }"
+          [resizable]="true"
+          [reorderable]="true"
+          [ngStyle]="gridHeight"
+          (columnReorder)="_gridCnfgService.columnsOrderChanged('company_grid', $event)"
+          (sortChange)="_gridCnfgService.sortChange('company_grid', $event)"
+          (pageChange)="_gridCnfgService.pageChange('company_grid', $event)"
+          (columnResize)="_gridCnfgService.columnResize(14,'company_grid', $event)"
+          (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'company_grid',companyGrid)">
+          <div class="grid-scroll-bar">
+            <kendo-grid-checkbox-column>
+              <ng-template kendoGridHeaderTemplate>
+                <input type="checkbox"
+                  kendoCheckBox
+                  id="selectAllCheckboxId"
+                  kendoGridSelectAllCheckbox
+                  [state]="selectAllState"
+                  (selectAllChange)="onSelectAllChange($event)" />
+                <label class="k-checkbox-label" for="selectAllCheckboxId"></label>
+              </ng-template>
+            </kendo-grid-checkbox-column>
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+              [field]="column.field"
+              [title]="column.title | titlecase"
+              [width]="column.field == '$' ? '40' : column.width"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [filterable]="true"
+              [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+              [includeInChooser]="column.field=='$' ? false : true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.field == 'companyName'" (click)="rowSelectionCompanyChangeFromBulk(dataItem['companyID'])"><a class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</a></div>
+                <div class="customer-name" *ngIf="column.field == 'webSite'"><a class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</a></div>
+                <div class="customer-name" *ngIf="column.field == 'phone'"><a class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</a></div>
+                <div class="customer-name" *ngIf="column.field == 'numContacts'"><a class="text-primary">{{ dataItem[column.field]  }}</a></div>
+                <div class="customer-name" *ngIf="column.field == 'city'"><a class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</a></div>
+                <div class="customer-name" *ngIf="column.field == 'state'"><a class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</a></div>
+                <div class="customer-name" *ngIf="column.field == 'cLPUserID'"><a class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</a></div>
+                <div class="customer-name" *ngIf="column.field == 'dtModified'"><a class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd /yyyy' }}</a></div>
+                <div class="customer-name" *ngIf="column.field == 'dtCreated'"><a class="text-primary">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yyyy' }}</a></div>
+              </ng-template>
+            </kendo-grid-column>
+            <kendo-grid-messages [pagerItemsPerPage]="'Per page'" [pagerItems]="'Companies'"> </kendo-grid-messages>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+
+
+

@@ -1,0 +1,93 @@
+<div class="wraper-main-section mb-3">
+  <div class="global-card-section">
+    <div class="global-header-section">
+      <div class="svg-icon-panel">Document Storage Summary </div>
+    </div>
+    <div class="wraper-body-panel">
+      <div class="wraper-body-left">
+        <div class="cards-body-section">
+          <div class="cards-colunm-left">Used Space</div>
+          <div class="cards-colunm-right">{{totalSpaceUsed }} MB</div>
+        </div>
+        <div class="cards-body-section">
+          <div class="cards-colunm-left">Free Space</div>
+          <div class="cards-colunm-right">{{totalCapacity - totalSpaceUsed }} MB</div>
+        </div>
+        <div class="cards-body-section">
+          <div class="cards-colunm-left">Total Space</div>
+          <div class="cards-colunm-right">{{totalCapacity}} MB</div>
+        </div>
+        <div class="cards-body-section">
+          <div class="cards-colunm-left"></div>
+          <div class="cards-colunm-right">
+            <button class="btn btn-primary" (click)="storageSum=!storageSum">{{storageSum? 'Hide User Usage': 'Usage by User'}}</button>
+          </div>
+        </div>        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wraper-main-section mb-2" *ngIf="storageSum" >
+  <div class="global-card-section">
+    <div class="global-header-section">
+      <div class="svg-icon-panel">Document Storage By User </div>
+      <div class="header-button-panel">
+        <div class="button-wrapper">
+          <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputSearch.value=''"><i class="fas fa-trash mr-1"></i>Reset Grid Setting</button>
+          <input class="form-control" placeholder="Search in all columns..." kendoTextBox (input)="onStorageSummaryFilter($event.target.value)" #inputSearch />
+        </div>
+      </div>
+    </div>
+    <div class="global-body-section">
+      <div class="storage-body-panel">
+        <kendo-grid #grid
+          id="gridId"
+          [kendoGridBinding]="storageSummary"
+          [pageSize]="_gridCnfgService.pageSize"
+          [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+          [sortable]="{mode: 'multiple'}"
+          [scrollable]="'scrollable'"
+          [sort]="_gridCnfgService.sort"
+          [columnMenu]="{ filter: true }"
+          [resizable]="true"
+          [reorderable]="true"
+          (remove)="removeHandler($event)"
+          (columnReorder)="_gridCnfgService.columnsOrderChanged('account_storage_grid', $event)"
+          (sortChange)="_gridCnfgService.sortChange('account_storage_grid', $event)"
+          (pageChange)="_gridCnfgService.pageChange('account_storage_grid', $event)"
+          (columnResize)="_gridCnfgService.columnResize(2,'account_storage_grid', $event)"
+          (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'account_storage_grid',grid)">
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of  _gridCnfgService.columns"
+              [field]="column.field"
+              [title]="column.title | titlecase"
+              [width]="column.width"
+              [filterable]="true"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : '' "
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm':'' "
+              [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+              [footerStyle]="{'color': '#fff','line-height': '1.5em'}">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.field == 'firstName'"> {{ dataItem.lastName  }},{{ dataItem.firstName  }}</div>
+                <div class="customer-name" *ngIf="column.field == 'spaceUsed'">{{  ((dataItem[column.field]/1024)/1024) | number: '1.0-1' }}</div>
+              </ng-template>
+              <ng-template kendoGridFooterTemplate let-column="column" let-columnIndex="columnIndex">
+                <div class="customer-name" *ngIf="(column.field == 'firstName')">Total</div>
+                <div class="customer-name" *ngIf="(column.field == 'spaceUsed')"> {{totalSpaceUsed}}   </div>
+              </ng-template>
+
+            </kendo-grid-column>
+            <kendo-grid-messages [pagerItemsPerPage]="'Storage Summary per page'" [pagerItems]="'Storage'"> </kendo-grid-messages>
+          </div>
+        </kendo-grid>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner ">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

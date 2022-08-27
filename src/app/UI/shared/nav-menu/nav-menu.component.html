@@ -1,0 +1,222 @@
+<div class="default-header">
+  <div class="logo-section">
+    <a><img [hidden]="validImage" src="../assets/logo_{{user?.cLPCompanyID}}.png" (error) ="validImage=true;">
+  <img src="../assets/so_logo.png"></a>
+    <div class="clear"></div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary" data-spy="affix" data-offset-top="50">
+    <div class="mobile_display">
+      <div class="mobile-menu-bar">
+        <div class="mobile-user-dropdown">
+          <ul class="user-drop-down" id="account-right-menu">
+          <li class="dropdown">
+            <a data-toggle="dropdown" style="color:#fff;">
+              <img class="profile-img" src="../assets/profileicon.svg" />
+              <span title="{{user?.firstName}}">{{user?.firstName}} {{user?.lastName}}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-messages">
+              <li>
+                <div class="dropdown-messages-box">
+                  <div class="message-body">
+                    <a [routerLink]="['/edit-profile', user?.cLPUserID]" routerLink="/edit-profile"><strong>Edit Profile </strong></a>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="dropdown-messages-box">
+                  <div class="message-body">
+                    <a (click)="logout();"><strong>Sign out </strong></a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        </div>
+        <div class="flex-2">
+          <div class="mobile-multiple-icon">
+            <div class="search-section">
+              <!--<kendo-menu [items]="homeMenu" (select)="onSelectHome($event)"></kendo-menu>-->
+              <ul class="navbar-nav">
+                <li class="nav-item dropdown" *ngFor="let category of homeMenu;let p=index;">
+                  <a class="nav-link dropdown-toggle" (click)="onSelectParent(category,0)" aria-haspopup="true" aria-expanded="false">
+                    <img src="{{category.icon}}" />
+                  </a>
+                  <ul class="dropdown-menu" [id]="getUniqueId(category.text?category.text:category.icon)" [ngClass]="currentSelectedParentId === getUniqueId(category.text?category.text:category.icon) ? 'show_nav_child' : 'hide_nav_child'">
+                    <li class="dropdown-submenu" *ngFor="let subcategory of category?.items">
+                      <a class="dropdown-item" (click)="onSelectHome(subcategory)" [hidden]="subcategory?.items?.length != 0">{{subcategory?.text}}</a>
+                      <a class="dropdown-item dropdown-toggle" (click)="onSelectParent(subcategory,1)" [hidden]="subcategory?.items?.length == 0">{{subcategory?.text}} <i class="fa " [ngClass]="currentSelectedId === getUniqueId(subcategory.text) ? 'fa-chevron-down ' : 'fa-chevron-right'"></i></a>
+                      <ul class="dropdown-menu" [id]="getUniqueId(subcategory.text)" [ngClass]="currentSelectedId === getUniqueId(subcategory.text) ? 'show_nav_child' : 'hide_nav_child'">
+                        <li class="dropdown-submenu" *ngFor="let childCategory of subcategory?.items">
+                          <a class="dropdown-item" (click)="onSelectHome(childCategory)" [hidden]="childCategory?.items?.length != 0">{{childCategory?.text}}</a>
+                          <a class="dropdown-item dropdown-toggle" (click)="onSelectParent(subcategory,2)" [hidden]="childCategory?.items?.length == 0">{{childCategory?.text}} <i class="fa fa-chevron-right"></i></a>
+                          <ul class="dropdown-menu">
+                            <li class="dropdown-submenu" *ngFor="let childSubCategory of childCategory?.items">
+                              <a class="dropdown-item" (click)="onSelectHome(childSubCategory)">{{childSubCategory?.text}}</a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <div class="menu-panel">
+              <ul class="navbar-nav">
+                <li class="nav-item dropdown " *ngFor="let category of menus;let p=index;">
+                  <a *ngIf="category.icon" class="nav-link dropdown-toggle" (click)="onSelectParent(category,0)" aria-haspopup="true" aria-expanded="false">
+                    <span [hidden]="category.text == null">{{category.text}}</span>
+                    <img [hidden]="category.icon == null" src="{{category.icon}}" />
+                  </a>
+                  <ul *ngIf="category.icon" class="dropdown-menu" [id]="getUniqueId(category.text?category.text:category.icon)" [ngClass]="currentSelectedParentId === getUniqueId(category.text?category.text:category.icon) ? 'show_nav_child' : 'hide_nav_child'">
+                    <li class="dropdown-submenu" *ngFor="let subcategory of category?.items ;let i=index;">
+                      <a class="dropdown-item" (click)="onSelectParent(subcategory,1)" [hidden]="subcategory?.items.length != 0">{{subcategory?.text}}</a>
+                      <a class="dropdown-item dropdown-toggle" (click)="onSelectParent(subcategory,1)" [hidden]="subcategory?.items.length == 0">{{subcategory?.text}}<i class="fa " [ngClass]="currentSelectedId === getUniqueId(subcategory.text) ? 'fa-chevron-down ' : 'fa-chevron-right'"></i></a>
+                      <!--1st level ul-->
+                      <ul class="dropdown-menu" [id]="getUniqueId(subcategory.text)" [ngClass]="currentSelectedId === getUniqueId(subcategory.text) ? 'show_nav_child' : 'hide_nav_child'" [hidden]="subcategory?.items.length == 0">
+                        <li class="dropdown-submenu" *ngFor="let childCategory of subcategory?.items">
+                          <a class="dropdown-item" (click)="onSelectParent(childCategory,2)" [hidden]="childCategory?.items.length != 0">{{childCategory?.text}}</a>
+                          <a class="dropdown-item dropdown-toggle" (click)="onSelectParent(childCategory,2)" [hidden]="childCategory?.items.length == 0">{{childCategory?.text}}<i class="fa " [ngClass]="currentSelectedId === getUniqueId(childCategory.text) ? 'fa-chevron-down ' : 'fa-chevron-right'"></i></a>
+                          <!--2nd level ul-->
+                          <ul class="dropdown-menu" [id]="getUniqueId(childCategory.text)" [ngClass]="currentSelectedChildId === getUniqueId(childCategory.text) ? 'show_nav_child' : 'hide_nav_child'" [hidden]="childCategory?.items.length == 0">
+                            <li class="dropdown-submenu" *ngFor="let childSubCategory of childCategory?.items">
+                              <a class="dropdown-item" (click)="onSelectParent(childSubCategory,2)">{{childSubCategory?.text}}</a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <div class="mobile-search">
+              <button (click)=" toggleSearch();"  class="btn-icon"><i class="fa " [ngClass]="showSearch ? ' fa-close' : ' fa-search' " ></i></button>
+            </div>
+          </div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" (click)="resetMenuState();" data-target="#main_nav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="desktop_display">
+      <div class="collapse navbar-collapse" id="main_nav">
+        <div class="search-section">
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown" *ngFor="let category of homeMenu;let p=index;">
+              <a class="nav-link dropdown-toggle" (click)="onSelectParent(category,0)" aria-haspopup="true" aria-expanded="false">
+                <img src="{{category.icon}}" />
+              </a>
+              <ul class="dropdown-menu" [id]="getUniqueId(category.text?category.text:category.icon)" [ngClass]="currentSelectedParentId === getUniqueId(category.text?category.text:category.icon) ? 'show_nav_child' : 'hide_nav_child'">
+                <li class="dropdown-submenu" *ngFor="let subcategory of category?.items">
+                  <a class="dropdown-item" (click)="onSelectHome(subcategory)" [hidden]="subcategory?.items?.length != 0">{{subcategory?.text}}</a>
+                  <a class="dropdown-item dropdown-toggle" (click)="onSelectParent(subcategory,1)" [hidden]="subcategory?.items?.length == 0">{{subcategory?.text}} <i class="fa " [ngClass]="currentSelectedId === getUniqueId(subcategory.text) ? 'fa-chevron-down ' : 'fa-chevron-right'"></i></a>
+                  <ul class="dropdown-menu" [id]="getUniqueId(subcategory.text)" [ngClass]="currentSelectedId === getUniqueId(subcategory.text) ? 'show_nav_child' : 'hide_nav_child'">
+                    <li class="dropdown-submenu" *ngFor="let childCategory of subcategory?.items">
+                      <a class="dropdown-item" (click)="onSelectHome(childCategory)" [hidden]="childCategory?.items?.length != 0">{{childCategory?.text}}</a>
+                      <a class="dropdown-item dropdown-toggle" (click)="onSelectParent(subcategory,2)" [hidden]="childCategory?.items?.length == 0">{{childCategory?.text}} <i class="fa fa-chevron-right"></i></a>
+                      <ul class="dropdown-menu">
+                        <li class="dropdown-submenu" *ngFor="let childSubCategory of childCategory?.items">
+                          <a class="dropdown-item" (click)="onSelectHome(childSubCategory)">{{childSubCategory?.text}}</a>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <form class="form-inline">
+            <div class="input-group">
+              <button class="btn btn-primary" type="button">
+                <i class="fa fa-search"></i>
+              </button>
+              <input type="text" placeholder="Search" aria-label="Search">
+            </div>
+          </form>
+
+        </div>
+        <div class="menu-panel">
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown" *ngFor="let category of menus;let p=index;">
+              <a class="nav-link dropdown-toggle" (click)="onSelectParent(category,0)" aria-haspopup="true" aria-expanded="false">
+                <span [hidden]="category.text == null">{{category.text}}</span>
+                <img [hidden]="category.icon == null" src="{{category.icon}}" />
+                <i class="fa " [ngClass]="currentSelectedParentId === getUniqueId(category.text) ? 'fa-chevron-down ' : 'fa-chevron-right'"></i>
+              </a>
+              <ul class="dropdown-menu" [id]="getUniqueId(category.text?category.text:category.icon)" [ngClass]="currentSelectedParentId === getUniqueId(category.text?category.text:category.icon) ? 'show_nav_child' : 'hide_nav_child'">
+                <li class="dropdown-submenu" *ngFor="let subcategory of category?.items ;let i=index;">
+                  <a class="dropdown-item" (click)="onSelectParent(subcategory,1)" [hidden]="subcategory?.items.length != 0">{{subcategory?.text}}</a>
+                  <a class="dropdown-item dropdown-toggle" (click)="onSelectParent(subcategory,1)" [hidden]="subcategory?.items.length == 0">{{subcategory?.text}} <i class="fa " [ngClass]="currentSelectedId === getUniqueId(subcategory.text) ? 'fa-chevron-down ' : 'fa-chevron-right'"></i></a>
+                  <!--1st level ul-->
+                  <ul class="dropdown-menu" [ngClass]="currentSelectedId === getUniqueId(subcategory.text) ? 'show_nav_child' : 'hide_nav_child'" [hidden]="subcategory?.items.length == 0" [id]="getUniqueId(subcategory.text)">
+                    <li class="dropdown-submenu" *ngFor="let childCategory of subcategory?.items">
+                      <a class="dropdown-item" (click)="onSelectParent(childCategory,2)" [hidden]="childCategory?.items.length != 0">{{childCategory?.text}} </a>
+                      <a class="dropdown-item dropdown-toggle" (click)="onSelectParent(childCategory,2)" [hidden]="childCategory?.items.length == 0">{{childCategory?.text}}<i class="fa" [ngClass]="currentSelectedChildId === getUniqueId(childCategory.text) ? 'fa-chevron-down ' : 'fa-chevron-right'"></i> </a>
+                      <!--2nd level ul-->
+                      <ul class="dropdown-menu" [id]="getUniqueId(childCategory.text)" [ngClass]="currentSelectedChildId === getUniqueId(childCategory.text) ? 'show_nav_child' : 'hide_nav_child'" [hidden]="childCategory?.items.length == 0">
+                        <li class="dropdown-submenu" *ngFor="let childSubCategory of childCategory?.items">
+                          <a class="dropdown-item" (click)="onSelectParent(childSubCategory,2)">{{childSubCategory?.text}}</a>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="user-drop-down" id="account-right-menu">
+            <li class="dropdown">
+              <a data-toggle="dropdown" style="color:#fff;">
+                <img class="profile-img" src="../assets/profileicon.svg" />
+                <span title="{{user?.firstName}}">{{user?.firstName}} {{user?.lastName}}</span>
+              </a>
+              <ul class="dropdown-menu dropdown-messages">
+                <li>
+                  <div class="dropdown-messages-box">
+                    <div class="message-body">
+                      <a [routerLink]="['/edit-profile', user?.cLPUserID]" routerLink="/edit-profile"><strong>Edit Profile </strong></a>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="dropdown-messages-box">
+                    <div class="message-body">
+                      <a (click)="logout();"><strong>Sign out </strong></a>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div @slideDownUp *ngIf="showSearch" class="show-search-box" [ngStyle]="{'display': showSearch ? 'block' : 'none' }"  [ngClass]="showSearch ? '' : 'collapse' " >
+    <form class="form-inline">
+      <div class="input-group">
+        <input type="text" placeholder="Search" aria-label="Search">
+        <button class="btn btn-primary" type="button"><i class="fa fa-search"></i></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="underConstruction" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-common-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body modal-common-body">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <p class="under-construction under-construction-common">
+          <img src="../../../assets/under-construction.gif" />
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

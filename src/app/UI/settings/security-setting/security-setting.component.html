@@ -1,0 +1,261 @@
+<div class="container-fluid mt-3 common-alignment">
+  <div class="custom-security-link">
+    <a [routerLink]="['/outlook-security-setting']">Outlook Security Settings</a>
+  </div>
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel">
+          <img src="../../../../assets/activity/config/securitytitle.svg" class="mr-1" />Security Settings Setup
+        </div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <button type="button" matTooltip="Edit" class="icon-btn" *ngIf="isEditMode == false && user?.userRole > 3 " [hidden]="roleFeaturePermissions?.edit == false" (click)="editMode()">
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+              <span class="btn-text">Edit</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="isEditMode" class="alert-panel">Please edit your security settings and click Save.</div>
+      <div *ngIf="!isEditMode && status == 'Cancel'" class="alert-panel">No changes have been made.</div>
+      <div *ngIf="!isEditMode && status == 'Save'" class="alert-panel">Changes have been saved.</div>
+      <div class="global-body-section">
+        <div class="security-setting-header">
+          <div class="inner-cards-panel">
+            <span class="border-colunm"></span>
+            <span class="text-center border-colunm"><img src="../../../../assets/activity/config/hdradministrators.svg" /></span>
+            <span class="text-center border-colunm"><img src="../../../../assets/activity/config/hdrmanagers.svg" /></span>
+            <span class="text-center border-colunm border-none"><img src="../../../../assets/activity/config/hdrgeneralusers.svg" /></span>
+          </div>
+        </div>
+
+        <div class="security-setting-background">
+          <div class="inner-cards-panel">
+            <span class="border-colunm"></span>
+            <span class=" border-colunm">
+              <span class="inner-cards-panel">
+                <span class="text-center">View</span>
+                <span class="text-center">Edit</span>
+              </span>
+            </span>
+            <span class="border-colunm">
+              <span class="inner-cards-panel">
+                <span class="text-center">View</span>
+                <span class="text-center">Edit</span>
+              </span>
+            </span>
+            <span class=" border-colunm border-none">
+              <span class="inner-cards-panel">
+                <span class="text-center">View</span>
+                <span class="text-center">Edit</span>
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="outlook-row-bg">
+          <div class="inner-cards-panel">
+            <span class="flex-align-panel border-colunm">Company</span>
+            <span class="border-colunm">
+              <span class="inner-cards-panel text-center">
+                <span><img [src]="checkedImagePath" /></span>
+                <span><img [src]="checkedImagePath" /></span>
+              </span>
+            </span>
+            <span class="border-colunm">
+              <span class="inner-cards-panel text-center">
+                <span>
+                  <span *ngIf="isEditMode == false">
+                    <img *ngIf="comManView == true" [src]="checkedImagePath" /><img *ngIf="comManView == false" [src]="uncheckedImagePath" />
+                  </span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="comManView" (change)="changeSettings(comManView?true:false , 'comManView')" id="comManView" name="comManView" />
+                </span>
+                <span>
+                  <span *ngIf="isEditMode == false">
+                    <img *ngIf="comManEdit == true" [src]="checkedImagePath" />
+                    <img *ngIf="comManEdit == false" [src]="uncheckedImagePath" />
+                  </span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="comManEdit" (change)="changeSettings(comManEdit?true:false , 'comManEdit')" id="comManEdit" name="comManEdit" />
+                </span>
+              </span>
+            </span>
+            <span class=" border-colunm border-none">
+              <span class="inner-cards-panel text-center">
+                <span>
+                  <span *ngIf="isEditMode == false">
+                    <img *ngIf="comGenView == true" [src]="checkedImagePath" />
+                    <img *ngIf="comGenView == false" [src]="uncheckedImagePath" />
+                  </span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="comGenView" (change)="changeSettings(comGenView?true:false , 'comGenView')" id="comGenView" name="comGenView" />
+                </span>
+                <span>
+                  <span *ngIf="isEditMode == false">
+                    <img *ngIf="comGenEdit == true" [src]="checkedImagePath" />
+                    <img *ngIf="comGenEdit == false" [src]="uncheckedImagePath" />
+                  </span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="comGenEdit" (change)="changeSettings(comGenEdit?true:false , 'comGenEdit')" id="comGenEdit" name="comGenEdit" />
+                </span>
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="security-setting-background" *ngIf="isShowOfficeSection">
+          <div class="inner-cards-panel">
+            <span class="flex-align-panel border-colunm">Office</span>
+            <span class="border-colunm">
+              <span class="inner-cards-panel text-center">
+                <span><img [src]="checkedImagePath" /></span>
+                <span><img [src]="checkedImagePath" /></span>
+              </span>
+            </span>
+            <span class="border-colunm">
+              <span class="inner-cards-panel text-center">
+                <span>
+                  <span *ngIf="isEditMode == false"><img *ngIf="offManView == true" [src]="checkedImagePath" /><img *ngIf="offManView == false" [src]="uncheckedImagePath" /></span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="offManView" (change)="changeSettings(offManView?true:false , 'offManView')" id="offManView" name="offManView" />
+                </span>
+                <span>
+                  <span *ngIf="isEditMode == false"><img *ngIf="offManEdit == true" [src]="checkedImagePath" /><img *ngIf="offManEdit == false" [src]="uncheckedImagePath" /></span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="offManEdit" (change)="changeSettings(offManEdit?true:false , 'offManEdit')" id="offManEdit" name="offManEdit" />
+                </span>
+              </span>
+            </span>
+            <span class=" border-colunm border-none">
+              <span class="inner-cards-panel text-center">
+                <span>
+                  <span *ngIf="isEditMode == false"><img *ngIf="offGenView == true" [src]="checkedImagePath" /><img *ngIf="offGenView == false" [src]="uncheckedImagePath" /></span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="offGenView" (change)="changeSettings(offGenView?true:false , 'offGenView')" id="offGenView" name="offGenView" />
+                </span>
+                <span>
+                  <span *ngIf="isEditMode == false"><img *ngIf="offGenEdit == true" [src]="checkedImagePath" /><img *ngIf="offGenEdit == false" [src]="uncheckedImagePath" /></span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="offGenEdit" (change)="changeSettings(offGenEdit?true:false , 'offGenEdit')" id="offGenEdit" name="offGenEdit" />
+                </span>
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="outlook-row-bg" *ngIf="isShowTeamSection">
+          <div class="inner-cards-panel">
+            <span class="flex-align-panel border-colunm">Team</span>
+            <span class="border-colunm">
+              <span class="inner-cards-panel text-center">
+                <span>
+                  <img [src]="checkedImagePath" />
+                </span>
+                <span><img [src]="checkedImagePath" /></span>
+              </span>
+            </span>
+            <span class="border-colunm">
+              <span class="inner-cards-panel text-center">
+                <span>
+                  <span *ngIf="isEditMode == false"><img *ngIf="teamManView == true" [src]="checkedImagePath" /><img *ngIf="teamManView == false" [src]="uncheckedImagePath" /></span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="teamManView" (change)="changeSettings(teamManView?true:false , 'teamManView')" id="teamManView" name="teamManView" />
+                </span>
+                <span>
+                  <span *ngIf="isEditMode == false"><img *ngIf="teamManEdit == true" [src]="checkedImagePath" /><img *ngIf="teamManEdit == false" [src]="uncheckedImagePath" /></span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="teamManEdit" (change)="changeSettings(teamManEdit?true:false , 'teamManEdit')" id="teamManEdit" name="teamManEdit" />
+                </span>
+              </span>
+            </span>
+            <span class=" border-colunm border-none">
+              <span class="inner-cards-panel text-center">
+                <span>
+                  <span *ngIf="isEditMode == false"><img *ngIf="teamGenView == true" [src]="checkedImagePath" /><img *ngIf="teamGenView == false" [src]="uncheckedImagePath" /></span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="teamGenView" (change)="changeSettings(teamGenView?true:false , 'teamGenView')" id="teamGenView" name="teamGenView" />
+                </span>
+                <span>
+                  <span *ngIf="isEditMode == false"><img *ngIf="teamGenEdit == true" [src]="checkedImagePath" /><img *ngIf="teamGenEdit == false" [src]="uncheckedImagePath" /></span>
+                  <input *ngIf="isEditMode == true" type="checkbox" class="checkbox" [(ngModel)]="teamGenEdit" (change)="changeSettings(teamGenEdit?true:false , 'teamGenEdit')" id="teamGenEdit" name="teamGenEdit" />
+                </span>
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="security-setting-background global-padding10">
+          <div class="bottom-button-bar">
+            <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" *ngIf="isEditMode == true" type="button" (click)="saveSecuritySetting();"> Save</button>
+            <button class="btn btn-cancel" *ngIf="isEditMode == true" type="button" (click)="cancelSecuritySetting();"> Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt-3 common-alignment">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/activity/config/securitygeneralusertitle.svg" class="mr-1" />General User Security Settings</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <button type="button" [hidden]="roleFeaturePermissions?.edit == false" matTooltip="Edit" class="icon-btn" *ngIf="isEditModeGeneralUser == false && (roleFeaturePermissions?.edit == true || user?.userRole > 3)" (click)="editModeGeneralUser()">
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+              <span class="btn-text">Edit</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="global-body-section">
+        <div class="wraper-body-panel">
+          <div class="wraper-body-left">
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">Note : </div>
+              <div class="cards-colunm-right search-query-error">General users can only view or edit their own or shared contacts.</div>
+            </div>
+
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">Share Contacts</div>
+              <div class="cards-colunm-right">
+                <input *ngIf="isEditModeGeneralUser == true" type="checkbox" class="checkbox" [(ngModel)]="shareContacts" id="shareContacts" name="shareContacts" />&nbsp;
+                <span [ngClass]="isEditModeGeneralUser == false?shareContacts == true? 'generaluser-true' : 'generaluser-false':''">{{isEditModeGeneralUser == false?shareContacts == true?'Users must ' : 'Users can choose to ':'Users must '}}share their contacts with other users</span>
+              </div>
+            </div>
+
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">Outlook integration</div>
+              <div class="cards-colunm-right">
+                <input *ngIf="isEditModeGeneralUser == true" type="checkbox" class="checkbox" [(ngModel)]="secOutlook" id="secOutlook" name="secOutlook" />&nbsp;
+                <span [ngClass]="isEditModeGeneralUser == false?secOutlook == true? 'generaluser-true' : 'generaluser-false':''">{{isEditModeGeneralUser == false?secOutlook == true?'Users can ' : 'Users cannot ':'Users can '}}download appointments and contacts into outlook.</span>
+              </div>
+            </div>
+
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">Excel integration</div>
+              <div class="cards-colunm-right">
+                <input *ngIf="isEditModeGeneralUser == true" type="checkbox" class="checkbox" [(ngModel)]="secExcel" id="secExcel" name="secExcel" />&nbsp;
+                <span [ngClass]="isEditModeGeneralUser == false?secExcel == true? 'generaluser-true' : 'generaluser-false':''">{{isEditModeGeneralUser == false?secExcel == true?'Users can ' : 'Users cannot ':'Users can '}}download lists into excel.</span>
+              </div>
+            </div>
+
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">Marketing Tools</div>
+              <div class="cards-colunm-right">
+                <input *ngIf="isEditModeGeneralUser == true" type="checkbox" class="checkbox" [(ngModel)]="secMarketingTool" id="secMarketingTool" name="secMarketingTool" />&nbsp;
+                <span [ngClass]="isEditModeGeneralUser == false?secMarketingTool == true? 'generaluser-true' : 'generaluser-false':''">{{isEditModeGeneralUser == false?secMarketingTool == true?'Users can ' : 'Users cannot ':'Users can '}}use marketing tool wizards.</span>
+              </div>
+            </div>
+
+            <div class="cards-body-section" *ngIf="isEditModeGeneralUser == true">
+              <div class="cards-colunm-left"></div>
+              <div class="cards-colunm-right">
+                <button class="btn btn-primary" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="button" (click)="saveCompanyData();"> Save</button>
+                <button class="btn btn-cancel" type="button" (click)="cancelGeneralUser();"> Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

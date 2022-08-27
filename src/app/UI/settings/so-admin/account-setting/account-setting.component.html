@@ -1,0 +1,211 @@
+<div class="container-fluid">
+  <div *ngIf="_localService.isShowAdminTabs" (click)="toggleCommon=!toggleCommon;" class="graph-slide">
+    <div class="graph-slide-panel">
+      <a><i [ngClass]="toggleCommon ? 'fa .fa fa-chevron-right' : 'fa .fa fa-chevron-left' "><span></span></i></a>
+    </div>
+  </div>
+  <div class="before-accounts-section">
+    <div class="admin-accounts-section">
+      <div [ngClass]="!_localService.isShowAdminTabs ? '' : toggleCommon? 'toggle-hide': 'admin-accounts-left leave-ml-acc'">
+        <app-admin-password-form *ngIf="!_localService.isAdminPassFrmValid"></app-admin-password-form>
+        <app-admin-company-list (selectedTab)="openApproachTab($event)" (selectedTabName)="getSelectedCompanyName($event)" *ngIf="_localService.isAdminPassFrmValid"></app-admin-company-list>
+      </div>
+
+      <div class="admin-accounts-right" [ngClass]="toggleCommon ? 'full-grid-section leave-ml-acc ' : '' " *ngIf="_localService.isShowAdminTabs">
+        <div>
+          <div class="role-tabs-panel account-setting-tab">
+            <div class="row mt-2">
+              <div class="col-md-6 text-align-left">
+                <span *ngIf="adminIdSelected">{{adminIdSelected}}: &nbsp;{{companyName}} </span>
+              </div>
+              <div class="col-md-6 text-align-right">
+                <button type="button" kendoButton [primary]="true" (click)="isLoadMore = !isLoadMore; onLessTabs()">{{ !isLoadMore ? 'More Options...' : 'Less Options...' }}</button>
+              </div>
+            </div>
+
+            <kendo-tabstrip *ngIf=" reloadAccount" (tabSelect)="onTabSelect($event)" [keepTabContent]="true" >
+              <kendo-tabstrip-tab [title]="'Company'" [selected]="selectedTab == 0  ">
+                <ng-template kendoTabTitle>
+                  </ng-template>
+                  <ng-template kendoTabContent>
+                    <account-info *ngIf="user " [user]="user" [companyId]="adminIdSelected" [roleFeaturePermissions]="roleFeaturePermissions"></account-info>
+                  </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'Tickets'" [selected]="selectedTab === 1  ">
+                <ng-template kendoTabContent>
+                  <div class="feature-table">
+                    <app-tickets *ngIf="user " [user]="user" [roleFeaturePermissions]="roleFeaturePermissions"></app-tickets>
+                  </div>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'User Info'" [selected]="selectedTab === 2  ">
+                <ng-template kendoTabContent>
+                  <user-setup *ngIf="user" [user]=user [companyIdBilling]="adminIdSelected" [roleFeaturePermissions]="roleFeaturePermissions"></user-setup>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'User Prefs'" [selected]="selectedTab === 3  ">
+                <ng-template kendoTabContent>
+                  <div class="feature-table">
+                    <app-user-preference [user]="user " [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></app-user-preference>
+                  </div>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'Billing Info'" [selected]="selectedTab === 4  ">
+                <ng-template kendoTabContent>
+                  <account-billing-history *ngIf="user " [user]=user [companyIdBilling]="adminIdSelected" [roleFeaturePermissions]="roleFeaturePermissions"></account-billing-history>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'HTML Usage'" [selected]="selectedTab === 5  ">
+                <ng-template kendoTabContent>
+                  <account-html-email *ngIf="user " [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></account-html-email>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'Credit Card'" [selected]="selectedTab === 6">
+                <ng-template kendoTabContent>
+                  <account-credit-card *ngIf="user" [user]=user [companyIdCredit]="adminIdSelected" [roleFeaturePermissions]="roleFeaturePermissions"></account-credit-card>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'Import SFA'" [selected]="selectedTab === 7">
+                <ng-template kendoTabContent>
+                  <div class="feature-table">
+                    <import-sfa *ngIf="user " [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></import-sfa>
+                  </div>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'Voice & Text'" [selected]="selectedTab === 8">
+                <ng-template kendoTabContent>
+                  <div class="feature-table">
+                    <text-msg-setting *ngIf="user " [user]=user [userId]=adminIdSelected [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></text-msg-setting>
+                  </div>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'Activity Log'" [selected]="selectedTab === 9">
+                <ng-template kendoTabContent>
+                  <div class="feature-table">
+                    <app-activity-log *ngIf="user " [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></app-activity-log>
+                  </div>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <kendo-tabstrip-tab [title]="'Roles'" [selected]="selectedTab === 10">
+                <ng-template kendoTabContent>
+                  <role-setup></role-setup>
+                </ng-template>
+              </kendo-tabstrip-tab>
+
+              <div *ngIf="isLoadMore">
+                <kendo-tabstrip-tab [title]="'Transfer User'" [selected]="selectedTab === 11">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      {{isLoadMore}}
+                      <transfer-user *ngIf="user" [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></transfer-user>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Company Module'" [selected]="selectedTab === 12">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <app-company-module></app-company-module>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Change Solution Settings'" [selected]="selectedTab === 13">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <p class="under-construction under-construction-common">
+                        <img src="../../../assets/under-construction.gif" />
+                      </p>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Refund a transaction'" [selected]="selectedTab === 14">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <p class="under-construction under-construction-common">
+                        <img src="../../../assets/under-construction.gif" />
+                      </p>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Apply a credit'" [selected]="selectedTab === 15">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <app-apply-credit [roleFeaturePermissions]="roleFeaturePermissions"></app-apply-credit>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Edit Transaction'" [selected]="selectedTab === 16">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <p class="under-construction under-construction-common">
+                        <img src="../../../assets/under-construction.gif" />
+                      </p>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Document Storage'" [selected]="selectedTab === 17">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <app-document-storage [roleFeaturePermissions]="roleFeaturePermissions"></app-document-storage>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'SMTP Settings'" [selected]="selectedTab === 18">
+                  <ng-template kendoTabContent>
+                    <smtp-setting *ngIf="user" [user]=user [companyIdSmtp]="adminIdSelected" [roleFeaturePermissions]="roleFeaturePermissions"></smtp-setting>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'IPhone Settings'" [selected]="selectedTab === 19">
+                  <ng-template kendoTabContent>
+                    <iphone-setting *ngIf="user" [user]=user [companyIdIphone]="adminIdSelected" [roleFeaturePermissions]="roleFeaturePermissions"></iphone-setting>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Outlook Addin'" [selected]="selectedTab === 20">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <app-outlook-addin *ngIf="user" [user]=user [roleFeaturePermissions]="roleFeaturePermissions"></app-outlook-addin>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'Email Dropbox Setting'" [selected]="selectedTab === 21">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <email-dropbox-setting *ngIf="user" [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></email-dropbox-setting>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+
+                <kendo-tabstrip-tab [title]="'API Settings'" [selected]="selectedTab === 22">
+                  <ng-template kendoTabContent>
+                    <div class="feature-table">
+                      <app-api-setting *ngIf="user" [user]=user [encryptedUser]=encryptedUser [roleFeaturePermissions]="roleFeaturePermissions"></app-api-setting>
+                    </div>
+                  </ng-template>
+                </kendo-tabstrip-tab>
+              </div>
+            </kendo-tabstrip>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

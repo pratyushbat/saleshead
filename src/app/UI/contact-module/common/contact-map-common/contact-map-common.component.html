@@ -1,0 +1,68 @@
+<div class="global-body-section">
+  <kendo-grid #grid id="gridId"
+    [kendoGridBinding]="contactsMapData"
+    [pageSize]="_gridCnfgService.pageSize"
+    [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+    [sortable]="{mode: 'multiple'}"
+    [scrollable]="'scrollable'"
+    [sort]="_gridCnfgService.sort"
+    [columnMenu]="{ filter: true }"
+    [resizable]="true"
+    [reorderable]="true"
+    [ngStyle]="gridHeight"
+    (columnReorder)="_gridCnfgService.columnsOrderChanged('contact_map_grid', $event)"
+    (sortChange)="_gridCnfgService.sortChange('contact_map_grid', $event)"
+    (pageChange)="_gridCnfgService.pageChange('contact_map_grid', $event)"
+    (columnResize)="_gridCnfgService.columnResize(5,'contact_map_grid', $event)"
+    (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'contact_map_grid',grid)">
+    <ng-template kendoGridToolbarTemplate>
+      <button class="btn btn-primary" type="button" (click)="resetGridSetting();">Reset Grid Setting</button>
+      <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onContactMapListFilter($event.target.value)" #inputContactSearch *ngIf="isSearch" />
+      <button type="button" class="k-button export-icon" title="Export list in excel" (click)="saveExcel(excelexport)" *ngIf="isDownload">
+        <img src="../../../../../assets/iconexcel.svg" class="mr-1" />
+        <span>Download Excel</span>
+      </button>
+      <button type="button" kendoGridPDFCommand icon="file-pdf" title="Export list in pdf" class="export-icon" *ngIf="isDownload">
+        <img src="../../../../../assets/iconpdf.svg" class="mr-1" />
+        <span>Download PDF</span>
+      </button>
+    </ng-template>
+    <div class="grid-scroll-bar">
+      <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+        [field]="column.field"
+        [title]="column.title | titlecase"
+        [width]="column.field == '$' ? '40' : column.width"
+        [filterable]="true"
+        [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+        [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+        [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+        [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+        [includeInChooser]="column.field=='$' ? false : true">
+        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+          <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+          <div class="customer-name" *ngIf="column.title == '  '"><a class="contact-cursor-pointer" (click)="gotoLink('address-card', dataItem);" title="View Contact"><i class="icon_contact"><img src="../../../assets/icon_contact.svg" /></i></a></div>
+          <div class="customer-name" *ngIf="column.field == 'email'"><a class="contact-cursor-pointer" (click)="gotoLink('email', dataItem);" title="send email to {{dataItem.email}}" *ngIf="dataItem.email"><i class="email_new"><img src="../../../assets/email_new.svg" /></i></a></div>
+          <div class="customer-name" *ngIf="column.field == 'phone'"><span [innerHTML]="dataItem[column.field] ? dataItem[column.field] : '--'"></span></div>
+          <div class="customer-name" [ngClass]="[column.field=='name' ? 'text-left' : '',  column.field=='companyName' ? 'text-left' : '']" *ngIf="showColumn(column.field)" [hidden]="column.field=='$'">
+            <a class="webkit-any-link" (click)="gotoLink(column.field, dataItem);" [style.color]="column.field == 'userName'? '#1c0dbf':''" *ngIf="(column.field == 'name' || column.field == 'userName') && !isContactReport">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</a>
+            <a class="webkit-any-link" (click)="gotoLink(column.field, dataItem);" [style.color]="column.field == 'userName'? '#1c0dbf':''" *ngIf="column.field == 'name' && isContactReport">{{dataItem.lastName}}, {{dataItem.firstName}}</a>
+            <a class="webkit-any-link" (click)="gotoLink(column.field, dataItem);" [style.color]="column.field == 'userName'? '#1c0dbf':''" *ngIf="column.field == 'userName' && isContactReport">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</a>
+            <span [hidden]="column.field == 'name' || column.field == 'userName' || column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay'">{{dataItem[column.field] ? dataItem[column.field] : '--'}}</span>
+            <span *ngIf="(column.field == 'dtModifiedDisplay' || column.field == 'dtCreatedDisplay') && !isContactReport">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy' }}</span>
+            <span *ngIf="column.field == 'dtModifiedDisplay' && isContactReport">{{ !dataItem.dtModified ? '--' : dataItem.dtModified | date: 'MM/dd/yy' }}</span>
+            <span *ngIf="column.field == 'dtCreatedDisplay' && isContactReport">{{ !dataItem.dtCreated ? '--' : dataItem.dtCreated | date: 'MM/dd/yy' }}</span>
+          </div>
+        </ng-template>
+      </kendo-grid-column>
+      <kendo-excelexport #excelexport [data]="contactsMapData" fileName='Contact-List'>
+        <kendo-excelexport-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width"></kendo-excelexport-column>
+      </kendo-excelexport>
+      <kendo-grid-pdf fileName="Contact-List.pdf" [scale]="0.8" [repeatHeaders]="true" [allPages]="true" [margin]="{ top: '1cm', left: '1cm', right: '1cm', bottom: '1cm' }">
+        <kendo-grid-column *ngFor="let col of _gridCnfgService.columns" [field]="col.field" [title]="col.title" [width]="col.width">
+        </kendo-grid-column>
+      </kendo-grid-pdf>
+    </div>
+  </kendo-grid>
+</div>
+
+

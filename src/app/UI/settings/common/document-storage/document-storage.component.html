@@ -1,0 +1,60 @@
+<div class="mb-2">
+  <div class="wraper-main-section">
+    <form [formGroup]="docStorageForm" (ngSubmit)="docStorageFormSubmit()">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"> Document Storage</div>
+        </div>
+        <div class="global-body-section">
+          <div class="wraper-body-left">
+            <div class="apply-credit-subHeader">These are the current document storage limits.</div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <span class="control-label">Company Storage Limit (in MB)</span>
+              </div>
+              <div class="cards-colunm-right">
+                <input type="text" name="companyStorageLimit" (keypress)="_localService.onKeyDown($event)" formControlName="companyStorageLimit" class="form-control webform-right-input" placeholder="Company Storage" [ngClass]="{'has-error': docStorageFormFrm.companyStorageLimit?.errors && (docStorageFormFrm.companyStorageLimit?.touched || docStorageFormFrm.companyStorageLimit?.dirty)}" />
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <span class="control-label">User Storage Limit (in MB)</span>
+              </div>
+              <div class="cards-colunm-right">
+                <input type="text" name="userStorageLimit" (keypress)="_localService.onKeyDown($event)" formControlName="userStorageLimit" class="form-control webform-right-input" placeholder="User Storage" [ngClass]="{'has-error': docStorageFormFrm.userStorageLimit?.errors && (docStorageFormFrm.userStorageLimit?.touched || docStorageFormFrm.userStorageLimit?.dirty)}" />
+              </div>
+            </div>
+          </div>
+          <div class="cards-body-section">
+            <div class="cards-colunm-left"></div>
+            <div class="cards-colunm-right">
+              <button [disabled]="showSpinner || docStorageForm.invalid" class="btn btn-primary" id="primarySaveWeb" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" type="submit"><i class="fas fa-check"></i> Save</button>
+            </div>
+          </div>        
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal fade" id="docStorageConfirmModal" tabindex="-1" role="dialog" aria-labelledby="docStorageConfirmModal" aria-hidden="true">
+    <div class="modal-dialog  modal-common-dialog" role="document">
+      <div class="modal-content modal-common-content">
+        <div class="modal-header modal-common-background">
+          <h4 class="modal-title modal-common-title">Confirmation</h4>
+        </div>
+        <div class="modal-body modal-common-body">
+          <h2>  Are you sure to update ?</h2>
+        </div>
+        <div class="modal-footer">
+          <button type="button" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" (click)="onConfirmDocStorage()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

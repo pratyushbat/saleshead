@@ -1,0 +1,254 @@
+<div class="margin-all-area">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><span>Company Setup</span></div>
+      </div>
+      <div class="global-body-section">
+        <form [formGroup]="accountInfoForm" (ngSubmit)="accountFormSubmit()">
+          <div class="cards-height-section">
+            <div class="cards-height-panel">
+              <div class="multiple-cards-section">
+                <!--1st half-->
+                <div class="multiple-cards-panel">
+                  <div class="wraper-main-section">
+                    <div class="global-card-section">
+                      <div class="global-header-section">
+                        <span>Company</span>
+                      </div>
+                      <div class="global-body-section">
+                        <div class="margin-all-area">
+                          <div class="form-group">
+                            <span class="control-label" for="companyName">Company Name<span class="acc-info-red">*</span> </span>
+                            <div [ngClass]="{'has-error': accountInfoFrm.companyName.errors && (accountInfoFrm.companyName.touched || accountInfoFrm.companyName.dirty)}">
+                              <input type="text" class="form-control" id="companyName" formControlName="companyName" placeholder="Company Name" />
+                            </div>
+                            <div *ngIf="!accountInfoFrm.companyName?.valid && (accountInfoFrm.companyName?.dirty
+                              ||accountInfoFrm.companyName?.touched )">
+                              <div class="search-query-error acc-info-srch-error" *ngIf="accountInfoFrm.companyName.errors?.required">Please enter Company Name.</div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="companyDesc">Company Desc</span>
+                            <div>
+                              <input type="text" class="form-control" id="companyDesc" formControlName="companyDesc" placeholder="Company Desc" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="companyAddress">Company Address</span>
+                            <div>
+                              <input type="text" class="form-control" id="companyAddress" formControlName="companyAddress" placeholder="Company Address" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="companyURL">Company URL</span>
+                            <div>
+                              <input type="text" class="form-control" id="companyURL" formControlName="companyURL" placeholder="Company URL" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="logoURL">logo URL<span class="acc-info-red">*</span></span>
+                            <div [ngClass]="{'has-error': accountInfoFrm.logoURL.errors && (accountInfoFrm.logoURL.touched || accountInfoFrm.logoURL.dirty)}">
+                              <input type="text" class="form-control" id="logoURL" formControlName="logoURL" placeholder="Logo URL" />
+                            </div>
+                            <div *ngIf="!accountInfoFrm.logoURL?.valid && (accountInfoFrm.logoURL?.dirty
+                              ||accountInfoFrm.logoURL?.touched )">
+                              <div class="search-query-error acc-info-srch-error" *ngIf="accountInfoFrm.logoURL.errors?.required">Please enter Logo Url.</div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--2nd half-->
+                <div class="multiple-cards-panel">
+                  <div class="wraper-main-section">
+                    <div class="global-card-section">
+                      <div class="global-header-section">
+                        <span>Detail</span>
+                      </div>
+                      <div class="global-body-section">
+                        <div class="margin-all-area">
+                          <div class="form-group">
+                            <span class="control-label" for="cLPRole">CLP Role</span>
+                            <div>
+                              <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="cLPRole" formControlName="cLPRole" placeholder="CLP Role" maxlength="3" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="status">Status</span>
+                            <div>
+                              <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="status" formControlName="status" placeholder="Status" maxlength="3" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="maxContacts">Max Contacts</span>
+                            <div>
+                              <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="maxContacts" formControlName="maxContacts" placeholder="Max Contacts" maxlength="6" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="maxEblast">Max Eblast</span>
+                            <div>
+                              <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="maxEblast" formControlName="maxEblast" placeholder="Max Eblast" maxlength="6" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="attachmentSizeLimit">Attachment Size Limit</span>
+                            <div>
+                              <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="attachmentSizeLimit" formControlName="attachmentSizeLimit" placeholder="Attachment Size Limit" maxlength="20" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="companyStorageLimit">Company Storage Limit</span>
+                            <div>
+                              <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="companyStorageLimit" formControlName="companyStorageLimit" placeholder="Company Storage Limit" maxlength="18" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="userStorageLimit">User Storage Limit</span>
+                            <div>
+                              <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="userStorageLimit" formControlName="userStorageLimit" placeholder="User Storage Limit" maxlength="18" />
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <span class="control-label" for="fileSizeLimit">File Size Limit</span>
+                            <div>
+                              <input type="text" class="form-control" (keypress)="_localService.onKeyDown($event)" (paste)="_localService.onPaste($event)" id="fileSizeLimit" formControlName="fileSizeLimit" placeholder="File Size Limit" maxlength="18" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--3rd half-->
+                <div class="multiple-cards-panel">
+                  <div class="wraper-main-section">
+                    <div class="global-card-section">
+                      <div class="global-header-section">
+                        <span>Setting</span>
+                      </div>
+                      <div class="global-body-section">
+                        <div class="margin-all-area">
+                          <div class="email-form-group merger">
+                            <span class="control-label  account-align" for="editOtherContacts">Edit Other Contacts</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="editOtherContacts" formControlName="editOtherContacts" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="blnLogSkypeCalls">Log Skype Calls</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="blnLogSkypeCalls" formControlName="blnLogSkypeCalls" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="blnEnableiPhone">Enable iPhone</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="blnEnableiPhone" formControlName="blnEnableiPhone" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="shareContacts">Share Contacts</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="shareContacts" formControlName="shareContacts" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="useCompanyModule">Use Company Module</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="useCompanyModule" formControlName="useCompanyModule" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="isBrandingIncluded">Branding Included</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="isBrandingIncluded" formControlName="isBrandingIncluded" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="isMobileIncluded">Mobile Included</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="isMobileIncluded" formControlName="isMobileIncluded" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="isHTMLEmailIncluded">HTML Email Included</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="isHTMLEmailIncluded" formControlName="isHTMLEmailIncluded" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="isOutlookIncluded">Outlook Included</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="isOutlookIncluded" formControlName="isOutlookIncluded" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="isMultipleFromAddresses">Multiple From Addresses</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="isMultipleFromAddresses" formControlName="isMultipleFromAddresses" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="email-form-group merger">
+                            <span class="control-label account-align" for="enableMoreFields">Enable More Fields</span>
+                            <div class="custom-toggle">
+                              <label class="switch">
+                                <input type="checkbox" class="form-control" id="enableMoreFields" formControlName="enableMoreFields" />
+                                <span class="slider round"></span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bottom-fix-footer">
+              <div class="top-common-btn">
+                <button [disabled]="isAccountInfo?true:false" class="btn btn-primary" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" type="submit"> Save</button>
+                <button class="btn btn-primary" (click)="onreset()" type="button">Reset</button>
+                <button class="btn btn-cancel" [routerLink]="['/contacts']"> Cancel</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

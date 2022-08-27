@@ -1,0 +1,120 @@
+<div class="create-email" #scrollIdTarget [@filterAnimation]="showAnimation">
+  <fieldset>
+    <legend>Compose Text Message</legend>
+    <div class="email-module">
+      <!-- error here-->
+      <div class="imp-sub-notes" *ngIf="hasError && txtMsgFilters && txtMsgFilters.messageString">
+        <span class="error-msg">{{txtMsgFilters.messageString}}</span>
+      </div>
+      <!-- error here-->
+      <div *ngIf="!hasError && txtMsgFilters && !txtMsgFilters.messageString">
+        <form class="form-horizontal required-section" [formGroup]="smsForm" (ngSubmit)="smsFormSubmit()">          
+          <div class="lead-wraper-section">
+            <div class="wraper-main-section">
+              <div class="global-card-section">
+                <div class="text-message-header">
+                  <div class="global-header-section">
+                    <div class="svg-icon-panel">Compose Text Message</div>
+                    <div class="header-button-panel">
+                      <div class="button-wrapper">
+                        <button type="button"  (click)="onCloseSms();" class="icon-btn">
+                          <i class="fas fa-times"></i>
+                          <span class="btn-text">Close</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="global-body-section">
+                  <div class="margin-all-area">
+                    <div class="templates-alignment">
+                      <div class="full-width-container">
+                        <div class="form-group">
+                          <span class="control-label" for="from">From</span>
+                          <div><span>Long Code {{ this.txtMsgFilters.smsLongCode }}</span></div>
+                        </div>
+                      </div>
+                      <div class="full-width-container">
+                        <div class="form-group">
+                          <span class="control-label" for="to">To</span>
+                          <div>
+                            <select class="form-control" formControlName="to">
+                              <option value="-1" [selected]="toChoiceDropDown?.length <= 0">-Select-</option>
+                              <option *ngFor="let choice of toChoiceDropDown" [value]="choice.key">{{choice.value}}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="full-width-container margin-left10">
+                        <div class="form-group">
+                          <span class="control-label" for="template">Template</span>
+                          <div>
+                            <select class="form-control" formControlName="template" (change)='onTemplateChange()'>
+                              <option value="-1" [selected]="true">-Select-</option>
+                              <option *ngFor="let temp of templateFilter" [value]="temp.key">{{temp.value}}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="templates-alignment">
+                      <div class="full-width-container">
+                        <div class="form-group">
+                          <span class="control-label" for="img">Image</span>
+                          <div class="sms-mat-option">
+                            <mat-select class="form-control" formControlName="image" placeholder="-Select-" (selectionChange)="onImageDropChange()">
+                              <mat-option *ngFor="let doc of imageFilter" [value]="doc.documentId">
+                                <img class="doc-image" [src]="'https://soimg.azureedge.net/devibank/' + doc.documentName "> {{doc.documentTitle}}
+                              </mat-option>
+                            </mat-select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="full-width-container margin-left10">
+                        <div class="form-group">
+                          <span class="control-label" for="mediaUrl">Media URL</span>
+                          <div><input type="text" class="form-control" formControlName="mediaUrl" /></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="templates-alignment">
+                      <div class="full-width-container">
+                        <div class="form-group">
+                          <span class="control-label" for="message">Message  <small class="text-success">( {{ 300 - messageChar.value.length }} chars left )</small></span>
+                          <div [ngClass]="{'has-error': smsFrm.message.errors && (smsFrm.message.touched ||  smsFrm.message.dirty)}">
+                            <textarea class="form-control" row="3" formControlName="message" maxlength="300" #messageChar></textarea>
+                          </div>
+                          <div class="search-query-error text-xs-left" *ngIf="smsFrm.message.errors && ( smsFrm.message.touched ||  smsFrm.message.dirty)">
+                            <div *ngIf="smsFrm.message.errors.required">Please describe the message.</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="templates-alignment">
+                  <div class="full-width-container">
+                    <div class="bottom-panel">
+                      <button class="btn btn-primary" [disabled]="isTextSend" type="submit">Send Text</button>
+                      <button class="btn btn-cancel" type="button" (click)="onCloseSms();">Close</button>
+                    </div>
+                  </div>
+                  <div class="full-width-container">
+                    <div class="text-right schedule-button">
+                      <a class="btn btn-primary" href="javascript:void(0)" (click)="showDatePicker = !showDatePicker" *ngIf="!showDatePicker">Schedule</a>
+                      <span *ngIf="showDatePicker">
+                        <kendo-datetimepicker [format]="datePickerformat" formControlName="datePickerValue" [min]="min" (valueChange)="onDateChange()"></kendo-datetimepicker>
+                        <a class="btn btn-cancel" href="javascript:void(0)" (click)="showDatePicker = !showDatePicker"> Cancel</a>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </fieldset>
+</div>

@@ -1,0 +1,195 @@
+<div class="login-screen-section">
+  <div class="container-fluid">
+    <div class="row justify-content-center align-items-center">
+      <div class="col-xl-4 col-lg-6 col-md-6 col-sm-10">
+        <div class="login-screen-panel">
+          <div class="login-logo">
+            <img src="../assets/so_logo.png">
+          </div>
+          <!-- progressbar -->
+          <ul class="step">
+            <li class="active">Step 1 of 3</li>
+            <li [ngClass]="{'active': step >= 2}">Step 2 of 3</li>
+            <li [ngClass]="{'active': step == 3}">Step 3 of 3</li>
+          </ul>
+          <!-- fieldsets class="step-first"-->
+          <div class="login-form-section" *ngIf="step == 1">
+            <form #f="ngForm" [formGroup]="signupForm">
+              <fieldset class="sign-up">
+                <h3>Verify your Mobile Number</h3>
+
+                <div class="input-icon-panel">
+                  <div class="form-group" [hidden]="showSecurityCode">
+                    <label class="bold-text">Enter your number so we can send you a security code.</label>
+                    <div class="country-dropdown">
+                      <mat-error *ngIf="f.form.controls['phone']?.errors?.validatePhoneNumber">Invalid Number</mat-error>
+                      <div class=" info" >
+                        <div class="form-group mb-0">
+                          <label class="control-label" for="phone">Mobile number </label>
+                          <div>
+                            <input type="text" formControlName="phone" (keyup)="changeMobileNumber()"  name="phone" class="form-control" maxlength="15" [placeholder]="placeHolder" [mask]="mobile_mask" #phone />
+                          </div>
+                          <div [hidden]="show_countries" class="change_country">
+                            <span (click)="show_countries = true;">({{countryCode}}) change country</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class=" info" [hidden]="!show_countries">
+                        <div class="form-group ">
+                          <label class="control-label" for="country">Country</label>
+                          <div>
+                            <select class="custom-select" formControlName="countryId" (change)="changeCountry($event)">
+                              <option *ngFor="let country of countryList" [value]="country.code2" [attr.data-code2]="country.code2">{{country.name}}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mt-2">
+                        <span *ngIf="isMobileValidate == 2"><i class="far fa-check-circle text-success"></i> </span>
+                        <span *ngIf="isMobileValidate == 1" class="acc-info-red"><i class="far fa-times-circle"></i></span>
+                      </div>
+                    </div>
+                    <div class="submit-btn submit-btn-signup">
+                      <button type="button" name="next" class="btn btn-primary" (click)="validateMobile()" [disabled]="isMobileValidate == 0 || isMobileValidate == 1 || f.form.controls['phone']?.errors?.validatePhoneNumber">
+                        {{ isShowSpinner ? 'Sending Code' :  'Send Code' }} <i class="fas fa-spinner fa-spin" *ngIf="isShowSpinner"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="otp-field" [hidden]="!showSecurityCode">
+                  <p>Enter the security code sent to your number <b>{{ signupForm.controls.phone.value }}</b></p>
+                  <div class="row justify-content-center">
+                    <div class="col-lg-7 col-xs-12">
+                      <div class="form-group">
+                        <label><b>Security code</b><span style="color:#f00;">*</span></label>
+                        <input type="text" class="form-control" #securityCode placeholder="123456" mask="000000" formControlName="securityCode" maxlength="6" />
+                        <a href="javascript:void(0);" (click)="validateMobile()">Resend Code</a>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" [disabled]="!signupForm.valid" name="next" class="btn btn-primary" (click)="confirmSecurityCode()">
+                    <i class="fas fa-spinner fa-spin" *ngIf="isShowSpinner"></i>  Confirm
+                  </button>
+                  <div class="form-group">
+                    <a href="javascript:void(0);" (click)="changeMobile()"><i class="fa fa-chevron-left"></i>Change Your Number</a>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-12 col-xs-12">
+                    </div>
+                  </div>
+                </div>
+
+              </fieldset>
+            </form>
+          </div>
+
+          <div class="step-second" *ngIf="step == 2">
+            <form #userF="ngForm" [formGroup]="userForm" (ngSubmit)="userFormSubmit()">
+              <fieldset class="sign-up">
+                <h3>Enter details</h3>
+                <div class="row">
+                  <div class="col-lg-6 col-xs-12">
+                    <div class="form-group">
+                      <label>First Name <span class="error-red">*</span></label>
+                      <input type="text" class="form-control" #firstName formControlName="firstName" placeholder="First Name" [ngClass]="{'has-error': (userF.form.controls['firstName'].errors && (userF.form.controls['firstName'].touched || userF.form.controls['firstName'].dirty))}" />
+                      <div *ngIf="!userForm.controls.firstName?.valid && (userForm.controls.firstName?.dirty
+                                ||userForm.controls.firstName?.touched )">
+                        <div *ngIf="userForm.controls.firstName.errors?.required">Please enter your First Name.</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-xs-12">
+                    <div class="form-group">
+                      <label>Last Name <span class="error-red">*</span></label>
+                      <input type="text" class="form-control" #lastName formControlName="lastName" placeholder="Last Name" [ngClass]="{'has-error': (userF.form.controls['lastName'].errors && (userF.form.controls['lastName'].touched || userF.form.controls['lastName'].dirty))}" />
+                      <div *ngIf="!userForm.controls.lastName?.valid && (userForm.controls.lastName?.dirty
+                                ||userForm.controls.lastName?.touched )">
+                        <div *ngIf="userForm.controls.lastName.errors?.required">Please enter your Last Name.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12 col-xs-12">
+                    <div class="form-group">
+                      <label>Email(Username) <span class="error-red">*</span></label>
+                      <input type="email" class="form-control" #email formControlName="email" placeholder="Email" (blur)="checkDuplicate('isEmail');" [ngClass]="{'has-error': (userF.form.controls['email'].errors && (userF.form.controls['email'].touched || userF.form.controls['email'].dirty))}" />
+                      <div *ngIf="!userForm.controls.email?.valid && (userForm.controls.email?.dirty
+                                ||userForm.controls.email?.touched )">
+                        <div *ngIf="userForm.controls.email.errors?.required">Please enter your email.</div>
+                        <div *ngIf="userForm.controls.email.errors?.pattern">Please enter correct email.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="(isMobileValidate == 0 || isMobileValidate == 1) && signup_submit">Submit</button>
+              </fieldset>
+            </form>
+          </div>
+          <div class="step-last" *ngIf="step == 3">
+            <form #passF="ngForm" [formGroup]="passwordForm">
+              <fieldset class="sign-up">
+                <h3>Set your Password</h3>
+                <div class="validation-message">
+                  <p>Select a password that lower and upper-case letters, numbers, special characters, at least 8 characters long</p>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12 col-xs-12">
+                    <div class="form-group">
+                      <label>New Password <span class="error-red">*</span></label>
+                      <input #inputpwd type="password" class="form-control" #password id="pwd" formControlName="password" placeholder="enter password" autocomplete="off" [ngClass]="{'has-error': ((passF.form.controls['password'].errors && (passF.form.controls['password'].touched || passF.form.controls['password'].dirty))||(passwordForm.errors?.mismatch))}" />
+                      <a><i class="fa  show-password" [ngClass]="{'fa-eye': shouldShowpwd, 'fa-eye-slash': !shouldShowpwd}" (click)="shouldShowpwd = !shouldShowpwd; changeInputType(inputpwd)"></i></a>
+                      <div class="login-error" *ngIf="!passwordForm.controls.password?.valid && (passwordForm.controls.password?.dirty
+                                ||passwordForm.controls.password?.touched )">
+                        <div *ngIf="passwordForm.controls.password.errors?.pattern">Password should contain lower and upper-case letters, numbers, special characters, at least 8 characters long.</div>
+                        <div *ngIf="passwordForm.controls.password.errors?.required">Please enter Password.</div>
+                        <div *ngIf="passwordForm.controls.password.errors?.mismatch">Password must be same</div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="col-lg-12 col-xs-12">
+                    <div class="form-group">
+                      <label>Confirm Password <span class="error-red">*</span></label>
+                      <input #inputrepwd type="password" class="form-control" #rePassword formControlName="rePassword" placeholder="enter re-enter password" autocomplete="off" [ngClass]="{'has-error': ((passF.form.controls['rePassword'].errors && (passF.form.controls['rePassword'].touched || passF.form.controls['rePassword'].dirty)) ||(passwordForm.errors?.mismatch))}" />
+                      <a><i class="fa  show-repassword" [ngClass]="{'fa-eye': shouldShowRepwd, 'fa-eye-slash': !shouldShowRepwd}" (click)="shouldShowRepwd = !shouldShowRepwd; changeInputType(inputrepwd)"></i></a>
+                      <div class="login-error" *ngIf="!passwordForm.controls.rePassword?.valid && (passwordForm.controls.rePassword?.dirty
+                                ||passwordForm.controls.rePassword?.touched )">
+                        <div *ngIf="passwordForm.controls.rePassword.errors?.required">Please enter confirm Password.</div>
+                        <div *ngIf="passwordForm.controls.rePassword.errors?.mismatch">Password must be same</div>
+                      </div>
+                      <div class="login-error" *ngIf="!passwordForm.controls.password.errors?.required && !passwordForm.controls.rePassword.errors?.required  && passwordForm.errors?.mismatch">
+                        Passwords don't match.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-12 col-xs-12">
+                    <div class="form-group">
+                      <input type="checkbox" id="checkSignup" formControlName="checkSignup" />
+                      I agree to the <a href="javascript:void(0);">Privacy Policy</a>, the <a href="javascript:void(0);">Security Policy</a> and the <a href="javascript:void(0);">Terms of Use*</a>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="sign-up-back">
+                  <button type="button" [disabled]="!passwordForm.valid?true:isSignupFinish?true:false" class="btn btn-primary" (click)="createUser()">Finish</button>
+                  <button class="btn btn-primary " type="button" (click)="goBackToInitialStep()"><i class="fa fa-chevron-left"></i>Go Back</button>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+          <p>
+            <b>Already have an account?</b> <button type="button" id="forgot-btn" [routerLink]="['/login']">&nbsp;Log in</button>
+          </p>
+         
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-section text-center">
+    Copyright ©2001 - 2021 SalesOptima. All rights reserved.
+  </div>
+</div>

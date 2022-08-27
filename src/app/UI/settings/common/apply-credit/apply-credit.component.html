@@ -1,0 +1,46 @@
+<div class="mb-2">
+  <div class="wraper-main-section">
+    <form [formGroup]="applyCreditForm" (ngSubmit)="applyCreditFormSubmit()">
+      <div class="global-card-section">
+        <div class="global-header-section">
+          <div class="svg-icon-panel"><img src="../../../../../assets/invoicestitle.svg" /> Apply credit transaction</div>
+        </div>
+        <div class="global-body-section">
+          <div class="wraper-body-left">
+            <div class="apply-credit-subHeader">Enter the credit amount.</div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left">
+                <span class="control-label">Date</span>
+              </div>
+              <div class="cards-colunm-right">
+                <div class="">{{ currentDate }}</div>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left"><span>Description</span></div>
+              <div class="cards-colunm-right">
+                <input type="text" id="txnDescription" name="txnDescription" formControlName="txnDescription" class="form-control webform-right-input" placeholder="Description" [ngClass]="{'has-error': applyCreditFrm.txnDescription?.errors && (applyCreditFrm.txnDescription?.touched || applyCreditFrm.txnDescription?.dirty)}" />
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left"><span>Credit Amount</span></div>
+              <div class="cards-colunm-right">
+                <input type="text" id="txnAmount" name="txnAmount" (keypress)="_localService.onKeyDown($event)" formControlName="txnAmount" class="form-control webform-right-input" placeholder="Amount" [ngClass]="{'has-error': applyCreditFrm.txnAmount?.errors && (applyCreditFrm.txnAmount?.touched || applyCreditFrm.txnAmount?.dirty)}" />
+                <div *ngIf="applyCreditFrm.txnAmount?.errors && (applyCreditFrm.txnAmount?.touched || applyCreditFrm.txnAmount?.dirty)">
+                  <div class="login-error" *ngIf="applyCreditFrm.txnAmount?.errors.required">Amount is required </div>
+                </div>
+              </div>
+            </div>
+            <div class="cards-body-section">
+              <div class="cards-colunm-left"></div>
+              <div class="cards-colunm-right">
+                <button [disabled]="showSpinner || applyCreditForm.invalid" class="btn btn-primary" id="primarySaveWeb" [hidden]="roleFeaturePermissions?.edit == false || roleFeaturePermissions?.create == false" type="submit"><i class="fas fa-check"></i> Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</div>

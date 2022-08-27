@@ -1,0 +1,279 @@
+<div class="activity-module">
+  <fieldset>
+    <legend>Lead Module</legend>
+    <div class="activity-panel">
+      <div class="activity-filter">
+        <label for="filterActivityId">Sort by: </label>
+        <select class="form-control" id="filterActivityId" (change)="changeLeadActivitySort($event);">
+          <option value="newest">Date Newest</option>
+          <option value="oldest">Date Oldest</option>
+        </select>
+      </div>
+
+      <div class="tabs-module-panel">
+        <div class="tabs">
+          <input type="radio" name="tabs" id="AllActivity" checked="checked">
+          <label for="AllActivity" class="border-contact-left-radius">All Activity</label>
+          <div class="tab">
+            <h6 class="text-dark" *ngIf="(apptHistory?.length == 0) && (noteHistory?.length == 0) && (taskHistory?.length == 0)">No items found</h6>
+            <div class="all-sechudule-module">
+              <div class="all-sechudule-panel" *ngFor="let item of noteHistory; let is = index;">
+                <div class="kCard notes-header-border">
+                  <kendo-card>
+                    <div class="email-content">
+                      <kendo-card-body>
+                        <div class="content-header">
+                          <div>
+                            <a href="javascript:void(0)">
+                              <img title="Edit email" src="../../../../assets/activity/note/notetitle.svg" class="title-img" />
+                              {{item?.strDay}}&nbsp;
+                            </a>
+                            <b>Note&nbsp;:</b> {{item?.typeCodeDisplay}}
+                          </div>
+                          <span class="status-info">
+                            {{item?.status == 1 ? 'Completed' : item?.status == 2 ? 'OnHold' : item?.status == 0 ? 'Pending' : item?.status == 9 ? 'ToBeDeleted' : 'None'}}
+                            &nbsp;<a title="view tasks" href="javascript:void(0)">
+                              <img *ngIf="item?.status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                              <img *ngIf="item?.status == 0" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                              <img *ngIf="item?.status == 1" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                            </a>
+                          </span>
+                        </div>
+                        <div class="content-body">
+                          <div class="note-panel">
+                            <p><b>User&nbsp;:</b><span> {{item.userLastFirst}}</span></p>
+                            <p><b>Lead&nbsp;:</b><span><a href="javascript:void(0)"> {{item.ownerName}}</a></span></p>
+                            <p><b>Subject&nbsp;:</b><span> {{item.noteSubject}}</span></p>
+                            <p><b>Notes&nbsp;:</b><span> {{item.noteDesc}}</span></p>
+                          </div>
+                        </div>
+                      </kendo-card-body>
+                    </div>
+                  </kendo-card>
+                </div>
+              </div>
+            </div>
+            <div class="all-sechudule-module">
+              <div class="all-sechudule-panel" *ngFor="let item of taskHistory; let is = index;">
+                <div class="kCard task-header-border">
+                  <kendo-card>
+                    <div class="email-content">
+                      <kendo-card-body>
+                        <div class="content-header">
+                          <div>
+                            <a href="javascript:void(0)">
+                              <img title="Edit email" src="../../../../assets/activity/task/tasktitle.svg" class="title-img" />
+                              {{item?.strDay}}&nbsp;
+                            </a>
+                            <b>Task&nbsp;:</b>
+                            <span class="task-status" [ngClass]="{'text-success':item?.priority == 1,'text-warning':item?.priority == 2,'text-danger':item?.priority == 3}">
+                              {{item?.priority == 1 ? 'Low' : item?.priority == 2 ? 'Medium' : item?.priority == 3 ? 'High' : 'None'}}
+                            </span> 
+                          </div>
+                          <span class="status-info" [ngClass]="{'text-danger':item?.status == 0}">
+                            {{item?.status == 1 ? 'Completed' : item?.status == 2 ? 'OnHold' : item?.status == 0 ? 'Pending' : item?.status == 9 ? 'ToBeDeleted' : 'None'}}
+                            &nbsp;<a title="view tasks" href="javascript:void(0)">
+                              <img *ngIf="item?.status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                              <img *ngIf="item?.status == 0" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                              <img *ngIf="item?.status == 1" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                            </a>
+                          </span>
+                        </div>
+                        <div class="content-body">
+                          <div class="note-panel">
+                            <p><b>User&nbsp;:</b><span> {{item.userLastFirst}}</span></p>
+                            <p><b>Lead&nbsp;:</b><span><a href="javascript:void(0)"> {{item.ownerName}}</a></span></p>
+                            <p><b>Task&nbsp;:</b><span> {{item.taskDesc}}</span></p>
+                          </div>
+                        </div>
+                      </kendo-card-body>
+                    </div>
+                  </kendo-card>
+                </div>
+              </div>
+            </div>
+            <div class="all-sechudule-module">
+              <div class="all-sechudule-panel" *ngFor="let item of apptHistory; let is = index;">
+                <div class="kCard appointment-header-border">
+                  <kendo-card>
+                    <div class="email-content">
+                      <kendo-card-body>
+                        <div class="content-header">
+                          <div>
+                            <a href="javascript:void(0)">
+                              <img title="Edit email" src="../../../../assets/activity/task/remindertasklead.svg" class="title-img" />
+                              {{item?.strDay}}&nbsp;
+                            </a>
+                            <b>Appointment&nbsp;:</b> {{item?.apptStartTime}}&nbsp;-&nbsp;{{item?.apptEndTime}}
+                          </div>
+                          <span class="status-info" [ngClass]="{'text-danger':item?.status == 0}">
+                            {{item?.status == 1 ? 'Completed' : item?.status == 2 ? 'OnHold' : item?.status == 0 ? 'Pending' : item?.status == 9 ? 'ToBeDeleted' : 'None'}}
+                            &nbsp;<a title="view tasks" href="javascript:void(0)">
+                              <img *ngIf="item?.status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                              <img *ngIf="item?.status == 0" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                              <img *ngIf="item?.status == 1" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                            </a>
+                          </span>
+                        </div>
+                        <div class="content-body">
+                          <div class="note-panel">
+                            <p><b>User&nbsp;:</b><span> {{item.userFullName}}</span></p>
+                            <p><b>Subject&nbsp;:</b><span> {{item.subject}}</span></p>
+                            <p><b>Lead&nbsp;:</b><span><a href="javascript:void(0)"> {{item.leadStatusCodeDisplay}}</a></span></p>
+                            <p><b>Type&nbsp;:</b><span> {{item?.typeCodeDisplay}}</span></p>
+                            <p><b>Notes&nbsp;:</b><span> {{item.notes}}</span></p>
+                          </div>
+                        </div>
+                      </kendo-card-body>
+                    </div>
+                  </kendo-card>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <input type="radio" name="tabs" id="Notes">
+          <label for="Notes">Notes</label>
+          <div class="tab">
+            <h6 class="text-dark" *ngIf="noteHistory?.length == 0">No items found</h6>
+            <div class="all-sechudule-module">
+              <div class="all-sechudule-panel" *ngFor="let item of noteHistory; let is = index;">
+                <div class="kCard notes-header-border">
+                  <kendo-card>
+                    <div class="email-content">
+                      <kendo-card-body>
+                        <div class="content-header">
+                          <div>
+                            <a href="javascript:void(0)">
+                              <img title="Edit email" src="../../../../assets/activity/note/notetitle.svg" class="title-img" />
+                              {{item?.strDay}}&nbsp;
+                            </a>
+                            <b>Note&nbsp;:</b> {{item?.typeCodeDisplay}}
+                          </div>
+                          <span class="status-info">
+                            {{item?.status == 1 ? 'Completed' : item?.status == 2 ? 'OnHold' : item?.status == 0 ? 'Pending' : item?.status == 9 ? 'ToBeDeleted' : 'None'}}
+                            &nbsp;<a title="view tasks" href="javascript:void(0)">
+                              <img *ngIf="item?.status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                              <img *ngIf="item?.status == 0" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                              <img *ngIf="item?.status == 1" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                            </a>
+                          </span>
+                        </div>
+                        <div class="content-body">
+                          <div class="note-panel">
+                            <p><b>User&nbsp;:</b><span> {{item.userLastFirst}}</span></p>
+                            <p><b>Lead&nbsp;:</b><span> <a href="javascript:void(0)"> {{item.ownerName}}</a></span></p>
+                            <p><b>Subject&nbsp;:</b><span> {{item.noteSubject}}</span></p>
+                            <p><b>Notes&nbsp;:</b><span> {{item.noteDesc}}</span></p>
+                          </div>
+                        </div>
+                      </kendo-card-body>
+                    </div>
+                  </kendo-card>
+                </div>
+              </div>
+            </div>
+          </div>
+          <input type="radio" name="tabs" id="Tasks">
+          <label for="Tasks">Tasks</label>
+          <div class="tab">
+            <h6 class="text-dark" *ngIf="taskHistory?.length == 0">No items found</h6>
+            <div class="all-sechudule-module">
+              <div class="all-sechudule-panel" *ngFor="let item of taskHistory; let is = index;">
+                <div class="kCard task-header-border">
+                  <kendo-card>
+                    <div class="email-content">
+                      <kendo-card-body>
+                        <div class="content-header">
+                          <div>
+                            <a href="javascript:void(0)">
+                              <img title="Edit email" src="../../../../assets/activity/task/tasktitle.svg" class="title-img" />
+                              {{item?.strDay}}&nbsp;
+                            </a>
+                            <b>Task&nbsp;:</b>
+                            <span class="task-status" [ngClass]="{'text-success':item?.priority == 1,'text-warning':item?.priority == 2,'text-danger':item?.priority == 3}">
+                              {{item?.priority == 1 ? 'Low' : item?.priority == 2 ? 'Medium' : item?.priority == 3 ? 'High' : 'None'}}
+                            </span> 
+                          </div>
+                          <span class="status-info" [ngClass]="{'text-danger':item?.status == 0}">
+                            {{item?.status == 1 ? 'Completed' : item?.status == 2 ? 'OnHold' : item?.status == 0 ? 'Pending' : item?.status == 9 ? 'ToBeDeleted' : 'None'}}
+                            &nbsp;<a title="view tasks" href="javascript:void(0)">
+                              <img *ngIf="item?.status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                              <img *ngIf="item?.status == 0" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                              <img *ngIf="item?.status == 1" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                            </a>
+                          </span>
+                        </div>
+                        <div class="content-body">
+                          <div class="note-panel">
+                            <p><b>User&nbsp;:</b><span> {{item.userLastFirst}}</span></p>
+                            <p><b>Lead&nbsp;:</b><span> <a href="javascript:void(0)">&nbsp;{{item.ownerName}}</a></span></p>
+                            <p><b>Task&nbsp;:</b><span> {{item.taskDesc}}</span></p>
+                          </div>
+                        </div>
+                      </kendo-card-body>
+                    </div>
+                  </kendo-card>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <input type="radio" name="tabs" id="Appointments">
+          <label for="Appointments">Appointments</label>
+          <div class="tab">
+            <h6 class="text-dark" *ngIf="apptHistory?.length == 0">No items found</h6>
+            <div class="all-sechudule-module">
+              <div class="all-sechudule-panel" *ngFor="let item of apptHistory; let is = index;">
+                <div class="kCard appointment-header-border">
+                  <kendo-card>
+                    <div class="email-content">
+                      <kendo-card-body>
+                        <div class="content-header">
+                          <div>
+                            <a href="javascript:void(0)">
+                              <img title="Edit email" src="../../../../assets/activity/task/remindertasklead.svg" class="title-img" />
+                              {{item?.strDay}}&nbsp;
+                            </a>
+                            <b>Appointment&nbsp;:</b> {{item?.apptStartTime}}&nbsp;-&nbsp;{{item?.apptEndTime}}
+                          </div>
+                          <span class="status-info" [ngClass]="{'text-danger':item?.status == 0}">
+                            {{item?.status == 1 ? 'Completed' : item?.status == 2 ? 'OnHold' : item?.status == 0 ? 'Pending' : item?.status == 9 ? 'ToBeDeleted' : 'None'}}
+                            &nbsp;<a title="view tasks" href="javascript:void(0)">
+                              <img *ngIf="item?.status == 2" src="../../../../assets/activity/main/statusonhold.svg" class="status-img" />
+                              <img *ngIf="item?.status == 0" src="../../../../assets/activity/main/statuspending.svg" class="status-img" />
+                              <img *ngIf="item?.status == 1" src="../../../../assets/activity/main/statuscompleted.svg" class="status-img" />
+                            </a>
+                          </span>
+                        </div>
+                        <div class="content-body">
+                          <div class="note-panel">
+                            <p><b>User&nbsp;:</b><span> {{item.userFullName}}</span></p>
+                            <p><b>Subject&nbsp;:</b><span> {{item.subject}}</span></p>
+                            <p><b>Lead&nbsp;:</b><span> <a href="javascript:void(0)">&nbsp;{{item.leadStatusCodeDisplay}}</a></span></p>
+                            <p><b>Type&nbsp;:</b><span> {{item.typeCodeDisplay}}</span></p>
+                            <p><b>Notes&nbsp;:</b><span> {{item.notes}}</span></p>
+                          </div>
+                        </div>
+                      </kendo-card-body>
+                    </div>
+                  </kendo-card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+
+
+

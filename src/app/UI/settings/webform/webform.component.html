@@ -1,0 +1,513 @@
+<div class="card1 feature-table1">
+  <div class="card-body1">
+    <div class="common-alignment">
+      <div class="wraper-main-section">
+        <div class="global-card-section">
+          <div class="global-header-section">
+            <div class="svg-icon-panel" *ngIf="!isEditWebForm"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Web Forms</div>
+            <div class="svg-icon-panel" *ngIf="isEditWebForm"><img src="../../../../assets/ddfieldtitle.svg" class="mr-1" />Web Form  Configuration</div>
+
+            <div class="header-button-panel" *ngIf="isEditWebForm === 0">
+              <div class="button-wrapper">
+                <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputWebSearch.value =''">Reset Grid Setting</button>
+                <input class="webform-input-home" placeholder="Search in all columns..." kendoTextBox (input)="onWebFormListFilter($event.target.value)" #inputWebSearch />
+                <button type="button" matTooltip="View Webform" class="icon-btn" (click)="viewWebForm()">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                  <span class="btn-text">View</span>
+                </button>
+                <button type="button" [hidden]="roleFeaturePermissions?.create == false" matTooltip="Create New Webform" class="icon-btn" (click)="createWebFormUser()">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                  <span class="btn-text">Add</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="header-button-panel" *ngIf="isEditWebForm === 1">
+              <div class="button-wrapper">
+                <button type="button" matTooltip="Back To List" class="icon-btn" (click)="defaultListWebForm()">
+                  <span class="btn-text">Back</span>
+                  <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </button>
+                <button type="button"  [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" matTooltip="Save Webform" class="icon-btn" (click)="saveTopWeb()">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                  <span class="btn-text">Save</span>
+                </button>
+                <button type="button" matTooltip="Cancel Webform" class="icon-btn" (click)="defaultListWebForm()">
+                  <span class="btn-text">Cancel</span>
+                  <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="header-button-panel" *ngIf="isEditWebForm === 2;">
+              <div class="button-wrapper">
+                <button type="button" matTooltip="Back To List" class="icon-btn" (click)="defaultListWebForm()">
+                  <span class="btn-text">Back</span>
+                  <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </button>
+                <button type="button" [hidden]="roleFeaturePermissions?.edit == false" matTooltip="Edit" class="icon-btn" (click)="editModeForm()">
+                  <i class="fa fa-pencil" aria-hidden="true"></i>
+                  <span class="btn-text">Edit</span>
+                </button>
+                <button type="button" [hidden]="roleFeaturePermissions?.create == false" matTooltip="Save as" class="icon-btn" (click)="editCopyWebForm()">
+                  <i class="fa fa-save" aria-hidden="true"></i>
+                  <span class="btn-text">Save As</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="global-body-section" *ngIf=" isEditWebForm==0 ">
+            <kendo-grid #grid
+              id="gridId"
+              [kendoGridBinding]="webFormList"
+              [pageSize]="_gridCnfgService.pageSize"
+              [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+              [sortable]="{mode: 'multiple'}"
+              [scrollable]="'scrollable'"
+              [sort]="_gridCnfgService.sort"
+              [columnMenu]="{ filter: true }"
+              [resizable]="true"
+              [reorderable]="true"
+              (remove)="removeHandler($event)"
+              [ngStyle]="gridHeight"
+              (columnReorder)="_gridCnfgService.columnsOrderChanged('webform_grid', $event)"
+              (sortChange)="_gridCnfgService.sortChange('webform_grid', $event)"
+              (pageChange)="_gridCnfgService.pageChange('webform_grid', $event)"
+              (columnResize)="_gridCnfgService.columnResize(7,'webform_grid', $event)"
+              (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'webform_grid',grid)">
+              <div class="grid-scroll-bar">
+                <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+                  [field]="column.field"
+                  [title]="column.title | titlecase"
+                  [filterable]="true"
+                  [width]="column.width"
+                  [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+                  [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+                  [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+                  [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+                  [includeInChooser]="column.field=='$' ? false : true">
+                  <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                    <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                    <div *ngIf="column.field == 'dtCreated'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] | date: 'MM/dd/yy' }}</div>
+                    <div *ngIf="column.field == 'formName'"><a class="webkit-any-link" (click)="editWebForm(dataItem);" [style.color]="'#1c0dbf'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</a></div>
+                    <div *ngIf="column.field == 'link'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }}</div>
+                    <div *ngIf="column.field == 'cTCampaignTemplateID' && dataItem.cTCampaignTemplateID !=0">{{ dataItem.cTCampaignTemplateID ? convertCapaignTriggerToView(dataItem.cTCampaignTemplateID) : 'Automation process not set.'}}<br />{{ dataItem.cTCLPUserID ? 'for' + ' ' + getCtUserName(dataItem.cTCLPUserID) : 'for -Not Selected-'}}</div>
+                    <div *ngIf="column.field == 'cTCampaignTemplateID' && dataItem.cTCampaignTemplateID ==0"><span class="text-danger">Automation process not set.</span><br />{{ dataItem.cTCLPUserID ? 'for' + ' ' + getCtUserName(dataItem.cTCLPUserID) : 'for -Not Selected-'}}</div>
+                    <div *ngIf="column.field == 'allowDuplicates' && dataItem.allowDuplicates == false" class="text-danger">
+                      {{dataItem.allowDuplicates ? "allow" : "don't allow"}}<br /><span *ngIf="dataItem.allowDuplicates == false">{{ dataItem.dupsActivateCampaign ? 'start Campaigning' : "don't start campaign"}}</span>
+                    </div>
+                    <div *ngIf="column.field == 'allowDuplicates' && dataItem.allowDuplicates != false">allow</div>
+                    <div *ngIf="column.field == 'cLPUserID'"><a class="webkit-any-link" (click)="goToUserProfile(dataItem);" [style.color]="'#1c0dbf'">{{ !dataItem['Name'] ? '--' : dataItem['Name'] }}</a></div>
+                    <div *ngIf="column.field == 'status'"><a class="webkit-any-link" (click)="goToUserProfile(dataItem);" [style.color]="dataItem[column.field]>1?'#1c0dbf':''">{{  convertStatusToView(dataItem[column.field]) }}</a></div>
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-messages [pagerItemsPerPage]="'Forms per page'" [pagerItems]="'Web Forms'"> </kendo-grid-messages>
+              </div>
+            </kendo-grid>
+          </div>
+
+          <div class="global-body-section" *ngIf=" isEditWebForm ">
+            <form [formGroup]="webForm" (ngSubmit)="webFormSubmit()">
+              <div class="wraper-body-panel">
+                <div class="wraper-body-left">
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Form Name</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <span *ngIf="!webFormEditMode"> {{webFormData?.formName}} </span>
+                      <div *ngIf="webFormEditMode">
+                        <input type="text" [ngClass]="{'has-error': webFormFrm.formName.errors && (webFormFrm.formName.touched || webFormFrm.formName.dirty)}" class="form-control" id="formName" name="formName" formControlName="formName" placeholder="Form Name" />
+                        <div *ngIf="webFormFrm.formName.errors && (webFormFrm.formName.touched || webFormFrm.formName.dirty)">
+                          <div class="login-error" *ngIf="webFormFrm.formName.errors.required">Title is required </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Link Code</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div *ngIf="!webFormEditMode">
+                        <span>{{ webFormData?.link }}</span>
+                        <a class="font-weight-bold webkit-any-link ml-2" (click)="copyInputMessage(webFormData?.link);  Copied_Dup.hidden=false;" *ngIf="webFormData && Copied_Dup.hidden==true" #Copy_Dup>Copy</a>
+                        <a class="font-weight-bold webkit-any-link ml-2" (click)="copyInputMessage(webFormData?.link);" #Copied_Dup hidden>Copied</a>
+                      </div>
+                      <div *ngIf="webFormEditMode">
+                        <span [hidden]="!webFormData">{{ webFormData?.link }}</span>
+                        <a class="font-weight-bold webkit-any-link ml-2" (click)="copyInputMessage(webFormData?.link);  Copied.hidden=false;" *ngIf="webFormData && Copied.hidden==true" #Copy>Copy</a>
+                        <a class="font-weight-bold webkit-any-link ml-2" (click)="copyInputMessage(webFormData?.link);" #Copied hidden>Copied</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Unique URL Name</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <span *ngIf="!webFormEditMode">{{webFormData?.otherPublishLink}}</span>
+                      <div class="flex-align-panel" *ngIf="webFormEditMode">
+                        <input type="text" id="otherPublishLink" name="otherPublishLink" formControlName="otherPublishLink" class="form-control webform-right-input" placeholder="Unique URL Name" />
+                        <button [disabled]="!webFormEditMode" class="btn btn-primary" (click)="checkUniqueUrl()" type="button">Check</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Default Owner of new contact</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <span *ngIf="!webFormEditMode"> {{ webFormData.cLPUserID ? getCtUserName(webFormData['cLPUserID']): '' }} </span>
+                      <div *ngIf="webFormEditMode" class=" webform-right-text email-form-group">
+                        <select class="form-control" formControlName="cLPUserID">
+                          <option value=""> -Select one- </option>
+                          <option *ngFor="let dtList of clpUserList; let i = index" [value]="dtList.cLPUserID">{{dtList.fullName }}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Round Robin New Lead Assignment</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <span *ngIf="!webFormEditMode && webFormData?.roundRobinID">{{ (webFormData.roundRobinID == 0)? 'Not set' : getRounRobinName(webFormData['roundRobinID']) }} </span>
+                      <div *ngIf="webFormEditMode" class="webform-right-text email-form-group">
+                        <select class="form-control" formControlName="roundRobinID">
+                          <option value=""> -Not Set- </option>
+                          <option *ngFor="let dtList of roundRobinList; let i = index" [value]="dtList.roundRobinID">{{dtList.roundRobinName }}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Alert</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <span *ngIf="!webFormEditMode" [ngStyle]="{'color':webFormData?.alertStatus ? '' : 'red' }"> {{webFormData.alertStatus ? 'Message center alerts are enabled.' : 'Message center alerts are disabled.'}} </span>
+                      <div class="flex-align-panel" *ngIf="webFormEditMode">
+                        <input type="checkbox" class="checkbox" id="alertStatus" name="roundRobinID" formControlName="alertStatus" />
+                        <span>Enable message center alerts.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Default Automation Process to launch</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div class="custom-action-title">
+                        <p>Automation Trigger Settings </p>
+                      </div>
+
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left">
+                          <span>Action to take</span>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <span *ngIf="!webFormEditMode"> {{webFormData.cTAction===0 ? 'start' : webFormData.cTAction===1 ? 'stop': webFormData.cTAction===2 ? 'pause':'remove'  }}</span>
+                          <div class="flex-row-inner" *ngIf="webFormEditMode">
+                            <label class="k-label" [for]="startCt">Start</label>
+                            <input type="radio"
+                                   name="cTAction"
+                                   value="0"
+                                   #startCt
+                                   formControlName="cTAction"
+                                   kendoRadioButton />
+
+                            <label class="k-label" [for]="stopCt">Stop</label>
+                            <input type="radio"
+                                   name="cTAction"
+                                   value="1"
+                                   #stopCt
+                                   formControlName="cTAction"
+                                   kendoRadioButton />
+
+                            <label class="k-label" [for]="pauseCt">Pause</label>
+                            <input type="radio"
+                                   name="cTAction"
+                                   value="2"
+                                   #pauseCt
+                                   formControlName="cTAction"
+                                   kendoRadioButton />
+
+                            <label class="k-label" [for]="removeCt">Remove</label>
+                            <input type="radio"
+                                   name="cTAction"
+                                   value="3"
+                                   #removeCt
+                                   formControlName="cTAction"
+                                   kendoRadioButton />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left">
+                          <span>Automation Process</span>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <span *ngIf="!webFormEditMode && webFormData?.cTCampaignTemplateID !=0"> {{webFormData?.cTCampaignTemplateID ? convertCapaignTriggerToView(webFormData['cTCampaignTemplateID']) : ''}} </span>
+                          <span *ngIf="!webFormEditMode && webFormData?.cTCampaignTemplateID ==0" class="text-danger"> Automation process not set. </span>
+                          <div class="email-form-group">
+                            <select class="form-control" formControlName="cTCampaignTemplateID" *ngIf="webFormEditMode">
+                              <option value="0" hidden>-Select One-{{cTCampaignTemplateID}}</option>
+                              <option value="-1" [hidden]="webFormData?.duplicateCTAction == 1">-All Processes-</option>
+                              <option *ngFor="let dtList of autoProcessList; let i = index" [value]="dtList.campaignTemplateID">{{dtList.campaignTemplateName }}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="cards-body-section">
+                        <div class="cards-colunm-left">
+                          <span>User</span>
+                        </div>
+                        <div class="cards-colunm-right">
+                          <span *ngIf="!webFormEditMode && webFormData?.cTCLPUserID !=0"> {{ webFormData.cTCLPUserID ? getCtUserName(webFormData['cTCLPUserID']): '' }} </span>
+                          <span *ngIf="!webFormEditMode && webFormData?.cTCLPUserID ==0"> -Not Selected- </span>
+                          <div>
+                            <select class="form-control" formControlName="cTCLPUserID" *ngIf="webFormEditMode">
+                              <option value="0" hidden>-Contact Owner-</option>
+                              <option value="-1" [hidden]="webFormData?.duplicateCTAction == 1">-All Users-</option>
+                              <option *ngFor="let dtList of clpUserList; let i = index" [value]="dtList.cLPUserID">{{dtList.fullName }}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Duplicate Automation Process to launch</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div class="">
+                        <div class="custom-action-title">
+                          <p>Automation Trigger Settings </p>
+                        </div>
+                        <div class="cards-body-section">
+                          <div class="cards-colunm-left">
+                            <span>Action to take</span>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <span *ngIf="!webFormEditMode"> {{webFormData.duplicateCTAction===0 ? 'start' : webFormData.duplicateCTAction===1 ? 'stop': webFormData.duplicateCTAction===2 ? 'pause':'remove'  }}</span>
+                            <div class="flex-row-inner" *ngIf="webFormEditMode">
+                              <label class="k-label" [for]="startduplCt">Start</label>
+                              <input type="radio"
+                                     name="duplicateCTAction"
+                                     value="0"
+                                     #startduplCt
+                                     formControlName="duplicateCTAction"
+                                     kendoRadioButton />
+                              <label class="k-label" [for]="stopduplCt">Stop</label>
+                              <input type="radio"
+                                     name="duplicateCTAction"
+                                     value="1"
+                                     #stopduplCt
+                                     formControlName="duplicateCTAction"
+                                     kendoRadioButton />
+                              <label class="k-label" [for]="pauseduplCt">Pause</label>
+                              <input type="radio"
+                                     name="duplicateCTAction"
+                                     value="2"
+                                     #pauseduplCt
+                                     formControlName="duplicateCTAction"
+                                     kendoRadioButton />
+                              <label class="k-label" [for]="removeduplCt">Remove</label>
+                              <input type="radio"
+                                     name="duplicateCTAction"
+                                     value="3"
+                                     #removeduplCt
+                                     formControlName="duplicateCTAction"
+                                     kendoRadioButton />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="cards-body-section">
+                          <div class="cards-colunm-left">
+                            <span>Automation Process</span>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <span *ngIf="!webFormEditMode && webFormData?.duplicateCTCampaignTemplateID !=0">{{webFormData.duplicateCTCampaignTemplateID ? convertCapaignTriggerToView(webFormData['duplicateCTCampaignTemplateID']) : ''}} </span>
+                            <span *ngIf="!webFormEditMode && webFormData?.duplicateCTCampaignTemplateID ==0" class="text-danger">Automation process not set. </span>
+                            <div>
+                              <select class="form-control" formControlName="duplicateCTCampaignTemplateID" *ngIf="webFormEditMode">
+                                <option value="0" hidden>-Select One-</option>
+                                <option value="-1" [hidden]="webFormData?.duplicateCTAction == 1">-All Processes-</option>
+                                <option *ngFor="let dtList of autoProcessList; let i = index" [value]="dtList.campaignTemplateID">{{dtList.campaignTemplateName }}</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="cards-body-section">
+                          <div class="cards-colunm-left">
+                            <span>User</span>
+                          </div>
+                          <div class="cards-colunm-right">
+                            <span *ngIf="!webFormEditMode && webFormData?.duplicateCTCLPUserID !=0"> {{webFormData.duplicateCTCLPUserID ? getCtUserName(webFormData['duplicateCTCLPUserID']) : ''}} </span>
+                            <span *ngIf="!webFormEditMode && webFormData?.duplicateCTCLPUserID ==0"> 	-Not Selected- </span>
+                            <div>
+                              <select class="form-control" formControlName="duplicateCTCLPUserID" *ngIf="webFormEditMode">
+                                <option value="0" hidden>-Contact Owner-</option>
+                                <option value="-1" [hidden]="webFormData?.duplicateCTAction == 1">-All Users-</option>
+                                <option *ngFor="let dtList of clpUserList; let i = index" [value]="dtList.cLPUserID">{{dtList.fullName }}</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Manage Duplicates defined by email</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <div>
+                        <span *ngIf="!webFormEditMode" [ngStyle]="{'color':webFormData?.allowDuplicates ? 'red' : '' }">
+                          {{webFormData.allowDuplicates ? 'Duplicate detection is turn OFF (All contacts will be created as new contacts).': 'Duplicate detection is turn ON.' }}
+                        </span>
+                        <div class="flex-align-panel" *ngIf="webFormEditMode">
+                          <input type="checkbox" class="checkbox" id="allowDuplicates" formControlName="allowDuplicates" />
+                          <span> Allow Duplicates (Turn off duplicate detection)</span>
+                        </div>
+                        <div>
+                          <span *ngIf="!webFormEditMode" [ngStyle]="{'color':webFormData?.dupsActivateCampaign ? '' : 'red' }">
+                            {{webFormData.dupsActivateCampaign ? 'If Duplicate is detected, the above campaign will be activated': 'If Duplicate is detected, the above campaign will NOT be activated.' }}
+                          </span>
+                          <div *ngIf="webFormEditMode">
+                            <div class="flex-align-panel">
+                              <input type="checkbox" class="checkbox" id="dupsActivateCampaign" formControlName="dupsActivateCampaign" />
+                              <span>Active Campaign</span>
+                            </div>
+                            <div>
+                              <span>Note: Only used when duplicates are NOT allowed.</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <div *ngIf="isEditWebFrm">
+                        <div>
+                          <span>HTML Display</span>
+                        </div>
+                        <div *ngIf="webFormEditMode">
+                          <button type="button" class="btn btn-primary ">Use Html Editor</button>
+                        </div>
+                        <div *ngIf="webFormEditMode">
+                          <button type="button" class="btn btn-primary"><i class="fas fa-check"></i> Save Progress</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <a href="javascript:void(0)" *ngIf="!webFormEditMode"> Click here to Preview web form </a>
+                      <!--<div class="email-form-group " *ngIf="isEditWebFrm">-->
+                      <div *ngIf="webFormEditMode">
+                        <textarea type="text" class="form-control webform-textarea" id="hTMLText" formControlName="hTMLText" placeholder=""></textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left">
+                      <span>Status</span>
+                    </div>
+                    <div class="cards-colunm-right">
+                      <span *ngIf="!webFormEditMode"> {{webFormData.status ? convertStatusToView(webFormData['status']): ''}}</span>
+                      <div>
+                        <select class="form-control" formControlName="status" *ngIf="webFormEditMode">
+                          <option value=""> -Select one- </option>
+                          <option *ngFor="let dtList of statusList; let i = index" [value]="dtList.key">{{dtList.value }}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="cards-body-section">
+                    <div class="cards-colunm-left"></div>
+                    <div class="cards-colunm-right">
+                      <div class="bottom-button-bar">
+                        <button [disabled]="showSpinner || webForm.invalid" *ngIf="webFormEditMode" class="btn btn-primary" id="primarySaveWeb" [hidden]="roleFeaturePermissions?.create == false || roleFeaturePermissions?.edit == false" type="submit"> Save</button>
+                        <button *ngIf="webFormEditMode" class="btn btn-cancel" type="button" (click)="defaultListWebForm()"> Cancel</button>
+                        <button class="btn btn-danger" [disabled]="!webFormEditMode || showSpinner" [hidden]="roleFeaturePermissions?.delete == false" *ngIf="isEditWebForm === 1 && webFormData?.webFormID != 0" type="button" data-toggle="modal" data-target="#webFormDeleteModal"> Delete</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="modal fade" id="webFormDeleteModal" tabindex="-1" role="dialog" aria-labelledby="webFormDeleteModallabel" aria-hidden="true">
+                    <div class="modal-dialog  modal-common-dialog" role="document">
+                      <div class="modal-content modal-common-content">
+                        <div class="modal-header modal-common-background">
+                          <h4 class="modal-title modal-common-title">Delete Confirmation</h4>
+                        </div>
+                        <div class="modal-body modal-common-body">
+                          <h2>  <b>Caution: </b>This Web Form will be permanently deleted. </h2>
+                          <h2>  Are you sure to delete this web form ? </h2>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" [hidden]="roleFeaturePermissions?.delete == false" (click)="deleteWebForm()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+                          <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="important-msg-section">
+            <div class="important-msg-panel">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Important Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> <a class="webkit-any-link text-primary" href="https://help.salesoptima.com/help/default.aspx?htid=184" target="_blank">1.	Overview of Sales Force Automation module</a>.</td>
+                  </tr>
+                  <tr>
+                    <td> 2.	If you are creating your own web forms, use the <a class="webkit-any-link text-primary" href="https://www.salesoptima.com/support/web-form-post-api" target="_blank">Web Form API </a>to map your HTML elements into SalesOptima fields.</td>
+                  </tr>
+                  <tr>
+                    <td> 3.	Quick Link: <a class="webkit-any-link text-primary" [routerLink]="['/workflow']" router>manage Automation Campaigns </a></td>
+                  </tr>
+                  <tr>
+                    <td> 4. Request custom web form services by emailing <a class="webkit-any-link text-primary">support@salesoptima.com. </a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner ">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner ">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>
+
+

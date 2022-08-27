@@ -1,0 +1,247 @@
+<div class="custom-security-link">
+  <a [routerLink]="['/account-setup']">Account Setup</a>
+  <a [routerLink]="['/teamoffice-setup']">Teams and Office Setup</a>
+</div>
+
+<div class="container-fluid mt-3 common-alignment" *ngIf="isNewUserList">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel">
+          <img src="../../../../../assets/salesoptimatitle.svg" class="mr-1" />New User List
+        </div>        
+      </div>
+      <div class="global-body-section">
+        <kendo-grid #grid id="gridIdNew" [kendoGridBinding]="newUsersList">
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of newUserColumns"
+              [field]="column.field"
+              [title]="column.title | titlecase"
+              [width]="column.width"
+              [filterable]="true"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+              [includeInChooser]="column.field=='$' ? false : true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.title == ' '">{{ rowIndex+1 }}</div>
+                <div *ngIf="column.field == 'email'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }} </div>
+                <div *ngIf="column.field == 'lastName'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }} </div>
+                <div *ngIf="column.field == 'firstName'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }} </div>
+                <div *ngIf="column.field == 'status'">{{ !dataItem[column.field] ? '--' : dataItem[column.field] }} </div>
+              </ng-template>
+            </kendo-grid-column>
+          </div>
+        </kendo-grid>
+      </div>     
+    </div>
+  </div>
+</div>
+<div class="container-fluid mt-3 common-alignment">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="global-header-section">
+        <div class="svg-icon-panel"><img src="../../../../assets/activity/config/userlisttitle.svg" class="mr-1" /> User List</div>
+        <div class="header-button-panel">
+          <div class="button-wrapper">
+            <button class="btn btn-primary" type="button" (click)="resetGridSetting(); inputUserSearch.value = ''"><i class="fas fa-undo mr-1"></i>Reset Grid Setting</button>
+            <input class="ml-2" placeholder="Search in all columns..." kendoTextBox (input)="onFilter($event.target.value) " #inputUserSearch />
+            <select *ngIf="user && this.user.userRole >= 3" [(ngModel)]="defaultItemOfficeCodeTop" (change)="officeCodeTopDDChange($event)" class="form-control select-option ml-2">
+              <option value="-1"> -All Offices- </option>
+              <option *ngFor="let dtList of officeCodeFilterList; let i = index" [ngValue]="dtList.key">{{dtList.value }}</option>
+            </select>
+            <select *ngIf="user " [(ngModel)]="defaultItemTeamCodeTop" (change)="teamCodeTopDDChange($event)" class="form-control userSetupSelect select-option ml-2">
+              <option value="-1"> -All Teams- </option>
+              <option *ngFor="let dtList of teamCodeFilterList; let i = index" [ngValue]="dtList.key">{{dtList.value }}</option>
+            </select>
+            <button type="button" [hidden]="roleFeaturePermissions?.create == false" matTooltip="Add" class="icon-btn" (click)="addNewUser()">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              <span class="btn-text">Add</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="global-body-section">
+        <kendo-grid class="create-user-grid" #grid id="gridId2"
+          [kendoGridBinding]="userDataOriginal"
+          [pageSize]="_gridCnfgService.pageSize"
+          [pageable]="{buttonCount:10,pageSizes:[10,50,100,200]}"
+          [sortable]="{mode: 'multiple'}"
+          [scrollable]="'scrollable'"
+          [sort]="_gridCnfgService.sort"
+          [columnMenu]="{ filter: true }"
+          [resizable]="true"
+          [reorderable]="true"
+          [ngStyle]="gridHeight"
+          (columnReorder)="_gridCnfgService.columnsOrderChanged('user_setup_grid', $event)"
+          (sortChange)="_gridCnfgService.sortChange('user_setup_grid', $event)"
+          (pageChange)="_gridCnfgService.pageChange('user_setup_grid', $event)"
+          (columnResize)="_gridCnfgService.columnResize(13,'user_setup_grid', $event)"
+          (columnVisibilityChange)="_gridCnfgService.onVisibilityChange($event,'user_setup_grid',grid)"
+          (edit)="editHandler($event)"
+          (cancel)="cancelHandler($event)"
+          (save)="saveHandler($event)"
+          (remove)="removeHandler($event)"
+          (add)="addHandler($event)">
+          <ng-template kendoGridToolbarTemplate kendoGridFilterCellTemplate let-filter>
+            <button kendoGridAddCommand id="btnForNewUser" [hidden]="true"><i class="fa fa-plus"></i>Add new</button>
+          </ng-template>
+          <!--savi-->
+          <!--savi-->
+          <div class="grid-scroll-bar">
+            <kendo-grid-column *ngFor="let column of _gridCnfgService.columns"
+              [field]="column.field"
+              [title]="column.title | titlecase"
+              [width]="column.width"
+              [editable]="column.field == 'cLPUserID'?false: true"
+              [headerStyle]="{'background-color': '#333','color': '#fff','line-height': '1.5em'}"
+              [headerClass]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-header' : ''"
+              [class]="mobileColumnNames?.includes(column.field) ? 'mobile-grid-colunm' : ''"
+              [hidden]="_gridCnfgService.hiddenColumns.indexOf(column.field) > -1"
+              [includeInChooser]="column.field.includes('$') ? false : true">
+              <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                <div class="customer-name" *ngIf="column.field == '$' && column.title == ' ' ">{{ rowIndex+1 }}</div>
+                <div class="customer-name" *ngIf="checkColumn(column)">
+                  <img *ngIf="dataItem.userRole == 2 && dataItem.status == 0" src="../../../../assets/icon_usermanager.png" alt="">
+                  <img *ngIf="dataItem.userRole == 1 && dataItem.status == 0" src="../../../../assets/icon_usergeneral.png" alt="">
+                  <img *ngIf="dataItem.userRole == 3 && dataItem.status == 0" src="../../../../assets/icon_useradmin.png" alt="">
+                  <img *ngIf="dataItem.status == 1" src="../../../../assets/icon_userdisabled.png" alt="">
+                </div>
+                <!--savi-->
+
+                <div class="customer-name" *ngIf="showColumns(column) "> {{dataItem[column.field] }}</div>
+                <div class="customer-name" *ngIf="column.field == 'firstName'">
+                  <span class="label-show-grid">First Name</span>
+                  <a [routerLink]="['/edit-profile', dataItem.cLPUserID]" class="text-primary">{{ dataItem[column.field] }}</a>
+                </div>
+                <div class="customer-name" *ngIf="column.field == 'lastName'">
+                  <span class="label-show-grid">Last Name</span>
+                  <a [routerLink]="['/edit-profile', dataItem.cLPUserID]" class="text-primary">{{ dataItem[column.field] }}</a>
+                </div>
+                <div class="customer-name" *ngIf="column.field == 'cLPUserID' && dataItem.cLPUserID != ''"><span class="label-show-grid">User Name</span> {{"VR9" + dataItem[column.field] }}</div> <!--savi-->
+                <div class="customer-name" *ngIf="column.field == 'teamCode'">{{ convertTeamCode(dataItem[column.field]) ? convertTeamCode(dataItem[column.field]) : '--' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'officeCode'"> {{ convertOfficeCode(dataItem[column.field]) ? convertOfficeCode(dataItem[column.field]) : '--' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'timeZone'"><span class="label-show-grid">Time Zone</span> {{ convertTimeZone(dataItem['timeZoneWinId']) ? convertTimeZone(dataItem['timeZoneWinId']) : '--' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'userRole'"><span class="label-show-grid">Type</span> {{ convertUserType(dataItem[column.field]) ? convertUserType(dataItem[column.field]) : '--' }}</div>
+                <div class="customer-name" *ngIf="column.field == 'status'"> {{ convertUserStatus(dataItem[column.field]) }}</div>
+                <div class="customer-name" *ngIf="column.field == 'dateFormat'"><span class="label-show-grid">Date Fromat</span> {{ convertUserDateFormat(dataItem['dateFormatId']) ? convertUserDateFormat(dataItem['dateFormatId']) : '--' }}</div>
+              </ng-template>
+
+              <ng-template kendoGridEditTemplate let-dataItem="dataItem" let-formGroup="formGroup" let-column="column">
+                <div class="customer-name" *ngIf="column.field=='officeCode'">
+                  <select [(ngModel)]="selectedValueOfficeCode" (change)="officeCodeDDChange(dataItem)" class="form-control">
+                    <option value="0"> -None Selected- </option>
+                    <option *ngFor="let dtList of officeCodeFilterList; let i = index" [ngValue]="dtList.key">{{dtList.value }}</option>
+                  </select>
+                </div>
+                <div class="customer-name" *ngIf="column.field=='teamCode'">
+                  <select [(ngModel)]="selectedValueTeamCode" (change)="teamCodeDDChange(dataItem)" class="form-control">
+                    <option value="0"> -None Selected- </option>
+                    <option *ngFor="let dtList of teamCodeFilterList; let i = index" [ngValue]="dtList.key">{{dtList.value }}</option>
+                  </select>
+                </div>
+                <div class="customer-name" *ngIf="column.field=='timeZone'">
+                  <select [(ngModel)]="selectedValueTimeZone" (change)="timeZoneDDChange(dataItem)" class="form-control" (click)="isTimeZoneTouch = true;" [ngClass]="{'has-error': selectedValueTimeZone == '0' && isTimeZoneTouch}" required>
+                    <option value="0"> -None Selected- </option>
+                    <option *ngFor="let dtList of timezoneFilterList; let i = index" [ngValue]="dtList.id">{{dtList.standardName }}</option>
+                  </select>
+                </div>
+                <div class="customer-name" *ngIf="column.field=='userRole'">
+
+                  <select [(ngModel)]="selectedValueUserType" (change)="userTypeDDChange(dataItem)" class="form-control">
+                    <option value="-1"> -None Selected- </option>
+                    <option *ngFor="let uList of userTypeFilterList; let i = index" [ngValue]="uList.key">{{uList.value }}</option>
+                  </select>
+                </div>
+                <div class="customer-name" *ngIf="column.field=='status'">
+
+                  <select [(ngModel)]="selectedValueStatus" (change)="userStatusDDChange(dataItem)" class="form-control">
+                    <option value="0"> -None Selected- </option>
+                    <option *ngFor="let uList of userStatusFilterList; let i = index" [ngValue]="uList.key">{{uList.value }}</option>
+                  </select>
+                </div>
+
+                <div class="customer-name" *ngIf="column.field=='dateFormat'">
+                  <select [(ngModel)]="selectedDateFormat" (change)="dateFormatDDChange(selectedDateFormat)" class="form-control">
+                    <option value="0"> -None Selected- </option>
+                    <option *ngFor="let dtList of dateFormatList; let i = index" [ngValue]="dtList.id">{{dtList.dateFormat }}</option>
+                  </select>
+                </div>
+
+                <div class="custom-toggle" *ngIf="column.field=='changePW'">
+                  <label class="switch">
+                    <input type="checkbox" [checked]="dataItem.changePW" (change)="changeCheckbox('changePW', $event)">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="custom-toggle" *ngIf="column.field=='isShowCP'">
+                  <label class="switch">
+                    <input type="checkbox" [checked]="dataItem.isShowCP" (change)="changeCheckbox('isShowCP', $event)">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div class="custom-toggle" *ngIf="column.field=='isAllowDownload'">
+                  <label class="switch">
+                    <input type="checkbox" [checked]="dataItem.isAllowDownload" (change)="changeCheckbox('allowDownload', $event)">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div class="customer-name" *ngIf="column.field=='lastName'">
+                  <input [(ngModel)]="dataItem[column.field]" placeholder="Last Name"
+                          name="column.title" [ngClass]="{'red-border-class': f.lastName.errors}" required />
+                </div>
+                <div class="customer-name" *ngIf="column.field=='firstName'">
+                  <input [(ngModel)]="dataItem[column.field]" placeholder="First Name"
+                          name="column.title" [ngClass]="{'red-border-class': f.firstName.errors}" required />
+                </div>
+                <div class="customer-name" *ngIf="column.field=='userName'">
+                  <input placeholder="User Name" (blur)="checkDuplicate(selectedUserName,dataItem[column.field]);" email="true" [(ngModel)]="selectedUserName"
+                          name="column.title" [ngClass]="{'redv-border-class': mob,'greenv-border-class': mobin}" required />
+                </div>
+              </ng-template>
+            </kendo-grid-column>
+
+            <kendo-grid-command-column title="Action" width="100" [hidden]="roleFeaturePermissions?.edit == false && roleFeaturePermissions?.delete == false">
+              <ng-template kendoGridCellTemplate let-isNew="isNew">
+                <button [hidden]="roleFeaturePermissions?.edit == false" kendoGridEditCommand [primary]="true" icon="edit" title="Edit"></button>
+                <button kendoGridRemoveCommand [primary]="true" [hidden]="roleFeaturePermissions?.delete == false" data-toggle="modal" data-target="#exampleModal" icon="delete" title="Remove"></button>
+
+                <button kendoGridSaveCommand [disabled]="disableAddUpdate(formGroup)" [primary]="true" *ngIf="isNew" icon="check" title="Add">
+                  <!--{{ isNew ? "Add" : "Update" }}-->
+                </button>
+                <button kendoGridSaveCommand [disabled]="disableAddUpdate(formGroup)" [primary]="true" *ngIf="!isNew" icon="check" title="Update">
+                  <!--{{ isNew ? "Add" : "Update" }}-->
+                </button>
+                <button kendoGridCancelCommand icon="times" [primary]="true">
+                  {{ isNew ? "" : "" }}
+                </button>
+              </ng-template>
+            </kendo-grid-command-column>
+          </div>
+        </kendo-grid>
+      </div>
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-common-dialog" role="document">
+          <div class="modal-content modal-common-content">
+            <div class="modal-header modal-common-background">
+              <h5 class="modal-title modal-common-title">Delete Confirmation</h5>
+            </div>
+            <div class="modal-body modal-common-body">
+              <h5>Are you sure to delete  - <b> {{currentUserUserName}} </b> ? </h5>
+            </div>
+            <div class="modal-footer">
+              <button type="button" (click)="deleteUser()" data-dismiss="modal" class="btn btn-primary">Confirm</button>
+              <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="loader-body" *ngIf="showSpinner || _gridCnfgService.showSpinner">
+  <div class="lds-ripple"><div></div><div></div></div>
+</div>

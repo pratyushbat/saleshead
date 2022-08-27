@@ -1,0 +1,56 @@
+<div class="margin-all-area" *ngIf="goalDisplay && goalDisplay.length>0">
+  <div class="wraper-main-section">
+    <div class="global-card-section">
+      <div class="">
+        <div class="inner-header-bg">
+          <div class="inner-detail-bg">
+            <span>Details</span>
+          </div>
+          <div class="inner-cards-panel header-inner-hidden">
+            <span>{{tableHeading}} </span>
+            <span>Monthly Goal</span>
+            <span>Actual</span>
+            <span>Completion %</span>
+          </div>
+        </div>
+        <div class="global-body-section">
+          <div class="wraper-body-panel" >
+            <div class="wraper-body-left">
+              <div class="inner-cards-grid-height">
+                <div *ngFor="let goalRes of goalDisplay; let idx=index;">
+                  <div class="inner-cards-grid">
+                    <div class="inner-card-mobile">
+                      <label>Display</label>
+                      <div class="mobile-view-design">
+                        <div>{{goalRes.display}}</div>
+                      </div>
+                    </div>
+                    <div class="inner-card-mobile">
+                      <label>goal</label>
+                      <div class="mobile-view-design">
+                        <div class="">{{goalRes.goalShow}}</div>
+                      </div>
+                    </div>
+                    <div class="inner-card-mobile">
+                      <label>actualShow</label>
+                      <div class="mobile-view-design">
+                        <div class="">{{goalRes.actualShow}}</div>
+                      </div>
+                    </div>
+                    <div class="inner-card-mobile">
+                      <label>pctCompleted</label>
+                      <div class="mobile-view-design">
+                        <div class="">{{goalRes.pctCompleted}}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="team-example-box" *ngIf="goalDisplay?.length === 0"><h6>No records found</h6></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

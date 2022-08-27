@@ -1,0 +1,17 @@
+ [
+
+    {
+      "value": 0,
+      "name": "Disabled"
+    },
+    {
+      "value": 1,
+      "name": "Active"
+    },
+    {
+      "value": 2,
+      "name": "Waiting To Be Configured"
+    }
+
+  ]
+
